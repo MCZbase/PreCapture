@@ -83,5 +83,10 @@
   		<artifactId>commons-logging</artifactId>
   		<version>1.1.1</version>
   	</dependency>
+  	<dependency>
+  		<groupId>com.jgoodies</groupId>
+  		<artifactId>forms</artifactId>
+  		<version>1.2.1</version>
+  	</dependency>
   </dependencies>
 </project>
