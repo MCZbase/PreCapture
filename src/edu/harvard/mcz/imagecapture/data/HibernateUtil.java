@@ -9,9 +9,9 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.*;
 import org.hibernate.cfg.*;
 
-import edu.harvard.mcz.imagecapture.LoginDialog;
-import edu.harvard.mcz.imagecapture.MainFrame;
-import edu.harvard.mcz.imagecapture.Singleton;
+// import edu.harvard.mcz.imagecapture.LoginDialog;
+// import edu.harvard.mcz.imagecapture.MainFrame;
+// import edu.harvard.mcz.imagecapture.Singleton;
 
 /**
  * Singleton class to obtain access to Hibernate sessions, used in the *LifeCycle classes.
@@ -51,6 +51,7 @@ public class HibernateUtil {
 	 *  @see edu.harvard.mcz.imagecapture.data.HibernateUtil#getSessionFactory
 	 */
 	private static void createSessionFactory() {
+/*			
 		try {
 			// Create the Configuration from hibernate.cfg.xml
 			Configuration config = new Configuration().configure();
@@ -165,6 +166,7 @@ public class HibernateUtil {
 			System.out.println("Cause" + ex.getCause().getMessage());
 			throw new ExceptionInInitializerError(ex);
 		}
+*/		
 	}
 	
 	

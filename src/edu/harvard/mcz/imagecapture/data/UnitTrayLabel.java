@@ -24,8 +24,6 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.harvard.mcz.imagecapture.interfaces.CollectionReturner;
-import edu.harvard.mcz.imagecapture.interfaces.DrawerNameReturner;
 import edu.harvard.mcz.imagecapture.interfaces.TaxonNameReturner;
 
 
@@ -37,7 +35,7 @@ import edu.harvard.mcz.imagecapture.interfaces.TaxonNameReturner;
  * @author Paul J. Morris
  *
  */
-public class UnitTrayLabel implements TaxonNameReturner, DrawerNameReturner, CollectionReturner {
+public class UnitTrayLabel implements TaxonNameReturner {
 	
 	private static final Log log = LogFactory.getLog(UnitTrayLabel.class);
 
@@ -547,7 +545,6 @@ public class UnitTrayLabel implements TaxonNameReturner, DrawerNameReturner, Col
 	}
 
 	
-	@Override
 	public String getCollection() {
 		return collection;
 	}
