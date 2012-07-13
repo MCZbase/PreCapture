@@ -1,0 +1,163 @@
+/**
+ * ConfigurationDialog.java
+ * edu.harvard.mcz.imagecapture.ui
+ * Copyright © 2012 President and Fellows of Harvard College
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of Version 2 of the GNU General Public License
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Author: Paul J. Morris
+ */
+package edu.harvard.mcz.imagecapture.ui;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
+import com.jgoodies.forms.factories.FormFactory;
+
+import edu.harvard.mcz.imagecapture.PreCaptureSingleton;
+import edu.harvard.mcz.imagecapture.xml.MappingTableModel;
+
+import javax.swing.JLabel;
+import javax.swing.JComboBox;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+public class ConfigurationDialog extends JDialog {
+
+	private static final long serialVersionUID = -8059759034783154405L;
+	
+	private final JPanel contentPanel = new JPanel();
+	private JTable table;
+
+	/**
+	 * Create the dialog.
+	 */
+	public ConfigurationDialog() {
+		setBounds(100, 100, 450, 300);
+		getContentPane().setLayout(new BorderLayout());
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		contentPanel.setLayout(new BorderLayout(0, 0));
+		{
+			JScrollPane scrollPane = new JScrollPane();
+			contentPanel.add(scrollPane, BorderLayout.CENTER);
+			{
+				JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+				scrollPane.setViewportView(tabbedPane);
+				{
+					JPanel panel = new JPanel();
+					tabbedPane.addTab("Printing", null, panel, null);
+					panel.setLayout(new FormLayout(new ColumnSpec[] {
+							FormFactory.RELATED_GAP_COLSPEC,
+							FormFactory.DEFAULT_COLSPEC,
+							FormFactory.RELATED_GAP_COLSPEC,
+							ColumnSpec.decode("default:grow"),},
+						new RowSpec[] {
+							FormFactory.RELATED_GAP_ROWSPEC,
+							FormFactory.DEFAULT_ROWSPEC,
+							FormFactory.RELATED_GAP_ROWSPEC,
+							FormFactory.DEFAULT_ROWSPEC,}));
+					{
+						JLabel lblPaperSize = new JLabel("Paper Size");
+						panel.add(lblPaperSize, "2, 2, right, default");
+					}
+					{
+						JComboBox comboBox = new JComboBox();
+						panel.add(comboBox, "4, 2, fill, default");
+					}
+					{
+						JLabel lblLabelsPerPage = new JLabel("Labels per Page");
+						panel.add(lblLabelsPerPage, "2, 4");
+					}
+					{
+						JSpinner spinner = new JSpinner();
+						spinner.setModel(new SpinnerNumberModel(1, 1, 2, 1));
+						panel.add(spinner, "4, 4");
+					}
+					tabbedPane.setMnemonicAt(0, KeyEvent.VK_R);
+				}
+				{
+					JPanel panel = new JPanel();
+					tabbedPane.addTab("Fields", null, panel, null);
+					panel.setLayout(new BorderLayout(0, 0));
+					{
+						JScrollPane scrollPane_1 = new JScrollPane();
+						panel.add(scrollPane_1, BorderLayout.CENTER);
+						{
+							table = new JTable();
+							TableModel model = new MappingTableModel(PreCaptureSingleton.getInstance().getMappingList());
+							table.setModel(model);
+							scrollPane_1.setViewportView(table);
+						}
+					}
+					tabbedPane.setMnemonicAt(1, KeyEvent.VK_F);
+				}
+				{
+					JPanel panel = new JPanel();
+					tabbedPane.addTab("Persistence", null, panel, null);
+					panel.setLayout(new FormLayout(new ColumnSpec[] {},
+						new RowSpec[] {}));
+					tabbedPane.setMnemonicAt(1, KeyEvent.VK_I);
+				}
+			}
+		}
+		{
+			JPanel buttonPane = new JPanel();
+			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			{
+				JButton okButton = new JButton("OK");
+				okButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						// Save Preferences
+						
+						// Close preferences dialog window
+						setVisible(false);
+					}
+				});
+				okButton.setActionCommand("OK");
+				okButton.setMnemonic(KeyEvent.VK_ENTER);
+				buttonPane.add(okButton);
+				getRootPane().setDefaultButton(okButton);
+			}
+			{
+				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						// Close preferences dialog window
+						setVisible(false);
+					}
+				});
+				cancelButton.setActionCommand("Cancel");
+				cancelButton.setMnemonic(KeyEvent.VK_C);
+				buttonPane.add(cancelButton);
+			}
+		}
+	}
+
+}

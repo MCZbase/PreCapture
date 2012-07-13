@@ -1,3 +1,22 @@
+/**
+ * MainFrame.java
+ * edu.harvard.mcz.imagecapture.ui
+ * Copyright © 2012 President and Fellows of Harvard College
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of Version 2 of the GNU General Public License
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Author: Paul J. Morris
+ */
 package edu.harvard.mcz.imagecapture.ui;
 
 import javax.swing.JFrame;
@@ -9,6 +28,8 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenuItem;
 
 import edu.harvard.mcz.imagecapture.PreCaptureApp;
+import edu.harvard.mcz.imagecapture.PreCaptureSingleton;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
@@ -24,20 +45,25 @@ import java.awt.Color;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import java.awt.GridLayout;
 import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.border.BevelBorder;
+import javax.swing.SwingConstants;
+import java.awt.FlowLayout;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class MainFrame {
 
 	private JFrame frame;
-	private JTextField textField;
+	private ArrayList<FieldPlusText> textFields;
+	/*
 	private JTextField textField_1;
 	private JTextField textField_2;
 	private JTextField textField_3;
 	private JTextField textField_4;
 	private JTextField textField_5;
+	*/
 	private JTable table;
 	private JTable table_1;
 
@@ -62,7 +88,7 @@ public class MainFrame {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 462, 432);
+		frame.setBounds(100, 100, 462, 640);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JMenuBar menuBar = new JMenuBar();
@@ -78,6 +104,16 @@ public class MainFrame {
 				System.exit(0);
 			}
 		});
+		
+		JMenuItem mntmConfiguration = new JMenuItem("Configuration");
+		mntmConfiguration.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ConfigurationDialog dialog = new ConfigurationDialog();
+				dialog.setVisible(true);
+			}
+		});
+		mntmConfiguration.setMnemonic(KeyEvent.VK_C);
+		mnFile.add(mntmConfiguration);
 		mntmExit.setMnemonic(KeyEvent.VK_X);
 		mnFile.add(mntmExit);
 		
@@ -128,6 +164,17 @@ public class MainFrame {
 		JComboBox comboBox_1 = new JComboBox();
 		panel_2.add(comboBox_1, "4, 4, fill, default");
 		
+		
+		int fieldCount = PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size();
+		
+		ArrayList<RowSpec> rowSpec = new ArrayList<RowSpec>();
+	    rowSpec.add(FormFactory.RELATED_GAP_ROWSPEC);
+	    rowSpec.add(FormFactory.DEFAULT_ROWSPEC);
+	    for (int i=0; i<=fieldCount; i++) { 
+	        rowSpec.add(FormFactory.RELATED_GAP_ROWSPEC);
+	        rowSpec.add(FormFactory.DEFAULT_ROWSPEC);
+	    }
+		
 		JPanel panel_3 = new JPanel();
 		panel.add(panel_3, BorderLayout.CENTER);
 		panel_3.setLayout(new FormLayout(new ColumnSpec[] {
@@ -137,37 +184,33 @@ public class MainFrame {
 				FormFactory.DEFAULT_COLSPEC,
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),},
-			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,}));
+			    (RowSpec[]) rowSpec.toArray((RowSpec[])Array.newInstance(RowSpec.class, rowSpec.size()))
+			));
 		
 		JLabel lblTaxon = new JLabel("Taxon");
 		panel_3.add(lblTaxon, "2, 2, right, default");
 		
 		JComboBox comboBox_2 = new JComboBox();
 		panel_3.add(comboBox_2, "4, 2, 3, 1, fill, default");
+	
+		textFields = new ArrayList<FieldPlusText>(); 
 		
-		JLabel lblGenus = new JLabel("Genus");
-		panel_3.add(lblGenus, "2, 4, right, default");
+	    for (int i=0; i<fieldCount; i++) { 
+	    	
+	    	textFields.add(new FieldPlusText(PreCaptureSingleton.getInstance().getMappingList().getFieldInList().get(i), new JTextField()));
 		
-		textField = new JTextField();
-		panel_3.add(textField, "4, 4, 3, 1, fill, default");
-		textField.setColumns(10);
+	    	int col = 2 + (i+1) * 2;
+	    	
+		    JLabel label = new JLabel(textFields.get(i).getField().getLabel());
+		    panel_3.add(label, "2, " + Integer.toString(col) + ", right, default");
 		
+		    textFields.get(i).getTextField().setColumns(10);
+		    panel_3.add(textFields.get(i).getTextField(), "4, " + Integer.toString(col) +  " , 3, 1, fill, default");
+		
+	    } 
+
+	    /* 
+	    
 		JLabel lblSpecies = new JLabel("Species");
 		panel_3.add(lblSpecies, "2, 6, right, default");
 		
@@ -203,21 +246,29 @@ public class MainFrame {
 		panel_3.add(textField_5, "4, 14, 3, 1, fill, default");
 		textField_5.setColumns(10);
 		
+		*/
+		
+		JPanel panel_5 = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) panel_5.getLayout();
+		flowLayout.setAlignment(FlowLayout.RIGHT);
+		panel.add(panel_5, BorderLayout.SOUTH);
+		
 		JButton btnPrint = new JButton("Print");
+		panel_5.add(btnPrint);
 		btnPrint.setMnemonic(KeyEvent.VK_P);
-		btnPrint.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		panel_3.add(btnPrint, "4, 16, fill, default");
 		
 		JButton btnAddToPrint = new JButton("Add to Print List");
+		btnAddToPrint.setHorizontalAlignment(SwingConstants.RIGHT);
+		panel_5.add(btnAddToPrint);
 		btnAddToPrint.setMnemonic(KeyEvent.VK_A);
 		btnAddToPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		panel_3.add(btnAddToPrint, "6, 16, left, default");
+		btnPrint.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		
 		
 		JPanel panel_4 = new JPanel();
@@ -238,9 +289,17 @@ public class MainFrame {
 			));
 		scrollPane.setViewportView(table);
 		
+		JPanel panel_6 = new JPanel();
+		FlowLayout flowLayout_1 = (FlowLayout) panel_6.getLayout();
+		flowLayout_1.setAlignment(FlowLayout.RIGHT);
+		panel_4.add(panel_6, BorderLayout.SOUTH);
+		
 		JButton btnPrint_1 = new JButton("Print");
+		panel_6.add(btnPrint_1);
 		btnPrint_1.setMnemonic(KeyEvent.VK_P);
-		panel_4.add(btnPrint_1, BorderLayout.SOUTH);
+		
+		JButton btnClear = new JButton("Clear");
+		panel_6.add(btnClear);
 		
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("Inventory", null, panel_1, null);

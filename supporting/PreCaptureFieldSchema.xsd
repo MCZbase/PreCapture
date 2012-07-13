@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PreCaptureFieldSchema" xmlns:tns="http://www.example.org/PreCaptureFieldSchema" elementFormDefault="qualified">
+
+    <annotation>
+    	<documentation>Schema to support encoding of a list of fields in JSON (in a barcode) for the precapture of a digitization project.</documentation></annotation>
+    <complexType name="Field">
+    	<sequence>
+    		<element name="Label" type="string" maxOccurs="1"
+    			minOccurs="1">
+                <annotation>
+                	<documentation>The label to display to human users for this field.</documentation>
+                </annotation>
+    		</element>
+    		<element name="Code" type="string" maxOccurs="1"
+    			minOccurs="1">
+                <annotation>
+                	<documentation>The short (one or two letter) code to use for this field when encoding as JSON.</documentation>
+                </annotation>
+    		</element>
+    		<element name="Type" type="string" maxOccurs="1"
+    			minOccurs="1">
+                <annotation>
+                	<documentation>Data type expected in this field</documentation>
+                </annotation>
+    		</element>
+    		<element name="VocabularyTerm" type="string" maxOccurs="1" minOccurs="1">
+    			<annotation>
+    				<documentation>Term in a vocabulary that this field maps onto.</documentation>
+    			</annotation></element>
+    		<element name="Optional" type="boolean" maxOccurs="1"
+    			minOccurs="1">
+    			<annotation>
+    				<documentation>
+    					True if the field is optional.
+    				</documentation>
+    			</annotation>
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <element name="FieldMapping" type="tns:MappingList">
+    	<annotation>
+    		<documentation>List of Fields to include in precapture encoding for this project.</documentation>
+    	</annotation></element>
+    
+
+
+
+    <complexType name="MappingList">
+    	<sequence>
+    		<element name="FieldInList" type="tns:Field"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</element>
+    		<element name="SupportedProject" type="string" maxOccurs="unbounded" minOccurs="1">
+    			<annotation>
+    				<documentation>Project Supported by this list of mappings.</documentation>
+    			</annotation></element>
+    		<element name="Version" type="string" maxOccurs="1" minOccurs="1">
+    			<annotation>
+    				<documentation>Version of this MappingList</documentation>
+    			</annotation></element>
+    	</sequence>
+    </complexType>
+</schema>
