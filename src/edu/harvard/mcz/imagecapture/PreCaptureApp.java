@@ -38,11 +38,12 @@ import edu.harvard.mcz.imagecapture.xml.MappingList;
  * 
  * @author mole
  *
+ * $Id$ 
  */
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "0.1";
+	public static final String VERSION = "0.2";
 
 	private static final Log log = LogFactory.getLog(PreCaptureApp.class);
 	/**

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * Author: Paul J. Morris
+ * 
+ * $Id$
  */
 package edu.harvard.mcz.imagecapture.ui;
 
@@ -119,8 +121,9 @@ public class MainFrame {
 		mnHelp.setMnemonic(KeyEvent.VK_H);
 		menuBar.add(mnHelp);
 		
-		JMenuItem mntmVersion = new JMenuItem("Version: " + PreCaptureApp.VERSION);
-		mntmVersion.setEnabled(false);
+		JMenuItem mntmVersion = new JMenuItem("Version: " + PreCaptureApp.VERSION  + " $Id$" );
+		// TODO: set to false on changing to normal look and feel
+		mntmVersion.setEnabled(true);
 		mnHelp.add(mntmVersion);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
