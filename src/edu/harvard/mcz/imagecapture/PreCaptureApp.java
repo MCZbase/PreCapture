@@ -20,18 +20,16 @@
 package edu.harvard.mcz.imagecapture;
 
 import java.awt.EventQueue;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Iterator;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.harvard.mcz.imagecapture.ui.LabelList;
 import edu.harvard.mcz.imagecapture.ui.MainFrame;
 import edu.harvard.mcz.imagecapture.xml.MappingList;
 
@@ -44,7 +42,7 @@ import edu.harvard.mcz.imagecapture.xml.MappingList;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "0.0";
+	public static final String VERSION = "0.1";
 
 	private static final Log log = LogFactory.getLog(PreCaptureApp.class);
 	/**
@@ -78,6 +76,9 @@ public class PreCaptureApp {
 			log.error("Couldn't find resource file: " + resource);
 		}		
 		
+		LabelList labelList = new LabelList();
+		PreCaptureSingleton.getInstance().setCurrentLabelList(labelList);
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -90,4 +91,14 @@ public class PreCaptureApp {
 		
 	}
 
+	public static void exit() {
+		try {
+			PreCaptureSingleton.getInstance().getProperties().saveProperties();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		log.debug("Exiting.");
+		System.exit(0);
+	}
 }

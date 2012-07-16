@@ -22,6 +22,7 @@ package edu.harvard.mcz.imagecapture;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.harvard.mcz.imagecapture.ui.LabelList;
 import edu.harvard.mcz.imagecapture.xml.MappingList;
 
 /**
@@ -33,6 +34,7 @@ public class PreCaptureSingleton {
 
 	private PreCaptureProperties properties;
 	private MappingList mappingList;
+	private LabelList currentLabelList;
 	
 	// Eagerly create an instance to let the JVM create the unique instance 
 	// during class load, this prevents the creation of multiple instances 
@@ -81,6 +83,18 @@ public class PreCaptureSingleton {
 	 */
 	public void setMappingList(MappingList mappingList) {
 		this.mappingList = mappingList;
+	}
+	/**
+	 * @return the currentLabelList
+	 */
+	public LabelList getCurrentLabelList() {
+		return currentLabelList;
+	}
+	/**
+	 * @param currentLabelList the currentLabelList to set
+	 */
+	public void setCurrentLabelList(LabelList currentLabelList) {
+		this.currentLabelList = currentLabelList;
 	}
 	
 	

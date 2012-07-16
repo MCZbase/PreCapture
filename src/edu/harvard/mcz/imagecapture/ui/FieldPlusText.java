@@ -73,6 +73,12 @@ public class FieldPlusText {
 	public JTextField getTextField() {
 		return textField;
 	}
+
+	protected FieldPlusText clone() {
+		FieldPlusText result = new FieldPlusText(field,new JTextField());
+		result.getTextField().setText(this.getTextField().getText());
+		return result;
+	}
 	
 	
 	

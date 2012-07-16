@@ -30,6 +30,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.print.DocPrintJob;
+import javax.print.PrintService;
+import javax.print.ServiceUI;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,10 +56,9 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
-import edu.harvard.mcz.imagecapture.data.UnitTrayLabel;
-import edu.harvard.mcz.imagecapture.data.UnitTrayLabelLifeCycle;
 import edu.harvard.mcz.imagecapture.exceptions.PrintFailedException;
-import edu.harvard.mcz.imagecapture.exceptions.SaveFailedException;
+import edu.harvard.mcz.imagecapture.ui.ContainerLabel;
+import edu.harvard.mcz.imagecapture.xml.Field;
 
 /** LabelEncoder
  * 
@@ -66,20 +69,30 @@ public class LabelEncoder {
 	
 	private static final Log log = LogFactory.getLog(LabelEncoder.class);
 	
-	private UnitTrayLabel label;
+	private ContainerLabel label;
 	
-	public LabelEncoder (UnitTrayLabel aLabel)  {
-		label = aLabel;
+	public LabelEncoder (ContainerLabel containerLabel)  {
+		label = containerLabel;
+	}
+	
+	public static boolean useItalic(Field aField) { 
+		boolean result = false;
+		if (aField.getVocabularyTerm().equals("dwc:genus")) { result = true; } 		
+		if (aField.getVocabularyTerm().equals("dwc:specificEpithet")) { result = true; } 		
+		if (aField.getVocabularyTerm().equals("dwc:infraspecificEpithet")) { result = true; } 		
+		return result;
 	}
 
 	private BitMatrix getQRCodeMatrix() { 
 		BitMatrix result = null;
 		QRCodeWriter writer = new QRCodeWriter();
 		try {
-			String data = label.toJSONString();
+			// String data = label.toJSONString();
+			StringBuffer data = new StringBuffer();
+			data.append(label.toJSON());
 			Hashtable<EncodeHintType, ErrorCorrectionLevel> hints = new Hashtable<EncodeHintType, ErrorCorrectionLevel>();  // set ErrorCorrectionLevel here
 			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-			result = writer.encode(data, BarcodeFormat.QR_CODE, 200, 200, hints);
+			result = writer.encode(data.toString(), BarcodeFormat.QR_CODE, 200, 200, hints);
 		} catch (WriterException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -91,24 +104,6 @@ public class LabelEncoder {
 	public Image getImage() { 
 		BitMatrix barcode = getQRCodeMatrix();
 		BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(barcode);
-		// ZXing now has MatrixToImageWriter to avoid looping through byte arrays.
-//			byte[][] bca = barcode.getArray();
-//			byte[] data = new byte[200*4*200*4];
-//			int z=0;
-//			for (int x=0; x<200; x++) { 
-//				for (int y=0; y<200; y++)  {
-//					data[z++] = bca[x][y];
-//				}
-//			}
-//			Image image = null;
-//			try {
-//				image = Image.getInstance(200, 200, 1, 8, data);
-//				image.scalePercent(50f);
-//			} catch (BadElementException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} 
-//			data = null;
 		Image image = null;
 		try {
 			image = Image.getInstance(bufferedImage,null);
@@ -123,10 +118,11 @@ public class LabelEncoder {
 	}
 	
 	@SuppressWarnings("hiding")
-	public static boolean printList(List<UnitTrayLabel> taxa) throws PrintFailedException { 
+	public static boolean printList(ArrayList<ContainerLabel> containers) throws PrintFailedException { 
+		log.debug("Invoked printList ");
 		boolean result = false;
-		UnitTrayLabel label = new UnitTrayLabel();
-		LabelEncoder encoder = new LabelEncoder(label);
+		ContainerLabel label = new ContainerLabel();
+		LabelEncoder encoder = new LabelEncoder(containers.get(0));
 		Image image = encoder.getImage();
 		int counter = 0;
 		try {
@@ -141,11 +137,7 @@ public class LabelEncoder {
 			float[] cellWidths = { 30f, 20f, 30f, 20f } ;
 			table.setWidths(cellWidths);
 			
-			UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
-			if (taxa==null) { 
-			   taxa = uls.findAll();
-			}
-			Iterator<UnitTrayLabel> i = taxa.iterator();
+			Iterator<ContainerLabel> i = containers.iterator();
 			PdfPCell cell = null;
 			PdfPCell cell_barcode = null;
 			// Create two lists of 12 cells, the first 6 of each representing
@@ -162,104 +154,20 @@ public class LabelEncoder {
 			while (i.hasNext()) {
 				// Loop through all of the taxa (unit tray labels) found to print 
 				label = i.next();
-				for (int toPrint=0; toPrint<label.getNumberToPrint(); toPrint++) {
+				//for (int toPrint=0; toPrint<label.getNumberToPrint(); toPrint++) {
+				for (int toPrint=0; toPrint<1; toPrint++) {
 					// For each taxon, loop through the number of requested copies 
 					// Generate a text and a barcode cell for each, and add to array for page
-					log.debug("Label " + toPrint + " of " + label.getNumberToPrint() );
-					cell = new PdfPCell();
-					cell.setBorderColor(Color.LIGHT_GRAY);
-					cell.setVerticalAlignment(PdfPCell.ALIGN_TOP);
-					cell.disableBorderSide(PdfPCell.RIGHT);
-					cell.setPaddingLeft(3);
+					log.debug("Label " + toPrint + " of " + 1 );
 
-					String higherNames = "";
-					if (label.getTribe().trim().length()>0) { 
-						higherNames = label.getFamily() + ": " + label.getSubfamily()+ ": " + label.getTribe();	
-					} else { 
-					    higherNames = label.getFamily() + ": " + label.getSubfamily();
-					} 
-					Paragraph higher = new Paragraph();
-					higher.setFont(new Font(Font.TIMES_ROMAN, 11, Font.NORMAL));
-					higher.add(new Chunk(higherNames));
-					cell.addElement(higher);
-
-					Paragraph name = new Paragraph();
-					Chunk genus = new Chunk(label.getGenus().trim() + " ");
-					genus.setFont(new Font(Font.TIMES_ROMAN, 11, Font.ITALIC));
-					Chunk species = new Chunk(label.getSpecificEpithet().trim());
-					Chunk normal = null;  // normal font prefix to preceed specific epithet (nr. <i>epithet</i>)
-					if (label.getSpecificEpithet().contains(".")|| label.getSpecificEpithet().contains("[")) {
-						if (label.getSpecificEpithet().startsWith("nr. ")) { 
-							normal = new Chunk("nr. ");
-							normal.setFont(new Font(Font.TIMES_ROMAN, 11, Font.NORMAL));
-							species = new Chunk(label.getSpecificEpithet().trim().substring(4));
-							species.setFont(new Font(Font.TIMES_ROMAN, 11, Font.ITALIC));	
-						} else { 
-						    species.setFont(new Font(Font.TIMES_ROMAN, 11, Font.NORMAL));
-						}
-					} else { 	
-						species.setFont(new Font(Font.TIMES_ROMAN, 11, Font.ITALIC));
-					} 
-					String s = "";
-					if (label.getSubspecificEpithet().trim().length()>0) { s=" "; } else { s = ""; }
-					Chunk subspecies = new Chunk(s + label.getSubspecificEpithet().trim());
-					if (label.getSubspecificEpithet().contains(".")|| label.getSubspecificEpithet().contains("[")) {
-						subspecies.setFont(new Font(Font.TIMES_ROMAN, 11, Font.NORMAL));
-					} else { 	
-						subspecies.setFont(new Font(Font.TIMES_ROMAN, 11, Font.ITALIC));
-					} 
-					if (label.getInfraspecificRank().trim().length()>0) { s=" "; } else { s = ""; }
-					Chunk infraRank = new Chunk(s + label.getInfraspecificRank().trim());
-					infraRank.setFont(new Font(Font.TIMES_ROMAN, 11, Font.NORMAL));
-
-					if (label.getInfraspecificEpithet().trim().length()>0) { s=" "; } else { s = ""; }
-					Chunk infra = new Chunk(s + label.getInfraspecificEpithet().trim());
-					infra.setFont(new Font(Font.TIMES_ROMAN, 11, Font.ITALIC));
-					if (label.getUnNamedForm().trim().length()>0) { s=" "; } else { s = ""; }
-					Chunk unNamed = new Chunk(s + label.getUnNamedForm().trim());
-					unNamed.setFont(new Font(Font.TIMES_ROMAN, 11, Font.NORMAL));
-
-					name.add(genus);
-					if (normal!=null) { 
-						name.add(normal);
-					}
-					name.add(species);
-					name.add(subspecies);
-					name.add(infraRank);
-					name.add(infra);
-					name.add(unNamed);
-					cell.addElement(name);
-
-					Paragraph authorship = new Paragraph();
-					authorship.setFont(new Font(Font.TIMES_ROMAN, 10, Font.NORMAL));
-					if (label.getAuthorship()!=null && label.getAuthorship().length()>0 ) { 
-						Chunk c_authorship = new Chunk (label.getAuthorship());
-						authorship.add(c_authorship);
-					}
-					cell.addElement(authorship);
-					//cell.addElement(new Paragraph(" "));
-					if (label.getDrawerNumber()!=null && label.getDrawerNumber().length()>0) {
-						Paragraph drawerNumber = new Paragraph();
-						drawerNumber.setFont(new Font(Font.TIMES_ROMAN,10,Font.NORMAL));
-					   Chunk c_drawerNumber = new Chunk(label.getDrawerNumber());
-					   drawerNumber.add(c_drawerNumber);
-					   cell.addElement(drawerNumber);
-					} else { 
-						if (label.getCollection()!=null && label.getCollection().length()>0) {
-							Paragraph collection = new Paragraph();
-							collection.setFont(new Font(Font.TIMES_ROMAN,10,Font.NORMAL));
-						   Chunk c_collection = new Chunk(label.getCollection());
-						   collection.add(c_collection);
-						   cell.addElement(collection);
-						} 	
-					}
-
+					cell = label.toPDFCell();
+					
 					cell_barcode = new PdfPCell();
 					cell_barcode.setBorderColor(Color.LIGHT_GRAY);
 					cell_barcode.disableBorderSide(PdfPCell.LEFT);
 					cell_barcode.setVerticalAlignment(PdfPCell.ALIGN_TOP);
 
-					encoder = new LabelEncoder(label);
+					encoder = new LabelEncoder(containers.get(cellCounter));
 					image = encoder.getImage();
 					image.setAlignment(Image.ALIGN_TOP);
 					cell_barcode.addElement(image);
@@ -330,7 +238,12 @@ public class LabelEncoder {
 			// add any remaining cells
 			document.add(table);
 			try { 
+				
+	    	    //TODO: Send to printer. 
+			    //See: http://stackoverflow.com/questions/4609667/how-to-print-a-pdf-created-with-itext
+				
 			    document.close();
+			    
 			} catch (Exception e) { 
 				throw new PrintFailedException("No labels to print." + e.getMessage());
 			}
@@ -341,19 +254,19 @@ public class LabelEncoder {
 			    // Printed to pdf ok.
 				result = true;
 				// Increment number printed.
-				i = taxa.iterator();
+				i = containers.iterator();
 				while (i.hasNext()) { 
 					label = i.next();
-					for (int toPrint=0; toPrint<label.getNumberToPrint(); toPrint++) {
-						label.setPrinted(label.getPrinted() + 1);
-					}
-					label.setNumberToPrint(0);
-                    try {
-						uls.attachDirty(label);
-					} catch (SaveFailedException e) {
+					//for (int toPrint=0; toPrint<label.getNumberToPrint(); toPrint++) {
+					//	label.setPrinted(label.getPrinted() + 1);
+					//}
+					//label.setNumberToPrint(0);
+                    //try {
+					//	uls.attachDirty(label);
+					//} catch (SaveFailedException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					//	e.printStackTrace();
+					//}
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -369,18 +282,8 @@ public class LabelEncoder {
 			System.out.println("Failed.  Too many labels.");
 			throw new PrintFailedException("Ran out of memory, too many labels at once.");
 		} 
+		log.debug("printList Done");
 		return result;
 	}
 	
-	public static void main (String[] args) {
-		try {
-			UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
-			List<UnitTrayLabel> taxa = uls.findAll();
-			boolean ok = LabelEncoder.printList(taxa);
-		} catch (PrintFailedException e) {
-			System.out.println("Failed to print all.  " + e.getMessage());
-		}
-		
-        System.out.println("Done.");
-	}
 }
