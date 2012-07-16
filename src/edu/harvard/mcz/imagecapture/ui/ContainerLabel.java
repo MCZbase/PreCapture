@@ -94,7 +94,7 @@ public class ContainerLabel {
 	public void resetToBlank() { 
 		numberToPrint = 1;
 		for (int i = 0; i<fields.size(); i++) { 
-			if (!fields.get(i).getField().getType().equals("dwc:genus")) { 
+			if (!fields.get(i).getField().getVocabularyTerm().equals("dwc:genus")) { 
 			    fields.get(i).getTextField().setText("");
 			}
 		}
@@ -125,8 +125,8 @@ public class ContainerLabel {
 		String comma = "";
 		for (int i=0;i<fields.size();i++) { 
 			if (!fields.get(i).getTextField().getText().isEmpty()) { 
-				data.append("\"").append(fields.get(i).getField().getCode()).append("\":\"").append(fields.get(i).getTextField().getText()).append("\"");
 				data.append(comma);
+				data.append("\"").append(fields.get(i).getField().getCode()).append("\":\"").append(fields.get(i).getTextField().getText()).append("\"");
 				comma = ", ";
 			}
 		}
