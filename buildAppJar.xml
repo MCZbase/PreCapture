@@ -5,7 +5,7 @@
     <target name="create_run_jar">
         <jar destfile="/home/mole/workspace/nevp_precapture/PreCaptureApp.jar" filesetmanifest="mergewithoutmain">
             <manifest>
-                <attribute name="Main-Class" value="edu.harvard.mcz.imagecapture.PreCaptureApp"/>
+                <attribute name="Main-Class" value="edu.harvard.mcz.precapture.PreCaptureApp"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="/home/mole/workspace/nevp_precapture/target/classes"/>
