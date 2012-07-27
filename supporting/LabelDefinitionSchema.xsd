@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://mcz.harvard.edu/LabelDefinitionSchema" xmlns:tns="http://mcz.harvard.edu/LabelDefinitionSchema" elementFormDefault="qualified">
+
+    <element name="LabelDefinitions"
+    	type="tns:LabelDefinitionListType">
+    </element>
+
+    <complexType name="LabelDefinitionType">
+    	<sequence>
+    		<element name="Title" type="string" maxOccurs="1" minOccurs="1"></element>
+    		<element name="Units" type="tns:UnitsType" maxOccurs="1" minOccurs="1"></element>
+    		<element name="PaperHeight" type="float" maxOccurs="1"
+    			minOccurs="1">
+    		</element>
+    		<element name="PaperWidth" type="float" maxOccurs="1"
+    			minOccurs="1">
+    		</element>
+    		<element name="Margins" type="float" maxOccurs="1" minOccurs="1"></element>
+    		<element name="Columns" type="int" maxOccurs="1" minOccurs="1"></element>
+    		<element name="LabelWidth" type="float" maxOccurs="1"
+    			minOccurs="1">
+    		</element>
+    		<element name="LabelHeight" type="float" maxOccurs="1"
+    			minOccurs="1">
+    		</element>
+    		<element name="TextOrentation" type="tns:TextOrentationType"
+    			maxOccurs="1" minOccurs="1">
+    		</element>
+    	</sequence>
+    </complexType>
+
+
+    <simpleType name="TextOrentationType">
+    	<restriction base="string">
+    		<enumeration value="Horizontal"></enumeration>
+    		<enumeration value="Vertical"></enumeration>
+    	</restriction>
+    </simpleType>
+
+    <simpleType name="UnitsType">
+    	<restriction base="string">
+    		<enumeration value="Inches"></enumeration>
+    		<enumeration value="cm"></enumeration>
+    	</restriction>
+    </simpleType>
+
+
+
+    <complexType name="LabelDefinitionListType">
+    	<sequence>
+    		<element name="LabelDefinition" type="tns:LabelDefinitionType" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+</schema>

@@ -19,7 +19,6 @@
  */
 package edu.harvard.mcz.precapture.encoder;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -44,21 +43,24 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.lowagie.text.BadElementException;
-import com.lowagie.text.Chunk;
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Font;
-import com.lowagie.text.Image;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
+import edu.harvard.mcz.precapture.PreCaptureProperties;
+import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.exceptions.PrintFailedException;
 import edu.harvard.mcz.precapture.ui.ContainerLabel;
 import edu.harvard.mcz.precapture.xml.Field;
+import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionListType;
+import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 
 /** LabelEncoder
  * 
@@ -66,17 +68,17 @@ import edu.harvard.mcz.precapture.xml.Field;
  *
  */
 public class LabelEncoder {
-	
+
 	private static final Log log = LogFactory.getLog(LabelEncoder.class);
-	
+
 	private ContainerLabel label;
-	
+
 	public LabelEncoder (ContainerLabel containerLabel)  {
 		label = containerLabel;
 	}
-	
+
 	/** Test fields for darwin core concepts that should be italicized in presentation.
-	 * 
+	 * @deprecated moved to configuration, IsItalic.
 	 * @param aField field to test.
 	 * @return true if field vocabularyTerm is one that should be italicized.
 	 * 
@@ -103,10 +105,10 @@ public class LabelEncoder {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
-	
+
 	public Image getImage() { 
 		BitMatrix barcode = getQRCodeMatrix();
 		BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(barcode);
@@ -122,7 +124,7 @@ public class LabelEncoder {
 		}
 		return image;
 	}
-	
+
 	@SuppressWarnings("hiding")
 	public static boolean printList(ArrayList<ContainerLabel> containers) throws PrintFailedException { 
 		log.debug("Invoked printList ");
@@ -131,170 +133,244 @@ public class LabelEncoder {
 		if (containers.isEmpty()) {
 			log.debug("No labels to print.");
 		} else { 
-			//TODO: Refactor to use properties to determine number of labels per page and layout.
-		LabelEncoder encoder = new LabelEncoder(containers.get(0));
-		Image image = encoder.getImage();
-		int counter = 0;
-		try {
-			Document document = new Document();
-			PdfWriter.getInstance(document, new FileOutputStream("labels.pdf"));
-			document.setPageSize(PageSize.LETTER);
-			document.open();
-			
-			PdfPTable table = new PdfPTable(4);
-			table.setWidthPercentage(100f);
-			//table.setHorizontalAlignment(PdfPTable.ALIGN_LEFT);
-			float[] cellWidths = { 30f, 20f, 30f, 20f } ;
-			table.setWidths(cellWidths);
-			
-			Iterator<ContainerLabel> i = containers.iterator();
-			PdfPCell cell = null;
-			PdfPCell cell_barcode = null;
-			// Create two lists of 12 cells, the first 6 of each representing
-			// the left hand column of 6 labels, the second 6 of each 
-			// representing the right hand column.  
-			// cells holds the text for each label, cells_barcode the barcode.
-			ArrayList<PdfPCell> cells = new ArrayList<PdfPCell>(12);
-			ArrayList<PdfPCell> cells_barcode = new ArrayList<PdfPCell>(12);
-			for (int x=0; x<12; x++) { 
-				cells.add(null);
-				cells_barcode.add(null);
-			}
-			int cellCounter = 0;
-			while (i.hasNext()) {
-				// Loop through all of the taxa (unit tray labels) found to print 
-				label = i.next();
-				//for (int toPrint=0; toPrint<label.getNumberToPrint(); toPrint++) {
-				for (int toPrint=0; toPrint<1; toPrint++) {
-					// For each taxon, loop through the number of requested copies 
-					// Generate a text and a barcode cell for each, and add to array for page
-					log.debug("Label " + toPrint + " of " + 1 );
-
-					cell = label.toPDFCell();
-					
-					cell_barcode = new PdfPCell();
-					cell_barcode.setBorderColor(Color.LIGHT_GRAY);
-					cell_barcode.disableBorderSide(PdfPCell.LEFT);
-					cell_barcode.setVerticalAlignment(PdfPCell.ALIGN_TOP);
-
-					encoder = new LabelEncoder(containers.get(cellCounter));
-					image = encoder.getImage();
-					image.setAlignment(Image.ALIGN_TOP);
-					cell_barcode.addElement(image);
-
-					cells.add(cellCounter, cell);
-					cells_barcode.add(cellCounter,cell_barcode);
-					
-					cellCounter++;
-					// If we have hit a full set of 12 labels, add them to the document
-					// in two columns, filling left column first, then right
-					if (cellCounter==12) {
-						// add a page of 12 cells in columns of two.
-						for (int x=0;x<6;x++) {
-							if (cells.get(x)==null) {
-								PdfPCell c = new PdfPCell();
-								c.setBorder(0);
-								table.addCell(c);
-						        table.addCell(c);
-							} else { 
-					            table.addCell(cells.get(x));
-					            table.addCell(cells_barcode.get(x));
-							}
-							if (cells.get(x+6)==null) {
-								PdfPCell c = new PdfPCell();
-								c.setBorder(0);
-								table.addCell(c);
-						        table.addCell(c);
-							} else { 
-					            table.addCell(cells.get(x+6));
-					            table.addCell(cells_barcode.get(x+6));
-							}
-						} 
-						// Reset to begin next page
-						cellCounter = 0;
-						document.add(table);
-						table = new PdfPTable(4);
-						table.setWidthPercentage(100f);
-						table.setWidths(cellWidths);
-						for (int x=0;x<12;x++) { 
-							cells.set(x, null);
-							cells_barcode.set(x, null);
-						}
-				    }
-				} // end loop through toPrint (for a taxon)
-				counter ++;
-			} // end while results has next (for all taxa requested)
-			// get any remaining cells in pairs
-			for (int x=0;x<6;x++) {
-				if (cells.get(x)==null) {
-					PdfPCell c = new PdfPCell();
-					c.setBorder(0);
-					table.addCell(c);
-			        table.addCell(c);
-				} else { 
-		            table.addCell(cells.get(x));
-		            table.addCell(cells_barcode.get(x));
+			LabelDefinitionType printDefinition = null;
+			LabelDefinitionListType printDefs = PreCaptureSingleton.getInstance().getPrintFormatDefinitionList();
+			List<LabelDefinitionType> printDefList = printDefs.getLabelDefinition();
+			Iterator<LabelDefinitionType> il = printDefList.iterator();
+			while (il.hasNext()) { 
+				LabelDefinitionType def = il.next();
+				if (def.getTitle().equals(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_SELECTED_PRINT_DEFINITION))) { 
+					printDefinition = def;
 				}
-				if (cells.get(x+6)==null) {
-					PdfPCell c = new PdfPCell();
-				    c.setBorder(0);
-					table.addCell(c);
-			        table.addCell(c);
-				} else { 
-		            table.addCell(cells.get(x+6));
-		            table.addCell(cells_barcode.get(x+6));
-				}
-			} 
-			// add any remaining cells
-			document.add(table);
-			try { 
-				
-	    	    //TODO: Send to printer. 
-			    //See: http://stackoverflow.com/questions/4609667/how-to-print-a-pdf-created-with-itext
-				
-			    document.close();
-			    
-			} catch (Exception e) { 
-				throw new PrintFailedException("No labels to print." + e.getMessage());
 			}
-			// Check to see if there was content in the document.
-			if (counter==0) { 
-				result = false;
+			if (printDefinition==null) {
+				//TODO add error handling dialog for users
+				log.error("No selected print format defintion found.");
 			} else { 
-			    // Printed to pdf ok.
-				result = true;
-				// Increment number printed.
-				i = containers.iterator();
-				while (i.hasNext()) { 
-					label = i.next();
-					//for (int toPrint=0; toPrint<label.getNumberToPrint(); toPrint++) {
-					//	label.setPrinted(label.getPrinted() + 1);
-					//}
-					//label.setNumberToPrint(0);
-                    //try {
-					//	uls.attachDirty(label);
-					//} catch (SaveFailedException e) {
-						// TODO Auto-generated catch block
-					//	e.printStackTrace();
-					//}
+
+				log.debug(printDefinition.getTitle());
+				log.debug(printDefinition.getTextOrentation().toString());
+				
+				//TODO: Refactor to use properties to determine number of labels per page and layout.
+				LabelEncoder encoder = new LabelEncoder(containers.get(0));
+				Image image = encoder.getImage();
+				try {
+					Document document = new Document();
+					PdfWriter.getInstance(document, new FileOutputStream("labels.pdf"));
+					// Convert units in print definition to points (72 points/inch, 28.346456 points/cm)
+					
+					int paperWidthPoints = 612;  // 8.5"
+					int paperHeightPoints = 792;  // 11"
+					int marginsPoints = 36; // 0.5"
+					int labelWidthPoints = 540;  // 7.5" 
+					int labelHeightPoints = 720; // 10"
+					int numColumns = 1;   // goes with above
+					
+					numColumns = printDefinition.getColumns();
+					
+					if (printDefinition.getUnits().toString().toLowerCase().equals("inches")) { 
+					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*72f);
+					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*72f);
+					    marginsPoints = (int)Math.floor(printDefinition.getMargins()*72f);
+					    labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*72f);
+					    labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*72f);
+					}
+					if (printDefinition.getUnits().toString().toLowerCase().equals("cm")) { 
+					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*28.346456f);
+					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*28.346456f);
+					    marginsPoints = (int)Math.floor(printDefinition.getMargins()*28.346456f);
+					    labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*28.346456f);
+					    labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*28.346456f);
+					}
+					if (printDefinition.getUnits().toString().toLowerCase().equals("points")) { 
+					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*1f);
+					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*1f);
+					    marginsPoints = (int)Math.floor(printDefinition.getMargins()*1f);
+					    labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*1f);
+					    labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*1f);
+					}
+					
+					if (paperWidthPoints==612 && paperHeightPoints==792) { 
+					    document.setPageSize(PageSize.LETTER);
+					} else { 
+						document.setPageSize(new Rectangle(paperWidthPoints,paperHeightPoints));
+					}
+					document.setMargins(marginsPoints, marginsPoints, marginsPoints, marginsPoints);
+					document.open();
+					
+					// Sanity check
+					if (paperWidthPoints<=0) { paperWidthPoints = 612; }  
+					if (paperHeightPoints<=0) { paperHeightPoints = 792; }  
+					if (marginsPoints<0) { marginsPoints = 0; }  
+					if (labelWidthPoints<=0) { labelWidthPoints = 540; }  
+					if (labelHeightPoints<=0) { labelHeightPoints = 720; }  
+					if (paperWidthPoints+(marginsPoints*2)<labelWidthPoints) { 
+						labelWidthPoints = paperWidthPoints+(marginsPoints*2);
+						log.debug("Adjusting label width to fit printable page width");
+					}
+					if (paperHeightPoints+(marginsPoints*2)<labelHeightPoints) { 
+						labelHeightPoints = paperHeightPoints+(marginsPoints*2);
+						log.debug("Adjusting label height to fit printable page height");
+					}
+					
+					// calculate how many columns will fit on the paper.
+					int columns = (int)Math.floor((paperWidthPoints - (marginsPoints*2))/labelWidthPoints);
+					// if specified column count is smaller, use the specified.
+					if (numColumns<columns) { 
+						columns = numColumns;
+						log.debug("Fewer columns specified in definition than will fit on page, using specified column count of " + numColumns);
+					}
+					
+					// define two table cells per column, one for text one for barcode.
+				    int subCellColumnCount = columns * 2;
+					
+				    // set the table, with an absolute width and relative widths of the cells in the table;
+					PdfPTable table = setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, columns, subCellColumnCount);
+					// figure out the width of the cells containing the barcodes.
+					float ratio = ((float)REL_WIDTH_BARCODE_CELL)/(((float)REL_WIDTH_BARCODE_CELL)+((float)REL_WIDTH_TEXT_CELL));
+		            float barcodeCellWidthPoints = (float) Math.floor(labelWidthPoints * ratio);
+		            log.debug("Width of barcode cell in points: " + barcodeCellWidthPoints);
+
+					//Rectangle pageSizeRectangle = new Rectangle(paperWidthPoints, paperHeightPoints);
+					//table.setWidthPercentage(cellWidthsPoints, pageSizeRectangle);
+					//table.setTotalWidth(cellWidthsPoints);
+					
+					// Calculate how many cells fit on a page (two cells per label).
+					int labelsPerColumn = (int)Math.floor((paperHeightPoints-(marginsPoints*2))/labelHeightPoints);
+					int cellsPerPage = subCellColumnCount * labelsPerColumn; 
+					log.debug("Labels per column = " + labelsPerColumn);
+					log.debug("Cells per page = " + cellsPerPage);
+			
+					Iterator<ContainerLabel> iterLabels = containers.iterator();
+					
+					int cellCounter = 0;  // counts number of cells filled on a page.
+					int counter = 0;      // counts number of pre capture label data rows to print (each of which may request more than one copy).
+					
+					// TODO: Doesn't fit on page.
+					
+					while (iterLabels.hasNext()) {
+						// Loop through all of the container labels found to print 
+						label = iterLabels.next();
+						log.debug("Label: " + counter + " " + label.toString());
+						for (int toPrint=0; toPrint<label.getNumberToPrint(); toPrint++) {
+							// For each container label, loop through the number of requested copies 
+							// Generate a text and a barcode cell for each, and add to array for page
+							int toPrintPlus = toPrint + 1;  // for pretty counter in log.
+							log.debug("Copy " + toPrintPlus + " of " + label.getNumberToPrint());
+
+							PdfPCell cell = label.toPDFCell(printDefinition);
+							cell.setFixedHeight(labelHeightPoints);
+
+							PdfPCell cell_barcode = new PdfPCell();
+							cell_barcode.setBorderColor(BaseColor.LIGHT_GRAY);
+							cell_barcode.disableBorderSide(PdfPCell.LEFT);
+							cell_barcode.setVerticalAlignment(PdfPCell.ALIGN_TOP);
+							cell_barcode.setFixedHeight(labelHeightPoints);
+
+							encoder = new LabelEncoder(label);
+							image = encoder.getImage();
+							image.setAlignment(Image.ALIGN_TOP);
+							image.setAlignment(Image.ALIGN_LEFT);
+							image.scaleToFit(barcodeCellWidthPoints, labelHeightPoints);
+							cell_barcode.addElement(image);
+
+							table.addCell(cell);
+							table.addCell(cell_barcode);
+
+							cellCounter = cellCounter + 2;  // we've added two cells to the page (two cells per label).
+							log.debug("Cells " + cellCounter + " of " + cellsPerPage + " cells per page.");
+							
+							// If we have hit a full set of labels for the page, add them to the document
+							// in each column, filling left to right
+							if (cellCounter>=cellsPerPage-1) {
+								log.debug("Page is full");
+								log.debug("Table has " + table.getNumberOfColumns() + " columns and " + table.getRows().size() + " rows ");
+								// Reset to begin next page
+								cellCounter = 0;
+								table.setLockedWidth(true);
+								document.add(table);
+								log.debug("Adding new page");
+								document.newPage();
+								table = setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, columns, subCellColumnCount);
+							}
+						} // end loop through toPrint (for a taxon/precapture label data row)
+						counter ++;  // Increment number of pre capture label data rows.
+					} // end while results has next (for all taxa requested)
+					// get any remaining cells in pairs
+					if (cellCounter>0) { 
+						log.debug("Adding remaining cells in partial page");
+						if (cellCounter<=cellsPerPage) { 
+							for (int i=cellCounter; i<=cellsPerPage; i++) { 
+								PdfPCell emptyCell = new PdfPCell();
+								emptyCell.setBorder(PdfPCell.NO_BORDER);
+								table.addCell(emptyCell);
+							}
+						}
+						log.debug("Table has " + table.getNumberOfColumns() + " columns and " + table.getRows().size() + " rows ");
+						table.setLockedWidth(true);
+						document.add(table);
+					}
+					try { 
+
+						//TODO: Send to printer. 
+						//See: http://stackoverflow.com/questions/4609667/how-to-print-a-pdf-created-with-itext
+
+						document.close();
+
+					} catch (Exception e) { 
+						throw new PrintFailedException("No labels to print." + e.getMessage());
+					}
+					// Check to see if there was content in the document.
+					if (counter==0) { 
+						result = false;
+					} else { 
+						// Printed to pdf ok.
+						result = true;
+					}
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					throw new PrintFailedException("File not found.");
+				} catch (DocumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					throw new PrintFailedException("Error buiding PDF document.");
+				} catch (OutOfMemoryError e ) { 
+					System.out.println("Out of memory error. " + e.getMessage());
+					System.out.println("Failed.  Too many labels.");
+					throw new PrintFailedException("Ran out of memory, too many labels at once.");
 				}
 			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new PrintFailedException("File not found.");
-		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new PrintFailedException("Error buiding PDF document.");
-		} catch (OutOfMemoryError e ) { 
-			System.out.println("Out of memory error. " + e.getMessage());
-			System.out.println("Failed.  Too many labels.");
-			throw new PrintFailedException("Ran out of memory, too many labels at once.");
-		}
-		}
-		log.debug("printList Done");
+			log.debug("printList Done. Success = " + result);
+		} 
 		return result;
 	}
+
+	// TODO: Move to print definition configuration;
+	public static final int REL_WIDTH_TEXT_CELL = 2;
+	public static final int REL_WIDTH_BARCODE_CELL = 3;
+	
+	private static PdfPTable setupTable(int paperWidthPoints, int marginsPoints, int labelWidthPoints, int columns, int subCellColumnCount) throws DocumentException { 
+		PdfPTable table = new PdfPTable(subCellColumnCount);
+		table.setLockedWidth(true);   // force use of totalWidth in points, rather than percentWidth.
+		float percentWidth = ((((float)paperWidthPoints)-(2f*((float)marginsPoints)))/((float)paperWidthPoints))*100f;
+		//percentWidth = 100f;
+		log.debug("Table Width Percent = " + percentWidth);
+		table.setHorizontalAlignment(PdfPTable.ALIGN_CENTER);
+		float[] cellWidthsRatio = new float[subCellColumnCount];
+		int cellNumber = 0;
+		for (int c=0;c<columns;c++) { 
+		    cellWidthsRatio[cellNumber] = REL_WIDTH_TEXT_CELL; // width of text cell
+		    cellNumber++;
+		    cellWidthsRatio[cellNumber] = REL_WIDTH_BARCODE_CELL; // width of barcode cell
+		    cellNumber++;
+		}
+		table.setTotalWidth(paperWidthPoints - 2* marginsPoints);
+		// must set total width before setting relative cell widths.
+		table.setWidths(cellWidthsRatio);
+		log.debug("Width:" + table.getTotalWidth());
+		return table;
+	}
+		
 	
 }

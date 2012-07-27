@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 
 /**
- * A list of container labels, each of which has a number to print an a list of fields.
+ * A list of container labels, each of which has a number to print and a list of fields.
  * 
  * A LabelList is a list of ContainerLabel, each of which has a list of FieldPlusText.
  * 
@@ -42,6 +42,9 @@ import edu.harvard.mcz.precapture.PreCaptureSingleton;
  *
  */
 public class LabelList extends AbstractTableModel {
+	
+	private static final long serialVersionUID = -4269045283222334588L;
+
 	private static final Log log = LogFactory.getLog(LabelList.class);
 
 	private ArrayList<ContainerLabel> labels;

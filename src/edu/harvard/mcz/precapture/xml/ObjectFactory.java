@@ -31,7 +31,7 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _FieldMapping_QNAME = new QName("http://www.example.org/PreCaptureFieldSchema", "FieldMapping");
+    private final static QName _FieldMapping_QNAME = new QName("http://mcz.harvard.edu/PreCaptureFieldSchema", "FieldMapping");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: edu.harvard.mcz.precapture.xml
@@ -60,7 +60,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link MappingList }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.example.org/PreCaptureFieldSchema", name = "FieldMapping")
+    @XmlElementDecl(namespace = "http://mcz.harvard.edu/PreCaptureFieldSchema", name = "FieldMapping")
     public JAXBElement<MappingList> createFieldMapping(MappingList value) {
         return new JAXBElement<MappingList>(_FieldMapping_QNAME, MappingList.class, null, value);
     }

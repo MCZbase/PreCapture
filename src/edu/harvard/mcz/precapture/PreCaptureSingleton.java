@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.harvard.mcz.precapture.ui.LabelList;
 import edu.harvard.mcz.precapture.xml.MappingList;
+import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionListType;
 
 /**
  * @author mole
@@ -35,6 +36,7 @@ public class PreCaptureSingleton {
 	private PreCaptureProperties properties;
 	private MappingList mappingList;
 	private LabelList currentLabelList;
+	private LabelDefinitionListType printFormatDefintionList;
 	
 	// Eagerly create an instance to let the JVM create the unique instance 
 	// during class load, this prevents the creation of multiple instances 
@@ -96,6 +98,16 @@ public class PreCaptureSingleton {
 	public void setCurrentLabelList(LabelList currentLabelList) {
 		this.currentLabelList = currentLabelList;
 	}
+	/**
+	 * @param printFormatDefintionList
+	 */
+	public void setPrintFormatDefinitionList(
+			LabelDefinitionListType printFormatDefintionList) {
+		this.printFormatDefintionList = printFormatDefintionList;
+	}
 	
+	public LabelDefinitionListType getPrintFormatDefinitionList() { 
+		return this.printFormatDefintionList;
+	}
 	
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PreCaptureFieldSchema" xmlns:tns="http://www.example.org/PreCaptureFieldSchema" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://mcz.harvard.edu/PreCaptureFieldSchema" xmlns:tns="http://mcz.harvard.edu/PreCaptureFieldSchema" elementFormDefault="qualified">
 
     <annotation>
     	<documentation>Schema to support encoding of a list of fields in JSON (in a barcode) for the precapture of a digitization project.</documentation></annotation>
@@ -8,33 +8,57 @@
     		<element name="Label" type="string" maxOccurs="1"
     			minOccurs="1">
                 <annotation>
-                	<documentation>The label to display to human users for this field.</documentation>
+                	<documentation>The label to display to human users for this field.  Purpose: UI</documentation>
                 </annotation>
     		</element>
     		<element name="Code" type="string" maxOccurs="1"
     			minOccurs="1">
                 <annotation>
-                	<documentation>The short (one or two letter) code to use for this field when encoding as JSON.</documentation>
+                	<documentation>The short (one or two letter) code to use for this field when encoding as JSON.  Purpose: Semantic</documentation>
                 </annotation>
     		</element>
     		<element name="Type" type="string" maxOccurs="1"
     			minOccurs="1">
                 <annotation>
-                	<documentation>Data type expected in this field</documentation>
+                	<documentation>Data type expected in this field.  Purpose: Semantic.</documentation>
                 </annotation>
     		</element>
     		<element name="VocabularyTerm" type="string" maxOccurs="1" minOccurs="1">
     			<annotation>
-    				<documentation>Term in a vocabulary that this field maps onto.</documentation>
+    				<documentation>Term in a vocabulary that this field maps onto.  Purpose: Semantic.</documentation>
     			</annotation></element>
     		<element name="Optional" type="boolean" maxOccurs="1"
     			minOccurs="1">
     			<annotation>
     				<documentation>
-    					True if the field is optional.
+    					True if display of the field to users is optional.  Purpose: UI.  Not currently used.  
     				</documentation>
     			</annotation>
     		</element>
+    		<element name="UseItalic" type="boolean" maxOccurs="1"
+    			minOccurs="1">
+    			<annotation>
+    				<documentation>
+    					True if the field should be italicized when printing.  Purpose: Print Format.
+    				</documentation>
+    			</annotation>
+    		</element>    		
+    		<element name="NewLine" type="boolean" maxOccurs="1"
+    			minOccurs="1">
+    			<annotation>
+    				<documentation>
+    					True if the field should begin a new line in printing.  Purpose: Print Format.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="FontSize" type="int" maxOccurs="1"
+    			minOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Print size of the text in this field in points.  Purpose: Print Format.
+    				</documentation>
+    			</annotation>
+    		</element>    		
     	</sequence>
     </complexType>
 

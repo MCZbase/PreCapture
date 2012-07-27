@@ -25,14 +25,16 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.lowagie.text.Chunk;
-import com.lowagie.text.Font;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.pdf.PdfCell;
-import com.lowagie.text.pdf.PdfPCell;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
 
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.encoder.LabelEncoder;
+import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
+import edu.harvard.mcz.precapture.xml.labels.TextOrentationType;
 
 /**
  * The list of fields that go with a single label for a container (a folder,
@@ -136,28 +138,65 @@ public class ContainerLabel {
 
 	}
 	
+	public String toString() { 
+		StringBuffer data = new StringBuffer(); 
+		for (int i=0;i<fields.size();i++) { 
+			if (!fields.get(i).getTextField().getText().isEmpty()) { 
+				data.append(fields.get(i).getTextField().getText()).append(" ");
+			}
+		}
+		return data.toString();
+	}
+	
 	/**
 	 * 
 	 * @return a PDF paragraph cell containing a text encoding of the fields in this set.
 	 */
-	public PdfPCell toPDFCell() { 
+	public PdfPCell toPDFCell(LabelDefinitionType printDefinition) { 
 		PdfPCell cell = new PdfPCell();
-		cell.setBorderColor(Color.LIGHT_GRAY);
+		;
+		if (printDefinition.getTextOrentation().toString().toLowerCase().equals(TextOrentationType.VERTICAL.toString().toLowerCase())) { 
+			log.debug("Print orientation of text is Vertical");
+			cell.setRotation(90);
+			cell.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
+		}
+		cell.setBorderColor(BaseColor.LIGHT_GRAY);
 		cell.setVerticalAlignment(PdfPCell.ALIGN_TOP);
 		cell.disableBorderSide(PdfPCell.RIGHT);
 		cell.setPaddingLeft(3);
 
+		Paragraph higher = new Paragraph();
+		boolean added = false;
+		boolean hasContent = false;
 		for (int i=0;i<fields.size();i++) { 
-		   Paragraph higher = new Paragraph();
-		   
-		   if (LabelEncoder.useItalic(fields.get(i).getField())) {
-		       higher.setFont(new Font(Font.TIMES_ROMAN, 11, Font.ITALIC));
-		   } else { 
-		       higher.setFont(new Font(Font.TIMES_ROMAN, 11, Font.NORMAL));
+		   if (fields.get(i).getField().isNewLine()) {
+			   if (hasContent) { 
+				   cell.addElement(higher);
+			   }
+			   higher = new Paragraph();
+			   added = false;
+			   hasContent = false;
 		   }
-		   higher.add(new Chunk(fields.get(i).getTextField().getText()));
-		   cell.addElement(higher);
+		   Chunk chunk = new Chunk(fields.get(i).getTextField().getText().trim()); 
+		   if (fields.get(i).getField().isUseItalic()) {
+		       chunk.setFont(new Font(Font.FontFamily.TIMES_ROMAN, 
+		    		   fields.get(i).getField().getFontSize(), 
+		    		   Font.ITALIC));
+		   } else { 
+		       chunk.setFont(new Font(Font.FontFamily.TIMES_ROMAN, 
+		    		   fields.get(i).getField().getFontSize(), 
+		    		   Font.NORMAL));
+		   }
+		   hasContent = true;
+		   higher.add(chunk);
+		   if (fields.get(i).getTextField().getText().trim().length()>0) { 
+			   // add a trailing space as a separator if there was something to separate.
+			   higher.add(new Chunk(" "));
+		   }
 		} 
+		if (!added) { 
+			cell.addElement(higher);
+		}
 
 		return cell;
 	}

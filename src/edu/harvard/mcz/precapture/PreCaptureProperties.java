@@ -50,6 +50,10 @@ public class PreCaptureProperties extends AbstractTableModel {
 	public static final String KEY_EDITABLE_AUTHORITY_FILE =  "config.editableauthorityfile";
 	/** Key for properties file for whether the inventory tab should be shown in the UI. */
 	public static final String KEY_SHOW_INVENTORY = "config.showinventorytab";
+	/** Key for properties file for location of print layout definition xml file. */
+	public static final String KEY_PRINTDEFINITIONS = "config.printdefinitions";
+	/** Key for properties file for location of print layout definition xml file. */
+	public static final String KEY_SELECTED_PRINT_DEFINITION = "config.selectedprintdefinition";
 
 	private Properties properties = null;
 	private String propertiesFilename = null;
@@ -165,6 +169,14 @@ public class PreCaptureProperties extends AbstractTableModel {
 		if (!properties.containsKey(KEY_SHOW_INVENTORY)) {
 			// is the taxon name authority file editable? 
 			properties.setProperty(KEY_SHOW_INVENTORY, "true");
+		}
+		if (!properties.containsKey(KEY_PRINTDEFINITIONS)) {
+			// xml file containing print layout definitions
+			properties.setProperty(KEY_PRINTDEFINITIONS, "resources/LabelDefinitions.xml");
+		}		
+		if (!properties.containsKey(KEY_SELECTED_PRINT_DEFINITION)) {
+			// name of selected print layout definition
+			properties.setProperty(KEY_SELECTED_PRINT_DEFINITION, "Half Sheet");
 		}
 	}
 

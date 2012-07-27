@@ -31,34 +31,45 @@ import javax.swing.JTabbedPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.Iterator;
+import java.util.List;
+
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
 
+import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.xml.MappingTableModel;
+import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionListTypeTableModel;
+import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.JTextField;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ConfigurationDialog extends JDialog {
 
 	private static final long serialVersionUID = -8059759034783154405L;
+	private static final Log log = LogFactory.getLog(ConfigurationDialog.class);
 	
 	private final JPanel contentPanel = new JPanel();
 	private JTable table;
+	private JTable tablePrintFormatList;
+	private JTextField txtDerby;
+	private JComboBox comboBoxPrintFormat;
 
 	/**
 	 * Create the dialog.
 	 */
 	public ConfigurationDialog() {
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 601, 531);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -70,36 +81,6 @@ public class ConfigurationDialog extends JDialog {
 				JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 				scrollPane.setViewportView(tabbedPane);
 				{
-					JPanel panel = new JPanel();
-					tabbedPane.addTab("Printing", null, panel, null);
-					panel.setLayout(new FormLayout(new ColumnSpec[] {
-							FormFactory.RELATED_GAP_COLSPEC,
-							FormFactory.DEFAULT_COLSPEC,
-							FormFactory.RELATED_GAP_COLSPEC,
-							ColumnSpec.decode("default:grow"),},
-						new RowSpec[] {
-							FormFactory.RELATED_GAP_ROWSPEC,
-							FormFactory.DEFAULT_ROWSPEC,
-							FormFactory.RELATED_GAP_ROWSPEC,
-							FormFactory.DEFAULT_ROWSPEC,}));
-					{
-						JLabel lblPaperSize = new JLabel("Paper Size");
-						panel.add(lblPaperSize, "2, 2, right, default");
-					}
-					{
-						JComboBox comboBox = new JComboBox();
-						panel.add(comboBox, "4, 2, fill, default");
-					}
-					{
-						JLabel lblLabelsPerPage = new JLabel("Labels per Page");
-						panel.add(lblLabelsPerPage, "2, 4");
-					}
-					{
-						JSpinner spinner = new JSpinner();
-						spinner.setModel(new SpinnerNumberModel(1, 1, 2, 1));
-						panel.add(spinner, "4, 4");
-					}
-					tabbedPane.setMnemonicAt(0, KeyEvent.VK_R);
 				}
 				{
 					JPanel panel = new JPanel();
@@ -115,14 +96,79 @@ public class ConfigurationDialog extends JDialog {
 							scrollPane_1.setViewportView(table);
 						}
 					}
-					tabbedPane.setMnemonicAt(1, KeyEvent.VK_F);
+					tabbedPane.setMnemonicAt(0, KeyEvent.VK_F);
 				}
 				{
-					JPanel panel = new JPanel();
-					tabbedPane.addTab("Persistence", null, panel, null);
-					panel.setLayout(new FormLayout(new ColumnSpec[] {},
-						new RowSpec[] {}));
-					tabbedPane.setMnemonicAt(1, KeyEvent.VK_I);
+					tabbedPane.setMnemonicAt(0, KeyEvent.VK_I);
+				}
+				JPanel panel = new JPanel();
+				tabbedPane.addTab("Printing", null, panel, null);
+				tabbedPane.setMnemonicAt(1, KeyEvent.VK_R);
+				panel.setLayout(new FormLayout(new ColumnSpec[] {
+						FormFactory.RELATED_GAP_COLSPEC,
+						ColumnSpec.decode("default:grow"),
+						FormFactory.RELATED_GAP_COLSPEC,
+						ColumnSpec.decode("default:grow"),},
+					new RowSpec[] {
+						FormFactory.RELATED_GAP_ROWSPEC,
+						FormFactory.DEFAULT_ROWSPEC,
+						FormFactory.RELATED_GAP_ROWSPEC,
+						FormFactory.DEFAULT_ROWSPEC,
+						FormFactory.RELATED_GAP_ROWSPEC,
+						RowSpec.decode("default:grow"),}));
+				{
+					JLabel lblPaperSize = new JLabel("Selected Printing Format");
+					panel.add(lblPaperSize, "2, 2, right, default");
+				}
+				comboBoxPrintFormat = new JComboBox();
+				List<LabelDefinitionType> defs = PreCaptureSingleton.getInstance().getPrintFormatDefinitionList().getLabelDefinition();
+				Iterator<LabelDefinitionType> i = defs.iterator();
+				while(i.hasNext()) { 
+					comboBoxPrintFormat.addItem(i.next().getTitle());
+				}				
+				comboBoxPrintFormat.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						log.debug(comboBoxPrintFormat.getSelectedItem().toString());
+						PreCaptureSingleton.getInstance().getProperties().getProperties().setProperty(PreCaptureProperties.KEY_SELECTED_PRINT_DEFINITION, 
+								comboBoxPrintFormat.getSelectedItem().toString());
+					}
+				});
+				comboBoxPrintFormat.setSelectedItem(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_SELECTED_PRINT_DEFINITION));
+				
+				panel.add(comboBoxPrintFormat, "4, 2, fill, default");
+				{
+					JLabel lblAvailablePrintingFormats = new JLabel("Available Printing Formats");
+					panel.add(lblAvailablePrintingFormats, "2, 4, 3, 1, center, default");
+				}
+				{
+					JScrollPane scrollPane_1 = new JScrollPane();
+					panel.add(scrollPane_1, "2, 6, 3, 1, fill, fill");
+					{
+						tablePrintFormatList = new JTable();
+						tablePrintFormatList.setModel(new LabelDefinitionListTypeTableModel(PreCaptureSingleton.getInstance().getPrintFormatDefinitionList()));
+						scrollPane_1.setViewportView(tablePrintFormatList);
+					}
+				}
+				JPanel panel_1 = new JPanel();
+				tabbedPane.addTab("Persistence", null, panel_1, null);
+				panel_1.setLayout(new FormLayout(new ColumnSpec[] {
+						FormFactory.RELATED_GAP_COLSPEC,
+						FormFactory.DEFAULT_COLSPEC,
+						FormFactory.RELATED_GAP_COLSPEC,
+						ColumnSpec.decode("default:grow"),},
+					new RowSpec[] {
+						FormFactory.RELATED_GAP_ROWSPEC,
+						FormFactory.DEFAULT_ROWSPEC,}));
+				{
+					JLabel lblDatabase = new JLabel("Database");
+					panel_1.add(lblDatabase, "2, 2, right, default");
+				}
+				{
+					txtDerby = new JTextField();
+					txtDerby.setEditable(false);
+					txtDerby.setText("localhost:derby");
+					panel_1.add(txtDerby, "4, 2, fill, default");
+					txtDerby.setColumns(10);
 				}
 			}
 		}

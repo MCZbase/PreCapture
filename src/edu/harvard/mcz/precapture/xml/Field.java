@@ -29,6 +29,9 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="Type" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="VocabularyTerm" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="Optional" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *         &lt;element name="UseItalic" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *         &lt;element name="NewLine" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *         &lt;element name="FontSize" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -43,7 +46,10 @@ import javax.xml.bind.annotation.XmlType;
     "code",
     "type",
     "vocabularyTerm",
-    "optional"
+    "optional",
+    "useItalic",
+    "newLine",
+    "fontSize"
 })
 public class Field {
 
@@ -57,6 +63,12 @@ public class Field {
     protected String vocabularyTerm;
     @XmlElement(name = "Optional")
     protected boolean optional;
+    @XmlElement(name = "UseItalic")
+    protected boolean useItalic;
+    @XmlElement(name = "NewLine")
+    protected boolean newLine;
+    @XmlElement(name = "FontSize")
+    protected int fontSize;
 
     /**
      * Gets the value of the label property.
@@ -170,4 +182,47 @@ public class Field {
         this.optional = value;
     }
 
+	/**
+	 * @return the useItalic
+	 */
+	public boolean isUseItalic() {
+		return useItalic;
+	}
+
+	/**
+	 * @param useItalic the useItalic to set
+	 */
+	public void setUseItalic(boolean useItalic) {
+		this.useItalic = useItalic;
+	}
+
+	/**
+	 * @return the newLine
+	 */
+	public boolean isNewLine() {
+		return newLine;
+	}
+
+	/**
+	 * @param newLine the newLine to set
+	 */
+	public void setNewLine(boolean newLine) {
+		this.newLine = newLine;
+	}
+
+	/**
+	 * @return the fontSize
+	 */
+	public int getFontSize() {
+		return fontSize;
+	}
+
+	/**
+	 * @param fontSize the fontSize to set
+	 */
+	public void setFontSize(int fontSize) {
+		this.fontSize = fontSize;
+	}
+
+    
 }
