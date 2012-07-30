@@ -19,7 +19,13 @@
  */
 package edu.harvard.mcz.precapture.ui;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -27,6 +33,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.harvard.mcz.precapture.data.Inventory;
+import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
+import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
 /**
  * @author mole
@@ -44,6 +52,10 @@ public class InventoryTableModel extends AbstractTableModel {
 	 */
 	public InventoryTableModel() {
 		inventoryList = new ArrayList<Inventory>();
+	}
+	
+	public InventoryTableModel(ArrayList<Inventory> list) { 
+		inventoryList = list;
 	}
 
 	/* (non-Javadoc)
@@ -113,8 +125,23 @@ public class InventoryTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
-		return super.getColumnClass(columnIndex);
+		Class<?> result = null;
+		Inventory inv = new Inventory();
+		switch (columnIndex) { 
+		case 0:
+			result = inv.getCabinet().getClass();
+			break;
+		case 1:
+			result = inv.getTaxon().getClass();
+			break;
+		case 2:
+			result = Float.class; // inv.getThickness().getClass();
+			break;
+		case 3:
+			result = Float.class; //inv.getSheetsPerUnitThickness().getClass();
+			break;
+		}
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -122,8 +149,7 @@ public class InventoryTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
-		return super.isCellEditable(rowIndex, columnIndex);
+		return true;
 	}
 
 	/* (non-Javadoc)
@@ -131,10 +157,108 @@ public class InventoryTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
-		super.setValueAt(aValue, rowIndex, columnIndex);
+		try {
+			switch (columnIndex) { 
+			case 0:
+				inventoryList.get(rowIndex).setCabinet((String)aValue);
+				break;
+			case 1:
+				inventoryList.get(rowIndex).setTaxon((String)aValue);
+				break;
+			case 2:
+				inventoryList.get(rowIndex).setThickness(((Float)aValue).floatValue());
+				break;
+			case 3:
+				inventoryList.get(rowIndex).setSheetsPerUnitThickness(((Float)aValue).floatValue());
+				break;
+			}
+			saveList();
+		} catch (ClassCastException ex) {
+			// TODO alert user
+			ex.printStackTrace();
+		} catch (SaveFailedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
+	public boolean saveList() throws SaveFailedException { 
+		boolean result = false;
+		
+		InventoryLifeCycle ils = new InventoryLifeCycle();
+		
+		Iterator<Inventory> i = inventoryList.iterator();
+		while (i.hasNext()) { 
+			ils.attachDirty(i.next());
+		}
+		
+		return result;
+	}
 	
+    
+
+	/* (non-Javadoc)
+	 * @see javax.swing.table.AbstractTableModel#fireTableDataChanged()
+	 */
+	@Override
+	public void fireTableDataChanged() {
+		super.fireTableDataChanged();
+		try {
+			saveList();
+		} catch (SaveFailedException e) {
+			log.error(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void addRow() {
+		log.debug("Adding new Inventory record");
+		log.debug("List size:" + inventoryList.size());
+		Inventory newInventoryRecord = new Inventory();
+		if (inventoryList.size()>0) { 
+	        newInventoryRecord.setTaxon(inventoryList.get(inventoryList.size()-1).getTaxon());
+		} 
+		inventoryList.add(newInventoryRecord);
+		log.debug("List size:" + inventoryList.size());
+		fireTableDataChanged();
+	}
+	
+	public void writeToFile(File filename) {
+		log.debug("Writing inventory to " + filename.getName());
+		if (!filename.exists() || filename.canWrite()) { 
+			try {
+				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(filename));
+				StringBuffer line = new StringBuffer();
+				line.append("\"").append("Cabinet").append("\",");
+				line.append("\"").append("Taxon").append("\",");
+				line.append("\"").append("Thickness").append("\",");
+				line.append("\"").append("SheetsPerUnitThickness").append("\"\r\n");
+				stream.write(line.toString().getBytes());
+				Iterator<Inventory> i = inventoryList.iterator();
+				while (i.hasNext()) {
+					Inventory inventory = i.next();
+					line = new StringBuffer();
+					line.append("\"").append(inventory.getCabinet().replace("\"", "\"\"")).append("\",");
+					line.append("\"").append(inventory.getTaxon().replace("\"", "\"\"")).append("\",");
+					line.append("\"").append(Float.toString(inventory.getThickness())).append("\",");
+					line.append("\"").append(Float.toString(inventory.getSheetsPerUnitThickness())).append("\"\r\n");
+					stream.write(line.toString().getBytes());
+				}
+				stream.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				log.error(e.getMessage());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				log.error(e.getMessage());
+			}
+			
+		}
+	}
 	
 }

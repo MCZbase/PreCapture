@@ -51,10 +51,14 @@ public class HibernateUtil {
 	 *  @see edu.harvard.mcz.precapture.data.HibernateUtil#getSessionFactory
 	 */
 	private static void createSessionFactory() {
+			Configuration config = new Configuration().configure();
+			sessionFactory = config.buildSessionFactory();
+			Session session = sessionFactory.getCurrentSession();
+			session.beginTransaction();
+			session.close();									
 /*			
 		try {
 			// Create the Configuration from hibernate.cfg.xml
-			Configuration config = new Configuration().configure();
 			// Add authentication properties obtained from the user
 			boolean success = false;
 			LoginDialog loginDialog = new LoginDialog();

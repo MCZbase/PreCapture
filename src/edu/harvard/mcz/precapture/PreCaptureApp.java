@@ -21,16 +21,27 @@ package edu.harvard.mcz.precapture;
 
 import java.awt.EventQueue;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.exception.GenericJDBCException;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
 
+import edu.harvard.mcz.precapture.data.HibernateUtil;
+import edu.harvard.mcz.precapture.data.Inventory;
+import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
 import edu.harvard.mcz.precapture.ui.LabelList;
 import edu.harvard.mcz.precapture.ui.MainFrame;
 import edu.harvard.mcz.precapture.xml.MappingList;
@@ -47,7 +58,7 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "0.3";
+	public static final String VERSION = "0.4";
 
 	private static final Log log = LogFactory.getLog(PreCaptureApp.class);
 	
@@ -139,15 +150,56 @@ public class PreCaptureApp {
 		LabelList labelList = new LabelList();
 		PreCaptureSingleton.getInstance().setCurrentLabelList(labelList);
 		
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainFrame window = new MainFrame();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		// Test database 
+		try {
+			log.debug(org.apache.derby.tools.sysinfo.getProductName() + " " + org.apache.derby.tools.sysinfo.getVersionString());
+			// Database lives in current directory.
+			System.setProperty("derby.system.home", System.getProperty("user.dir"));
+
+			// test database connectivity
+			SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+			Session session = sessionFactory.openSession();
+			try {
+				// Test to see if inventory table exists
+				InventoryLifeCycle ils = new InventoryLifeCycle();
+				log.debug("Inventory Records: " + ils.findAll().size());
+			} catch (NullPointerException ex) { 
+				// if not, create schema specified in hibernate.cfg.xml
+				Configuration conf = new Configuration().configure();
+				new SchemaExport(conf).create(true, true);
 			}
-		});		
+
+
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						MainFrame window = new MainFrame();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});		
+		
+		} catch (Exception e) {
+			// report database connection error
+			StringBuffer messages = new StringBuffer();
+			messages.append(e.getMessage()).append("\n");
+			log.error(e.getMessage());
+			if (e.getCause()!=null) { 
+			    messages.append(e.getCause().getMessage()).append("\n");
+			    log.error(e.getCause().getMessage());
+			    if (e.getCause().getCause()!=null) { 
+			       log.error(e.getCause().getCause().getMessage());
+			       messages.append(e.getCause().getCause().getMessage()).append("\n");
+			       if (e.getCause().getCause().getCause()!=null) { 
+  			          log.error(e.getCause().getCause().getCause().getMessage());
+			          messages.append(e.getCause().getCause().getCause().getMessage()).append("\n");
+ 			       }
+			    }
+			}
+			JOptionPane.showMessageDialog(null, "Unable to start. \n" + messages);
+			exit();
+		}
 		
 	}
 
@@ -157,6 +209,7 @@ public class PreCaptureApp {
 	public static void exit() {
 		try {
 			PreCaptureSingleton.getInstance().getProperties().saveProperties();
+			HibernateUtil.terminateSessionFactory();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -3,11 +3,10 @@
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping default-lazy="false" >
-  <class name="edu.harvard.mcz.precapture.data.UnitTrayLabel" table="UNIT_TRAY_LABEL" catalog="precapture">
+  <class name="edu.harvard.mcz.precapture.data.UnitTrayLabel" table="UNIT_TRAY_LABEL" catalog="PRECAPTURE">
         <id name="id" type="java.lang.Long">
             <column name="id" />
-            <generator class="native" >
-                <param name="sequence">UNIT_TRAY_LABEL_ID_SEQ</param> 
+            <generator class="increment" >
             </generator>
         </id>
         <property name="family" type="string">

@@ -40,7 +40,10 @@ public class Inventory  {
 	 * Default no argument constructor, constructs a new Inventory instance.
 	 */
 	public Inventory() {
-
+         cabinet = "";
+         taxon = "";
+         thickness = 0f;
+         sheetsPerUnitThickness = 0f;
 	}
 
 	/**
@@ -97,6 +100,20 @@ public class Inventory  {
 	 */
 	public void setSheetsPerUnitThickness(float sheetsPerUnitThickness) {
 		this.sheetsPerUnitThickness = sheetsPerUnitThickness;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	

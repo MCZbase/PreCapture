@@ -32,24 +32,31 @@ import javax.swing.JMenuItem;
 import edu.harvard.mcz.precapture.PreCaptureApp;
 import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
+import edu.harvard.mcz.precapture.data.Inventory;
+import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
 import edu.harvard.mcz.precapture.encoder.LabelEncoder;
 import edu.harvard.mcz.precapture.exceptions.PrintFailedException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
+
+import javax.swing.JFileChooser;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
+import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Main UI Frame for the PreCapture Application.
@@ -214,7 +221,9 @@ public class MainFrame {
 			panel_1.add(scrollPane_1, BorderLayout.CENTER);
 
 			tableInventory = new JTable();
-			tableInventory.setModel(new InventoryTableModel());
+			InventoryLifeCycle ils = new InventoryLifeCycle();
+			InventoryTableModel iTableModel = new InventoryTableModel((ArrayList<Inventory>)ils.findAll());
+			tableInventory.setModel(iTableModel);
 			scrollPane_1.setViewportView(tableInventory);
 			tabbedPane.setMnemonicAt(2, KeyEvent.VK_I);
 			
@@ -223,12 +232,33 @@ public class MainFrame {
 			flowLayout_8.setAlignment(FlowLayout.RIGHT);
 			panel_1.add(panel_8, BorderLayout.SOUTH);
 			
+			JButton btnAddInventoryRow = new JButton("Add Row");
+			panel_8.add(btnAddInventoryRow);
+			btnAddInventoryRow.setMnemonic(KeyEvent.VK_A);
+			btnAddInventoryRow.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) { 
+					try { 
+					    ((InventoryTableModel)tableInventory.getModel()).addRow();
+					} catch (Exception ex) { 
+						log.debug(ex.getMessage());
+					}
+				}
+			});			
+			
 			JButton btnExport = new JButton("Export as spreadsheet");
 			panel_8.add(btnExport);
 			btnExport.setMnemonic(KeyEvent.VK_E);
 			btnExport.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) { 
 					// TODO Export to file
+					JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
+					FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV spreadsheets", "csv");
+					fileChooser.setFileFilter(filter);
+				    int returnVal = fileChooser.showSaveDialog(frame);
+				        if (returnVal == JFileChooser.APPROVE_OPTION) {
+				            File filename = fileChooser.getSelectedFile();
+				            ((InventoryTableModel)tableInventory.getModel()).writeToFile(filename);
+				        }
 				}
 			});
 		} 
