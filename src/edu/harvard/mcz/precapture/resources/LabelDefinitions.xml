@@ -34,14 +34,14 @@
     <tns:TextOrentation>Horizontal</tns:TextOrentation>
   </tns:LabelDefinition>
   <tns:LabelDefinition>
-    <tns:Title>4"Label</tns:Title>
+    <tns:Title>4x2.3"Label</tns:Title>
     <tns:Units>Inches</tns:Units>
-    <tns:PaperHeight>3.5</tns:PaperHeight>
+    <tns:PaperHeight>2.3125</tns:PaperHeight>
     <tns:PaperWidth>4</tns:PaperWidth>
-    <tns:Margins>.25</tns:Margins>
+    <tns:Margins>.1</tns:Margins>
     <tns:Columns>1</tns:Columns>
-    <tns:LabelWidth>3.5</tns:LabelWidth>
-    <tns:LabelHeight>3</tns:LabelHeight>
+    <tns:LabelWidth>3.8</tns:LabelWidth>
+    <tns:LabelHeight>2.1125</tns:LabelHeight>
     <tns:TextOrentation>Horizontal</tns:TextOrentation>
   </tns:LabelDefinition>  
 </tns:LabelDefinitions>

@@ -21,19 +21,26 @@ package edu.harvard.mcz.precapture.data;
 
 import static org.hibernate.criterion.Example.create;
 
-import java.math.BigDecimal;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.SessionException;
 import org.hibernate.classic.Session;
 
+import com.csvreader.CsvReader;
+import com.csvreader.CsvWriter;
+
 import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
-/** UnitTrayLabelLifeCycle
+/** UnitTrayLabelLifeCycle  Utility class to manage the lifecycle of UnitTrayLabel PDOs,
+ * and support various other functions related to UnitTrayLabel objects.
  * 
  * @author Paul J. Morris
  *
@@ -41,8 +48,87 @@ import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 public class UnitTrayLabelLifeCycle  {
 	
 private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
-	
 
+    /**
+     * Given a unit tray label object, return a string representation of the taxon name.
+     * 
+     * Placed here as UnitTrayLabel class is generated from xml and could be 
+     * overwritten if regenerated.
+     * 
+     * @see UnitTrayLabel
+     * @param unitTrayLabel the unit tray label from which to extract a taxon name
+     * @return a string representation of the taxon name, or an empty string if unitTrayLabel is null.
+     */
+    public static String getScientificName(UnitTrayLabel unitTrayLabel) {
+    	StringBuffer result = new StringBuffer();
+    	if (unitTrayLabel!=null) { 
+    		result.append(unitTrayLabel.getGenus()).append(" ");
+    		result.append(unitTrayLabel.getSpecificEpithet()).append(" ");
+    		if (unitTrayLabel.getSubspecificEpithet()!=null && unitTrayLabel.getSubspecificEpithet().length()>0) {
+    			result.append(unitTrayLabel.getSubspecificEpithet()).append(" ");
+    		}
+    		if (unitTrayLabel.getInfraspecificRank()!=null && unitTrayLabel.getInfraspecificRank().length()>0) {    	
+    			result.append(unitTrayLabel.getInfraspecificRank()).append(" ");
+    		}    	
+    		if (unitTrayLabel.getInfraspecificEpithet()!=null && unitTrayLabel.getInfraspecificEpithet().length()>0) {    	
+    			result.append(unitTrayLabel.getInfraspecificEpithet()).append(" ");
+    		}
+    		result.append(unitTrayLabel.getAuthorship());
+    	}
+    	return result.toString();
+	}
+	
+    public static int loadFromCSV(String filename) throws IOException {
+    	int numberLoaded = 0;
+    	CsvReader reader = new CsvReader(filename);
+    	reader.readHeaders();
+    	UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
+    	uls.deleteAll();
+    	while (reader.readRecord()) { 
+    		UnitTrayLabel unitTrayLabel = new UnitTrayLabel();
+    		unitTrayLabel.setFamily(reader.get("Family"));
+    		unitTrayLabel.setGenus(reader.get("Genus"));
+    		unitTrayLabel.setSpecificEpithet(reader.get("SpecificEpithet"));
+    		unitTrayLabel.setSubspecificEpithet(reader.get("SubspecificEpithet"));
+    		unitTrayLabel.setInfraspecificEpithet(reader.get("InfraspecificEpithet"));
+    		unitTrayLabel.setInfraspecificRank(reader.get("InfraspecificRank"));
+    		unitTrayLabel.setAuthorship(reader.get("Authorship"));
+    		try {
+				uls.persist(unitTrayLabel);
+				numberLoaded++;
+			} catch (SaveFailedException e) {
+				log.error(e.getMessage());
+			}
+    	}
+    	reader.close();
+    	return numberLoaded;
+    }
+
+    public static int exportToCSV(String filename) throws IOException {
+    	int numberWritten = 0;
+    	CsvWriter writer = new CsvWriter(filename);
+    	String[] header = {"Family","Genus","SpecificEpithet","SubspecificEpithet","InfraspecificEpithet","InfraspecificRank","Authorship"};
+    	writer.writeRecord(header,false);
+    	UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
+    	List<UnitTrayLabel> list = uls.findAll();
+    	Iterator<UnitTrayLabel> i = list.iterator();
+    	while (i.hasNext()) { 
+    		UnitTrayLabel unitTrayLabel = i.next();
+    		ArrayList<String> row = new ArrayList<String>();
+    		row.add(unitTrayLabel.getFamily());
+    		row.add(unitTrayLabel.getGenus());
+    		row.add(unitTrayLabel.getSpecificEpithet());
+    		row.add(unitTrayLabel.getSubspecificEpithet());
+    		row.add(unitTrayLabel.getInfraspecificEpithet());
+    		row.add(unitTrayLabel.getInfraspecificRank());
+    		row.add(unitTrayLabel.getAuthorship());
+    		writer.writeRecord(row.toArray(new String[row.size()]), true);
+    		numberWritten++;
+    	}
+    	writer.close();
+    	return numberWritten;
+    }    
+    
 	public void persist(UnitTrayLabel transientInstance) throws SaveFailedException {
 		log.debug("persisting UnitTrayLabel instance");
 		try {
@@ -214,8 +300,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			try { 
 				results = (List<UnitTrayLabel>) session.createQuery("from UnitTrayLabel u order by u.ordinal, u.family, u.subfamily, u.tribe, u.genus, u.specificEpithet ").list();
 				session.getTransaction().commit();
-				log.debug("find by example successful, result size: "
-						+ results.size());
+				log.debug("find all successful, result size: " + results.size());
 			} catch (HibernateException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
@@ -224,11 +309,36 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			}
 			return results;
 		} catch (RuntimeException re) {
-			log.error("find by example failed", re);
+			log.error("find all failed", re);
 			throw re;
 		}
 	}
-	
+
+	public boolean deleteAll() {
+		boolean result = false;
+		log.debug("deleting all UnitTrayLabel records");
+		try {
+			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+			session.beginTransaction();
+			try { 
+				Query delete = session.createQuery("delete from UnitTrayLabel u ");
+				int rowsAffected = delete.executeUpdate();
+				session.getTransaction().commit();
+				log.debug("delete all successful.  Rows=" + rowsAffected);
+				result = true;
+			} catch (HibernateException e) { 
+				session.getTransaction().rollback();
+				log.error(e.getMessage());
+			} finally { 
+			    try { session.close(); } catch (SessionException e) { }
+			}
+			return result;
+		} catch (RuntimeException re) {
+			log.error("delete all failed", re);
+			throw re;
+		}
+	}	
+
 	public Integer findMaxOrdinal() { 
 		log.debug("finding max ordinal in UnitTrayLabel");
 		Integer result = 0;
@@ -263,5 +373,63 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 		
 		return result;
 	}
+	
+	/**
+	 * select count(*) from UnitTrayLabel;
+	 * 
+	 * @return the number of rows in the UnitTrayLabel table.
+	 */
+	public int count() {
+		int result = 0;
+		log.debug("counting UnitTrayLabel records");
+		try {
+			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+			session.beginTransaction();
+			try { 
+				result = ((Long)session.createQuery("select count(*) from UnitTrayLabel ").iterate().next()).intValue();
+				session.getTransaction().commit();
+				log.debug("find all successful, count= " + result);
+			} catch (HibernateException e) { 
+				session.getTransaction().rollback();
+				log.error(e.getMessage());
+			} finally { 
+			    try { session.close(); } catch (SessionException e) { }
+			}
+			return result;
+		} catch (RuntimeException re) {
+			log.error("count failed", re);
+			throw re;
+		}
+	}	
+	
+	/**
+	 * Like count(), but passes on hibernate exceptions.  Used to test for 
+	 * presence of tables at startup.
+	 * 
+	 * @return the number of rows in the UnitTrayLabel table.
+	 */
+	public int countAtStartup() throws Exception {
+		int result = 0;
+		log.debug("counting UnitTrayLabel records");
+		try {
+			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+			session.beginTransaction();
+			try { 
+				result = ((Long)session.createQuery("select count(*) from UnitTrayLabel ").iterate().next()).intValue();
+				session.getTransaction().commit();
+				log.debug("find all successful, count= " + result);
+			} catch (HibernateException e) { 
+				session.getTransaction().rollback();
+				log.error(e.getMessage());
+				throw e;
+			} finally { 
+			    try { session.close(); } catch (SessionException e) { }
+			}
+			return result;
+		} catch (RuntimeException re) {
+			log.error("count failed", re);
+			throw re;
+		}
+	}	
 
 }

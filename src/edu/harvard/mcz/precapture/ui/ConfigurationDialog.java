@@ -41,6 +41,7 @@ import com.jgoodies.forms.factories.FormFactory;
 
 import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
+import edu.harvard.mcz.precapture.data.HibernateUtil;
 import edu.harvard.mcz.precapture.xml.MappingTableModel;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionListTypeTableModel;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
@@ -150,7 +151,7 @@ public class ConfigurationDialog extends JDialog {
 					}
 				}
 				JPanel panel_1 = new JPanel();
-				tabbedPane.addTab("Persistence", null, panel_1, null);
+				tabbedPane.addTab("Properties", null, panel_1, null);
 				panel_1.setLayout(new FormLayout(new ColumnSpec[] {
 						FormFactory.RELATED_GAP_COLSPEC,
 						FormFactory.DEFAULT_COLSPEC,
@@ -158,18 +159,32 @@ public class ConfigurationDialog extends JDialog {
 						ColumnSpec.decode("default:grow"),},
 					new RowSpec[] {
 						FormFactory.RELATED_GAP_ROWSPEC,
-						FormFactory.DEFAULT_ROWSPEC,}));
+						FormFactory.DEFAULT_ROWSPEC,
+						FormFactory.RELATED_GAP_ROWSPEC,
+						FormFactory.DEFAULT_ROWSPEC,
+						}));
 				{
-					JLabel lblDatabase = new JLabel("Database");
+					JLabel lblDatabase = new JLabel("Database Driver");
 					panel_1.add(lblDatabase, "2, 2, right, default");
 				}
 				{
 					txtDerby = new JTextField();
 					txtDerby.setEditable(false);
-					txtDerby.setText("localhost:derby");
+					txtDerby.setText(HibernateUtil.getDriverClassString());
 					panel_1.add(txtDerby, "4, 2, fill, default");
-					txtDerby.setColumns(10);
+					txtDerby.setColumns(20);
 				}
+				{
+					JLabel lblDatabaseConn = new JLabel("Database Connection");
+					panel_1.add(lblDatabaseConn, "2, 4, right, default");
+				}
+				{
+					JTextField txtDerbyConn = new JTextField();
+					txtDerbyConn.setEditable(false);
+					txtDerbyConn.setText(HibernateUtil.getConnectionURL());
+					panel_1.add(txtDerbyConn, "4, 4, fill, default");
+					txtDerbyConn.setColumns(20);
+				}				
 			}
 		}
 		{

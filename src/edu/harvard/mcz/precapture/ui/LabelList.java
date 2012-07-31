@@ -33,10 +33,11 @@ import edu.harvard.mcz.precapture.PreCaptureSingleton;
 /**
  * A list of container labels, each of which has a number to print and a list of fields.
  * 
- * A LabelList is a list of ContainerLabel, each of which has a list of FieldPlusText.
+ * A LabelList is a list of ContainerLabel, each of which has a list of FieldPlusText 
+ * and a number to print.
  * 
  * A ContainerLabel corresponds with a MappingList, and each Field in the MappingList
- * corresponds with a FieldPlusText.
+ * corresponds with a FieldPlusText.  
  * 
  * @author mole
  *
@@ -114,6 +115,7 @@ public class LabelList extends AbstractTableModel {
 	 */
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
+		// Determine if this is a column in the mapping list or the number to print column.
 		Object result = labels.get(rowIndex).getNumberToPrint();
 		if (columnIndex < PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size()) { 
 		    result = labels.get(rowIndex).getFields().get(columnIndex).getTextField().getText();
@@ -127,6 +129,7 @@ public class LabelList extends AbstractTableModel {
 	 */
 	@Override
 	public String getColumnName(int column) {
+		// Determine if this is a column in the mapping list or the number to print column.
 		String result = "Number To Print";
 		if (column < PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size()) { 
 			result = exampleItem.getFields().get(column).getField().getLabel();
@@ -140,8 +143,7 @@ public class LabelList extends AbstractTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		// TODO Auto-generated method stub
-		return super.getColumnClass(columnIndex);
+		return String.class;
 	}
 
 
@@ -150,8 +152,7 @@ public class LabelList extends AbstractTableModel {
 	 */
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		//TODO: make editable (all?)
-		return false;
+		return true;
 	}
 
 
@@ -160,8 +161,12 @@ public class LabelList extends AbstractTableModel {
 	 */
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
-		super.setValueAt(aValue, rowIndex, columnIndex);
+		// Determine if this is a column in the mapping list or the number to print column.
+		if (columnIndex < PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size()) { 
+		     labels.get(rowIndex).getFields().get(columnIndex).getTextField().setText(aValue.toString());
+		} else { 
+			 labels.get(rowIndex).setNumberToPrint(Integer.valueOf(aValue.toString()));
+		}
 	}
 	
 	

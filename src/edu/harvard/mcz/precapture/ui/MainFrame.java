@@ -34,14 +34,17 @@ import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.data.Inventory;
 import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
+import edu.harvard.mcz.precapture.data.UnitTrayLabelLifeCycle;
 import edu.harvard.mcz.precapture.encoder.LabelEncoder;
 import edu.harvard.mcz.precapture.exceptions.PrintFailedException;
+import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -71,6 +74,9 @@ public class MainFrame {
 	private JFrame frame;
 	private JTable tablePrintList;
 	private JTable tableInventory;
+	/** Set to true to use Napkin Look and Feel.
+	*/
+	private boolean useNapkin;
 	
 	private FolderPanel folderPanel;
 
@@ -79,12 +85,18 @@ public class MainFrame {
 	 */
 	public MainFrame() {
 		
-		try {
-			// Use the Napkin look and feel
-	        UIManager.setLookAndFeel("net.sourceforge.napkinlaf.NapkinLookAndFeel");
-	    } catch (Exception e) {
-	        // Expected if Napkin look and feel isn't on build path.
-	    }		
+		useNapkin = false;
+		
+		if (useNapkin) { 
+
+			try {
+				// Use the Napkin look and feel
+				UIManager.setLookAndFeel("net.sourceforge.napkinlaf.NapkinLookAndFeel");
+			} catch (Exception e) {
+				// Expected if Napkin look and feel isn't on build path.
+			}		
+
+		}
 		
 		initialize();
 		frame.setVisible(true);
@@ -121,7 +133,28 @@ public class MainFrame {
 			}
 		});
 		mntmConfiguration.setMnemonic(KeyEvent.VK_C);
+		// TODO: Move to configuration.
+		JMenuItem mntmLoadTaxa = new JMenuItem("Load Taxon List");
+		mntmLoadTaxa.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV spreadsheets", "csv");
+				fileChooser.setFileFilter(filter);
+				int returnVal = fileChooser.showOpenDialog(frame);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					File file = fileChooser.getSelectedFile();
+					try { 
+						UnitTrayLabelLifeCycle.loadFromCSV(file.getCanonicalPath());
+					} catch (Exception ex) { 
+						log.error(ex.getMessage());
+						JOptionPane.showMessageDialog(frame, "Failed to load taxon list. " + ex.getMessage());
+					}
+				}
+			}
+		});
+		mntmLoadTaxa.setMnemonic(KeyEvent.VK_T);		
 		mnFile.add(mntmConfiguration);
+		mnFile.add(mntmLoadTaxa);
 		mntmExit.setMnemonic(KeyEvent.VK_X);
 		mnFile.add(mntmExit);
 		
@@ -129,10 +162,38 @@ public class MainFrame {
 		mnHelp.setMnemonic(KeyEvent.VK_H);
 		menuBar.add(mnHelp);
 		
-		JMenuItem mntmVersion = new JMenuItem("Version: " + PreCaptureApp.VERSION  + " $Id$" );
-		// TODO: set to false on changing to normal look and feel
-		mntmVersion.setEnabled(true);
+		JMenuItem mntmApplicationHelp = new JMenuItem("Using " + PreCaptureApp.NAME);
+		mntmApplicationHelp.setMnemonic(KeyEvent.VK_U);
+		mntmApplicationHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				log.debug("Help selected");
+				HelpFrame help = new HelpFrame();
+				help.setVisible(true);
+			}
+		});
+		mnHelp.add(mntmApplicationHelp);
+		
+		JMenuItem mntmAbout = new JMenuItem("About");
+		mntmAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				log.debug("About selected");
+				AboutFrame about = new AboutFrame();
+				about.setVisible(true);
+			}
+		});
+		mntmAbout.setMnemonic(KeyEvent.VK_A);
+		mnHelp.add(mntmAbout);
+		
+		JMenuItem mntmVersion = new JMenuItem("Version: " + PreCaptureApp.VERSION);
+		// needs to be enabled to be readable in napkin look and feel
+		mntmVersion.setEnabled(useNapkin);
 		mnHelp.add(mntmVersion);
+		
+		JMenuItem mntmID = new JMenuItem("$Id$" );
+		// needs to be enabled to be readable in napkin look and feel
+		mntmID.setEnabled(useNapkin);
+		mnHelp.add(mntmID);		
+		
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -198,8 +259,8 @@ public class MainFrame {
 				try {
 					LabelEncoder.printList(PreCaptureSingleton.getInstance().getCurrentLabelList().getLabels());
 				} catch (PrintFailedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					log.error(e1.getMessage());
+					JOptionPane.showMessageDialog(frame, "Failed to print. " + e1.getMessage());
 				}				
 			}
 		});
@@ -240,7 +301,8 @@ public class MainFrame {
 					try { 
 					    ((InventoryTableModel)tableInventory.getModel()).addRow();
 					} catch (Exception ex) { 
-						log.debug(ex.getMessage());
+						log.error(ex.getMessage());
+						JOptionPane.showMessageDialog(frame, "Failed to add an Inventory row. " + ex.getMessage());
 					}
 				}
 			});			
@@ -250,14 +312,18 @@ public class MainFrame {
 			btnExport.setMnemonic(KeyEvent.VK_E);
 			btnExport.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) { 
-					// TODO Export to file
 					JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 					FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV spreadsheets", "csv");
 					fileChooser.setFileFilter(filter);
 				    int returnVal = fileChooser.showSaveDialog(frame);
 				        if (returnVal == JFileChooser.APPROVE_OPTION) {
 				            File filename = fileChooser.getSelectedFile();
-				            ((InventoryTableModel)tableInventory.getModel()).writeToFile(filename);
+				            try {
+								((InventoryTableModel)tableInventory.getModel()).writeToFile(filename);
+							} catch (SaveFailedException e1) {
+						         log.error(e1.getMessage());
+						         JOptionPane.showMessageDialog(frame, "Failed to export. " + e1.getMessage());
+							}
 				        }
 				}
 			});

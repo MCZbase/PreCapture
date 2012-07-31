@@ -226,7 +226,7 @@ public class InventoryTableModel extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 	
-	public void writeToFile(File filename) {
+	public void writeToFile(File filename) throws SaveFailedException {
 		log.debug("Writing inventory to " + filename.getName());
 		if (!filename.exists() || filename.canWrite()) { 
 			try {
@@ -249,15 +249,12 @@ public class InventoryTableModel extends AbstractTableModel {
 				}
 				stream.close();
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 				log.error(e.getMessage());
+				throw new SaveFailedException("Unable to write to file " + filename.getName() + e.getMessage());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 				log.error(e.getMessage());
+				throw new SaveFailedException("Unable to write to file " + filename.getName() + e.getMessage());
 			}
-			
 		}
 	}
 	

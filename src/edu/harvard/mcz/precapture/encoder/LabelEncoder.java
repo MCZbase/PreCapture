@@ -20,6 +20,8 @@
 package edu.harvard.mcz.precapture.encoder;
 
 import java.awt.image.BufferedImage;
+import java.awt.print.PrinterJob;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,9 +31,22 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.print.Doc;
+import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
+import javax.print.PrintException;
 import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
 import javax.print.ServiceUI;
+import javax.print.SimpleDoc;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.Size2DSyntax;
+import javax.print.attribute.standard.Copies;
+import javax.print.attribute.standard.MediaSize;
+import javax.print.attribute.standard.MediaSizeName;
+import javax.print.attribute.standard.Sides;
+import javax.swing.JOptionPane;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,6 +87,9 @@ public class LabelEncoder {
 	private static final Log log = LogFactory.getLog(LabelEncoder.class);
 
 	private ContainerLabel label;
+	
+	// TODO: Move to a property.
+	private static final String PRINTFILE = "labels.pdf";
 
 	public LabelEncoder (ContainerLabel containerLabel)  {
 		label = containerLabel;
@@ -156,7 +174,7 @@ public class LabelEncoder {
 				Image image = encoder.getImage();
 				try {
 					Document document = new Document();
-					PdfWriter.getInstance(document, new FileOutputStream("labels.pdf"));
+					PdfWriter.getInstance(document, new FileOutputStream(PRINTFILE));
 					// Convert units in print definition to points (72 points/inch, 28.346456 points/cm)
 					
 					int paperWidthPoints = 612;  // 8.5"
@@ -170,21 +188,21 @@ public class LabelEncoder {
 					
 					if (printDefinition.getUnits().toString().toLowerCase().equals("inches")) { 
 					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*72f);
-					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*72f);
+					    paperHeightPoints = (int)Math.floor(printDefinition.getPaperHeight()*72f);
 					    marginsPoints = (int)Math.floor(printDefinition.getMargins()*72f);
 					    labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*72f);
 					    labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*72f);
 					}
 					if (printDefinition.getUnits().toString().toLowerCase().equals("cm")) { 
 					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*28.346456f);
-					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*28.346456f);
+					    paperHeightPoints = (int)Math.floor(printDefinition.getPaperHeight()*28.346456f);
 					    marginsPoints = (int)Math.floor(printDefinition.getMargins()*28.346456f);
 					    labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*28.346456f);
 					    labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*28.346456f);
 					}
 					if (printDefinition.getUnits().toString().toLowerCase().equals("points")) { 
 					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*1f);
-					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*1f);
+					    paperHeightPoints = (int)Math.floor(printDefinition.getPaperHeight()*1f);
 					    marginsPoints = (int)Math.floor(printDefinition.getMargins()*1f);
 					    labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*1f);
 					    labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*1f);
@@ -316,6 +334,62 @@ public class LabelEncoder {
 						//See: http://stackoverflow.com/questions/4609667/how-to-print-a-pdf-created-with-itext
 
 						document.close();
+						
+						try {
+							FileInputStream pdfInputStream = new FileInputStream(PRINTFILE);
+
+							DocFlavor psInFormat = DocFlavor.INPUT_STREAM.PDF;
+							Doc myDoc = new SimpleDoc(pdfInputStream, psInFormat, null);  
+							PrintRequestAttributeSet atset = new HashPrintRequestAttributeSet();
+							atset.add(new Copies(1));
+							// Set paper size
+							if (paperWidthPoints==612 && paperHeightPoints==792) { 
+							    atset.add(MediaSizeName.NA_LETTER);
+							} else { 
+								float x = printDefinition.getPaperWidth();
+								float y = printDefinition.getPaperHeight();
+								if (printDefinition.getUnits().toString().toLowerCase().equals("inches")) { 
+									atset.add(MediaSize.findMedia(x, y, Size2DSyntax.INCH));
+								}
+								if (printDefinition.getUnits().toString().toLowerCase().equals("cm")) { 
+									x=x*10f;
+									y=y*10f;
+									atset.add(MediaSize.findMedia(x, y, Size2DSyntax.INCH));
+								}
+								if (printDefinition.getUnits().toString().toLowerCase().equals("points")) { 
+									x=x/72f;
+									y=y/72f;
+									atset.add(MediaSize.findMedia(x, y, Size2DSyntax.INCH));
+								}
+							}
+							atset.add(Sides.ONE_SIDED);
+							PrintService[] services = PrintServiceLookup.lookupPrintServices(psInFormat, atset);
+							if (services.length > 0) {
+
+								Object selectedService = JOptionPane.showInputDialog(null,
+										"Send labels to which printer?", "Input",
+										JOptionPane.INFORMATION_MESSAGE, null,
+										services, services[0]);
+
+								if (selectedService!=null) { 
+									DocPrintJob job = ((PrintService)selectedService).createPrintJob();
+									try {
+										job.print(myDoc, atset);
+									} catch (PrintException pe) {
+										log.error("Printing Error: " + pe.getMessage());
+									}
+								}
+								log.debug("Available printing services " + services.length);
+								for (int i =0; i< services.length; i++) { 
+									log.debug(services[i].getName());
+								}
+							} else { 
+								log.error("No available printing services");
+							}
+						} catch (FileNotFoundException e) {
+							log.error(e.getMessage());
+						}
+						
 
 					} catch (Exception e) { 
 						throw new PrintFailedException("No labels to print." + e.getMessage());

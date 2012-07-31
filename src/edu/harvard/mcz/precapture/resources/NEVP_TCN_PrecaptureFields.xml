@@ -36,7 +36,7 @@
     <tns:Label>Infraspecific Rank</tns:Label>
     <tns:Code>ir</tns:Code>
     <tns:Type>String</tns:Type>
-    <tns:VocabularyTerm></tns:VocabularyTerm>
+    <tns:VocabularyTerm>hispid:isprk</tns:VocabularyTerm>
     <tns:Optional>false</tns:Optional>
     <tns:UseItalic>false</tns:UseItalic>
     <tns:NewLine>false</tns:NewLine>

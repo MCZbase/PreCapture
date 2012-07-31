@@ -21,15 +21,22 @@ package edu.harvard.mcz.precapture.data;
 
 import static org.hibernate.criterion.Example.create;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.SessionException;
 import org.hibernate.classic.Session;
+
+import com.csvreader.CsvReader;
+import com.csvreader.CsvWriter;
 
 import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
@@ -202,7 +209,7 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 	}
 
 	/**
-	 * @return
+	 * @return a list of all the Inventory records as Inventory objects
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Inventory> findAll() {
@@ -224,10 +231,140 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 			}
 			return results;
 		} catch (RuntimeException re) {
-			log.error("find by example failed", re);
+			log.error("find all failed", re);
 			throw re;
 		}
 	}
 	
-
+	/**
+	 * select count(*) from Inventory;
+	 * 
+	 * @return the number of rows in the Inventory table.
+	 */
+	public int count() {
+		int result = 0;
+		log.debug("counting Inventory records");
+		try {
+			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+			session.beginTransaction();
+			try { 
+				result = ((Long)session.createQuery("select count(*) from Inventory i").iterate().next()).intValue();
+				session.getTransaction().commit();
+				log.debug("count successful, count= " + result);
+			} catch (HibernateException e) { 
+				session.getTransaction().rollback();
+				log.error(e.getMessage());
+			} finally { 
+			    try { session.close(); } catch (SessionException e) { }
+			}
+			return result;
+		} catch (RuntimeException re) {
+			log.error("count failed", re);
+			throw re;
+		}
+	}	
+	
+	/**
+	 * like count() but throws exceptions.
+	 * 
+	 * Used in startup to test for the existance of database tables.
+	 * 
+	 * @return the number of rows in the Inventory table.
+	 */
+	public int countAtStartup() throws Exception {
+		int result = 0;
+		log.debug("counting Inventory records");
+		try {
+			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+			session.beginTransaction();
+			try { 
+				result = ((Long)session.createQuery("select count(*) from Inventory i").iterate().next()).intValue();
+				session.getTransaction().commit();
+				log.debug("count successful, count= " + result);
+			} catch (HibernateException e) { 
+				session.getTransaction().rollback();
+				log.error(e.getMessage());
+				throw e;
+			} finally { 
+			    try { session.close(); } catch (SessionException e) { }
+			}
+			return result;
+		} catch (RuntimeException re) {
+			log.error("count failed", re);
+			throw re;
+		}
+	}		
+	
+	public boolean deleteAll() {
+		boolean result = false;
+		log.debug("deleting all Inventory records");
+		try {
+			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+			session.beginTransaction();
+			try { 
+				Query delete = session.createQuery("delete from Inventory ");
+				int rows = delete.executeUpdate();
+				session.getTransaction().commit();
+				log.debug("delete all successful.  Rows=" + rows);
+				result = true;
+			} catch (HibernateException e) { 
+				session.getTransaction().rollback();
+				log.error(e.getMessage());
+			} finally { 
+			    try { session.close(); } catch (SessionException e) { }
+			}
+			return result;
+		} catch (RuntimeException re) {
+			log.error("delete all failed", re);
+			throw re;
+		}
+	}		
+	
+    public static int exportToCSV(String filename) throws IOException {
+    	int numberWritten = 0;
+    	CsvWriter writer = new CsvWriter(filename);
+    	String[] header = {"Cabinet","Taxon","Thickness","SheetsPerUnitThickness"};
+    	writer.writeRecord(header,false);
+    	InventoryLifeCycle ils = new InventoryLifeCycle();
+    	List<Inventory> list = ils.findAll();
+    	Iterator<Inventory> i = list.iterator();
+    	while (i.hasNext()) { 
+    		Inventory inventory = i.next();
+    		ArrayList<String> row = new ArrayList<String>();
+    		row.add(inventory.getCabinet());
+    		row.add(inventory.getTaxon());
+    		row.add(((Float)inventory.getThickness()).toString());
+    		row.add(((Float)inventory.getSheetsPerUnitThickness()).toString());
+    		writer.writeRecord(row.toArray(new String[row.size()]), true);
+    		numberWritten++;
+    	}
+    	writer.close();
+    	return numberWritten;
+    } 
+    
+    public static int loadFromCSV(String filename, boolean deleteAllFirst) throws IOException {
+    	int numberLoaded = 0;
+    	CsvReader reader = new CsvReader(filename);
+    	reader.readHeaders();
+    	InventoryLifeCycle ils = new InventoryLifeCycle();
+    	if (deleteAllFirst) { 
+    	    ils.deleteAll();
+    	}
+    	while (reader.readRecord()) { 
+    		Inventory inventory = new Inventory();
+    		inventory.setCabinet(reader.get("Cabinet"));
+    		inventory.setTaxon(reader.get("Taxon"));
+    		inventory.setThickness(Float.parseFloat(reader.get("Thickness")));
+    		inventory.setSheetsPerUnitThickness(Float.parseFloat(reader.get("SheetsPerUnitThickness")));
+    		try {
+				ils.persist(inventory);
+				numberLoaded++;
+			} catch (SaveFailedException e) {
+				log.error(e.getMessage());
+			}
+    	}
+    	reader.close();
+    	return numberLoaded;
+    }    
+	
 }

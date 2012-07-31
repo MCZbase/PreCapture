@@ -192,6 +192,30 @@ public class HibernateUtil {
 		return sessionFactory;
 	}
 
+	/**
+	 * Provide a display of the configured driver_class.  Intended to show, in 
+	 * the UI, the user the value of driver_class.
+	 * 
+	 * @return a string representing the connection.driver_class in the 
+	 * hibernate configuration file.
+	 */
+	public static String getDriverClassString() { 
+		Configuration config = new Configuration().configure();
+		return config.getProperties().getProperty("hibernate.connection.driver_class");
+	}
+	
+	/**
+	 * Provide a display of the configured database connection url.  Intended to
+	 * show the user the value of connection.url in the UI.
+	 * 
+	 * @return a string representing the connection.url in the hibernate
+	 * configuration file.
+	 */
+    public static String getConnectionURL() { 
+		Configuration config = new Configuration().configure();
+		return config.getProperties().getProperty("hibernate.connection.url");
+	}
+	
 }
 	
 
