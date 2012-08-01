@@ -46,7 +46,7 @@ public class PreCaptureProperties extends AbstractTableModel {
 	public static final String KEY_PAPERSIZE = "print.papersize";
 	/** Key for properties file for location of field mapping xml file. */
 	public static final String KEY_FIELDMAPPING = "config.fieldmap";
-	/** Key for properties file for whether authority file is ediatable. */
+	/** Key for properties file for whether authority file is editable. */
 	public static final String KEY_EDITABLE_AUTHORITY_FILE =  "config.editableauthorityfile";
 	/** Key for properties file for whether the inventory tab should be shown in the UI. */
 	public static final String KEY_SHOW_INVENTORY = "config.showinventorytab";
@@ -54,6 +54,8 @@ public class PreCaptureProperties extends AbstractTableModel {
 	public static final String KEY_PRINTDEFINITIONS = "config.printdefinitions";
 	/** Key for properties file for location of print layout definition xml file. */
 	public static final String KEY_SELECTED_PRINT_DEFINITION = "config.selectedprintdefinition";
+	/** Key for properties file for which main frame variant to use. */
+	public static final String KEY_MAINFRAME = "config.mainuiframe";
 
 	private Properties properties = null;
 	private String propertiesFilename = null;
@@ -178,6 +180,10 @@ public class PreCaptureProperties extends AbstractTableModel {
 			// name of selected print layout definition
 			properties.setProperty(KEY_SELECTED_PRINT_DEFINITION, "Half Sheet");
 		}
+		if (!properties.containsKey(KEY_MAINFRAME)) {
+			// name of selected UI main frame 
+			properties.setProperty(KEY_MAINFRAME, "MainFrame");
+		}		
 	}
 
 	/**

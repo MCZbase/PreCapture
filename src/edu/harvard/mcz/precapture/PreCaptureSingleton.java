@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.harvard.mcz.precapture.ui.LabelList;
+import edu.harvard.mcz.precapture.ui.MainFrame;
 import edu.harvard.mcz.precapture.xml.MappingList;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionListType;
 

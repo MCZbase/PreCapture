@@ -21,6 +21,7 @@ package edu.harvard.mcz.precapture;
 
 import java.awt.EventQueue;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,6 +44,7 @@ import edu.harvard.mcz.precapture.data.UnitTrayLabelLifeCycle;
 import edu.harvard.mcz.precapture.exceptions.StartupFailedException;
 import edu.harvard.mcz.precapture.ui.LabelList;
 import edu.harvard.mcz.precapture.ui.MainFrame;
+import edu.harvard.mcz.precapture.ui.MainFrameAltenative;
 import edu.harvard.mcz.precapture.xml.MappingList;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionListType;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
@@ -191,7 +193,11 @@ public class PreCaptureApp {
 					public void run() {
 						try {
 							// Launch user interface
-							MainFrame window = new MainFrame();
+							if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MAINFRAME).equals("MainFrame")) {
+							    MainFrame window = new MainFrame();
+							} else { 
+							    MainFrameAltenative window = new MainFrameAltenative();
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -238,6 +244,10 @@ public class PreCaptureApp {
 			InventoryLifeCycle ils = new InventoryLifeCycle();
 			if (ils.count()>0) { 
 			    InventoryLifeCycle.exportToCSV("Inventory_backup.csv");
+			    Date now = new Date();
+				String date = Long.toString(now.getTime());
+				date.replace(" ", "");
+			    InventoryLifeCycle.exportToCSV("Inventory_backup_"+date+".csv");
 			} 
 			// Test to see if UnitTrayLabel table is non-empty, if so, backup.
 			UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();

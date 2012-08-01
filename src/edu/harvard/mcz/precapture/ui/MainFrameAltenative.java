@@ -17,7 +17,7 @@
  * 
  * Author: Paul J. Morris
  * 
- * $Id$
+ * $Id: MainFrame.java 34 2012-07-31 23:30:57Z chicoreus $
  */
 package edu.harvard.mcz.precapture.ui;
 
@@ -61,6 +61,7 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.io.File;
 import java.util.ArrayList;
+import javax.swing.JSplitPane;
 
 /**
  * Main UI Frame for the PreCapture Application.
@@ -68,9 +69,9 @@ import java.util.ArrayList;
  * @author mole
  *
  */
-public class MainFrame {
+public class MainFrameAltenative {
 
-	private static final Log log = LogFactory.getLog(MainFrame.class);
+	private static final Log log = LogFactory.getLog(MainFrameAltenative.class);
 	
 	private JFrame frame;
 	private JTable tablePrintList;
@@ -84,7 +85,7 @@ public class MainFrame {
 	/**
 	 * Create the user interface.
 	 */
-	public MainFrame() {
+	public MainFrameAltenative() {
 		
 		useNapkin = false;
 		
@@ -108,8 +109,8 @@ public class MainFrame {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/edu/harvard/mcz/precapture/resources/icon.png")));
-		frame.setBounds(100, 100, 640, 640);
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrameAltenative.class.getResource("/edu/harvard/mcz/precapture/resources/icon.png")));
+		frame.setBounds(100, 100, 910, 641);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JMenuBar menuBar = new JMenuBar();
@@ -194,7 +195,7 @@ public class MainFrame {
 		mntmVersion.setEnabled(useNapkin);
 		mnHelp.add(mntmVersion);
 		
-		JMenuItem mntmID = new JMenuItem("$Id$" );
+		JMenuItem mntmID = new JMenuItem("$Id: MainFrame.java 34 2012-07-31 23:30:57Z chicoreus $" );
 		// needs to be enabled to be readable in napkin look and feel
 		mntmID.setEnabled(useNapkin);
 		mnHelp.add(mntmID);		
@@ -205,23 +206,30 @@ public class MainFrame {
 		frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		
 		JPanel panel = new JPanel();
-		tabbedPane.addTab("Folder", null, panel, null);
+		tabbedPane.addTab("Folders", null, panel, null);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_O);
 		panel.setLayout(new BorderLayout(0, 0));
 		
+		JSplitPane splitPane = new JSplitPane();
+		panel.add(splitPane, BorderLayout.CENTER);
+		
+		JPanel panel_2 = new JPanel();
+		splitPane.setLeftComponent(panel_2);
+		panel_2.setLayout(new BorderLayout(0, 0));
+		
 		JScrollPane scrollPaneFolder = new JScrollPane();
+		panel_2.add(scrollPaneFolder, BorderLayout.CENTER);
 		folderPanel = new FolderEntryPanel();
 		scrollPaneFolder.setViewportView(folderPanel);
-		panel.add(scrollPaneFolder, BorderLayout.CENTER);
 		
 		JPanel panel_5 = new JPanel();
+		panel_2.add(panel_5, BorderLayout.SOUTH);
 		FlowLayout flowLayout = (FlowLayout) panel_5.getLayout();
 		flowLayout.setAlignment(FlowLayout.RIGHT);
-		panel.add(panel_5, BorderLayout.SOUTH);
 		
-		JButton btnPrint = new JButton("Print");
+		JButton btnPrint = new JButton("Print One");
 		panel_5.add(btnPrint);
-		btnPrint.setMnemonic(KeyEvent.VK_P);
+		btnPrint.setMnemonic(KeyEvent.VK_O);
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				folderPanel.invokePrintOne();
@@ -238,25 +246,23 @@ public class MainFrame {
 			}
 		});
 		
-		
-		JPanel panel_4 = new JPanel();
-		tabbedPane.addTab("Print List", null, panel_4, null);
-		tabbedPane.setMnemonicAt(1, KeyEvent.VK_L);
-		panel_4.setLayout(new BorderLayout(0, 0));
+		JPanel panel_3 = new JPanel();
+		splitPane.setRightComponent(panel_3);
+		panel_3.setLayout(new BorderLayout(0, 0));
 		
 		JScrollPane scrollPane = new JScrollPane();
-		panel_4.add(scrollPane, BorderLayout.CENTER);
+		panel_3.add(scrollPane, BorderLayout.CENTER);
 		
 		tablePrintList = new JTable();
 		tablePrintList.setModel(PreCaptureSingleton.getInstance().getCurrentLabelList());
 		scrollPane.setViewportView(tablePrintList);
 		
 		JPanel panel_6 = new JPanel();
+		panel_3.add(panel_6, BorderLayout.SOUTH);
 		FlowLayout flowLayout_1 = (FlowLayout) panel_6.getLayout();
 		flowLayout_1.setAlignment(FlowLayout.RIGHT);
-		panel_4.add(panel_6, BorderLayout.SOUTH);
 		
-		JButton btnPrint_1 = new JButton("Print");
+		JButton btnPrint_1 = new JButton("Print All");
 		panel_6.add(btnPrint_1);
 		btnPrint_1.setMnemonic(KeyEvent.VK_P);
 		btnPrint_1.addActionListener(new ActionListener() {
@@ -278,7 +284,7 @@ public class MainFrame {
 		});
 		panel_6.add(btnClear);
 		
-		if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_SHOW_INVENTORY).equals("true"))  {
+		// if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_SHOW_INVENTORY).equals("true"))  {
 			JPanel panel_1 = new JPanel();
 			tabbedPane.addTab("Inventory", null, panel_1, null);
 			panel_1.setLayout(new BorderLayout(0, 0));
@@ -291,7 +297,7 @@ public class MainFrame {
 			InventoryTableModel iTableModel = new InventoryTableModel((ArrayList<Inventory>)ils.findAll());
 			tableInventory.setModel(iTableModel);
 			scrollPane_1.setViewportView(tableInventory);
-			tabbedPane.setMnemonicAt(2, KeyEvent.VK_I);
+			tabbedPane.setMnemonicAt(1, KeyEvent.VK_I);
 			
 			JPanel panel_8 = new JPanel();
 			FlowLayout flowLayout_8 = (FlowLayout) panel_8.getLayout();
@@ -332,6 +338,6 @@ public class MainFrame {
 				        }
 				}
 			});
-		} 
+		//} 
 	}
 }

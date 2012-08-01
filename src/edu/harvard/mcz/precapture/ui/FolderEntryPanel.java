@@ -1,5 +1,5 @@
 /**
- * FolderPanel.java
+ * FolderEntryPanel.java
  * edu.harvard.mcz.precapture.ui
  * Copyright © 2012 President and Fellows of Harvard College
  *
@@ -58,11 +58,11 @@ import edu.harvard.mcz.precapture.exceptions.PrintFailedException;
  * @author mole
  *
  */
-public class FolderPanel extends JPanel {
+public class FolderEntryPanel extends JPanel {
 	
 	private static final long serialVersionUID = -7835985799794074075L;
 
-	private static final Log log = LogFactory.getLog(FolderPanel.class);
+	private static final Log log = LogFactory.getLog(FolderEntryPanel.class);
 
 	//private ArrayList<FieldPlusText> textFields;
 	private ContainerLabel containerLabel;
@@ -71,9 +71,9 @@ public class FolderPanel extends JPanel {
 	private ArrayList<FieldPlusText> textFields;
 
 	/** 
-	 * Default no argument constructor, constructs a new FolderPanel instance.
+	 * Default no argument constructor, constructs a new FolderEntryPanel instance.
 	 */
-	public FolderPanel() {
+	public FolderEntryPanel() {
 		init();
 		
 	}
