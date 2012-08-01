@@ -29,10 +29,23 @@ properties file, others in xml configuration files.</p>
 <pre>
 Family,Genus,SpecificEpithet,SubspecificEpithet,InfraspecificEpithet,InfraspecificRank,Authorship
 </pre>
-<p>Load this file with <em>File/Load Taxon List</em>.  Restart the application.</p>
+<p>Load this file from the <strong>Data Sources</strong> tab of the Configuration Dialog 
+(accessed with <em>File/Configuration</em>), by pressing the <strong>Load Taxon Authority File</strong> 
+button and picking a csv file.  The new authority list will be available in the Taxon combo box when
+you delete all text from the box.</p>
+
+<h2>Editing properties</h2>
+<p>Properties are store in a text file called PreCapture.properties which is created in the
+application directory.  You can edit this file directly, or with the Properties tab of the Configuration Dialog.</p>
+<p>To change the main frame from separate tabs for Label and Print List to a split pane, 
+change the property config.mainuiframe from "MainFrame" to "MainFrameAlternative"</p>
+<img src="ScreenshotConfigurationDialogProperties.png">
+
 
 <h1>Managing backups</h1>
 <p>The Inventory data set and the loaded taxon authority file are backed up to
 .csv exports each time the program successfully exits.</p>
+<p>Backups of the taxon authority file and inventory can be reloaded from the 
+<strong>Data Sources</strong> tab of the Configuration Dialog (accessed with <em>File/Configuration</em>). 
 </body>
 </html>
