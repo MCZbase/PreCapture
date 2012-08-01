@@ -75,7 +75,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     		}
     		result.append(unitTrayLabel.getAuthorship());
     	}
-    	return result.toString();
+    	return result.toString().trim();
 	}
 	
     public static int loadFromCSV(String filename) throws IOException {

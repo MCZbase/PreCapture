@@ -109,9 +109,23 @@ public class ContainerLabel {
      * @return a JSON represenation of the metadata.
      */
 	public String metadataToJSON() { 
+		// RFC4627 allows space after the value separator character (and the other 
+		// structural characters), but we'll leave spaces out to reduce the number
+		// of characters involved in the QRcode.
 		StringBuffer data = new StringBuffer();
-		data.append("\"m1p\":\"").append(PreCaptureSingleton.getInstance().getMappingList().getSupportedProject()).append("\", ");
-		data.append("\"m2v\":\"").append(PreCaptureSingleton.getInstance().getMappingList().getVersion()).append("\", ");
+		// m for metadata
+		// 1p for project (actually a list of projects, thus square brackets).
+		// 2v for version.
+		// numbers are included to make it less likely that there will be a 
+		// collision with field names.
+		data.append("\"m1p\":\"").append(PreCaptureSingleton.getInstance().getMappingList().getSupportedProject()).append("\",");
+		String content = PreCaptureSingleton.getInstance().getMappingList().getVersion();
+		if (content==null || content.equals("null")) {
+			// null is a special case that isn't quoted
+		    data.append("\"m2v\":").append(content).append("");
+		} else { 
+		    data.append("\"m2v\":\"").append(content).append("\"");
+		}
 		return data.toString();
 	}
 	
@@ -122,17 +136,28 @@ public class ContainerLabel {
 	public String toJSON() { 
 
 		StringBuffer data = new StringBuffer(); 
-		data.append("{ ");
+		data.append("{");
 		data.append(metadataToJSON());
 		String comma = "";
+		if (metadataToJSON().length()>0) {
+			// don't add a leading comma if 
+			comma = ",";
+		}
 		for (int i=0;i<fields.size();i++) { 
 			if (!fields.get(i).getTextField().getText().isEmpty()) { 
 				data.append(comma);
-				data.append("\"").append(fields.get(i).getField().getCode()).append("\":\"").append(fields.get(i).getTextField().getText()).append("\"");
-				comma = ", ";
+				String content = fields.get(i).getTextField().getText();
+				content = content.replace("\"", "\\\""); // escape quotation marks occurring in the content.
+				if (content.equals("null")) { 
+					// null is a special case that isn't quoted.
+				    data.append("\"").append(fields.get(i).getField().getCode()).append("\":").append(content).append("");
+				} else { 
+				    data.append("\"").append(fields.get(i).getField().getCode()).append("\":\"").append(content).append("\"");
+				}
+				comma = ",";
 			}
 		}
-		data.append(" }");	
+		data.append("}");	
 
 		return data.toString();
 

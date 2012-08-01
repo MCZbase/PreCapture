@@ -14,7 +14,7 @@
     		<element name="Code" type="string" maxOccurs="1"
     			minOccurs="1">
                 <annotation>
-                	<documentation>The short (one or two letter) code to use for this field when encoding as JSON.  Purpose: Semantic</documentation>
+                	<documentation>The short (one or two letter) code to use for this field when encoding as JSON.  The code must not begin with the letter m followed by a number, as such codes are reserved for metadata derived from the instance document  Purpose: Semantic</documentation>
                 </annotation>
     		</element>
     		<element name="Type" type="string" maxOccurs="1"
@@ -77,11 +77,11 @@
     		</element>
     		<element name="SupportedProject" type="string" maxOccurs="unbounded" minOccurs="1">
     			<annotation>
-    				<documentation>Project Supported by this list of mappings.</documentation>
+    				<documentation>Project Supported by this list of mappings.  This corresponds to the code m1p in a JSON encoding.</documentation>
     			</annotation></element>
     		<element name="Version" type="string" maxOccurs="1" minOccurs="1">
     			<annotation>
-    				<documentation>Version of this MappingList</documentation>
+    				<documentation>Version of this MappingList.  This corresponds to the code m2v in a JSON encoding.</documentation>
     			</annotation></element>
     	</sequence>
     </complexType>
