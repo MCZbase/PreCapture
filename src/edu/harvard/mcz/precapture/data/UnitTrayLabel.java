@@ -58,7 +58,14 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	private String collection;  // collection from which the material came
 	private Integer ordinal;     // order in which to print
 	
-
+    /**
+     * Returns a string containing the taxon name used in this UnitTrayLabel.
+     * 
+     */
+	public String toString() { 
+		return UnitTrayLabelLifeCycle.getScientificName(this);
+	}
+	
 	public UnitTrayLabel() {
 		this.printed = 0;
 		this.numberToPrint = 1;

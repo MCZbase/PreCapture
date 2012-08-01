@@ -66,7 +66,7 @@ public class FolderPanel extends JPanel {
 
 	//private ArrayList<FieldPlusText> textFields;
 	private ContainerLabel containerLabel;
-	private JComboBox comboBoxTaxonPicker;
+	private FilteringJComboBox comboBoxTaxonPicker;
 	private JTextField textNumberToPrint;
 	private ArrayList<FieldPlusText> textFields;
 
@@ -152,8 +152,8 @@ public class FolderPanel extends JPanel {
 		
 		UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
 		
-		comboBoxTaxonPicker = new JComboBox();
-		comboBoxTaxonPicker.setModel(new UnitTrayLabelComboBoxModel(uls.findAll()));
+		comboBoxTaxonPicker = new FilteringJComboBox();
+		comboBoxTaxonPicker.setUTLModel(new UnitTrayLabelComboBoxModel(uls.findAll()));
 		comboBoxTaxonPicker.setEditable(true);
 		comboBoxTaxonPicker.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

@@ -52,6 +52,11 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
         dataListeners = new ArrayList<ListDataListener>();
 	}
 
+	/**
+	 * Construct a new UnitTrayLabelComboBoxModel from a list of UnitTrayLabels.
+	 * 
+	 * @param unitTrayLabelList
+	 */
 	public UnitTrayLabelComboBoxModel(List<UnitTrayLabel> unitTrayLabelList) { 
 		model = (ArrayList<UnitTrayLabel>) unitTrayLabelList;
 		if (model==null) { 
@@ -63,6 +68,23 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
         }
 	}
 	
+	/**
+	 * Add a unit tray label to the model. 
+	 * 
+	 * @param label the label to add.
+	 */
+	public void addElement(UnitTrayLabel label) { 
+		model.add(label);
+	}
+	
+	
+	/** 
+	 * 
+	 * @return a copy of the model.
+	 */
+	public List<UnitTrayLabel> getModel() {
+		return (List<UnitTrayLabel>) model.clone();
+	}
 	
 	/* (non-Javadoc)
 	 * @see javax.swing.ListModel#getSize()
@@ -78,6 +100,17 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
 	@Override
 	public Object getElementAt(int index) {
 		return UnitTrayLabelLifeCycle.getScientificName(model.get(index));
+	}
+	
+	/**
+	 * For dealing directly with the UnitTrayLabel objects in the model.
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public UnitTrayLabel getDataElementAt(int index) { 
+		return model.get(index);
+		
 	}
 
 	/* (non-Javadoc)
@@ -122,5 +155,13 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
 	
 	public UnitTrayLabel getSelectedContainerLabel() { 
 		return selectedItem;
+	}
+
+	/**
+	 * 
+	 */
+	public void removeAllElements() {
+		model = new ArrayList<UnitTrayLabel>();
+		
 	}
 }

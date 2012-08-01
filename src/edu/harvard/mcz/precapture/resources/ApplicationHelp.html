@@ -11,6 +11,7 @@ accompany containers of collection objects (Folders of Herbarium Sheets,
 Unit Trays of Insects, etc.) into a digitization apparatus where the machine
 readable information can be extracted at the container level and applied to the
 digital records of each of the contained collection objects.</p>
+
 <h1>Using the Pre-Capture Application</h1>
 <p>The pre-capture application has three main functions: First, to capture the
 information that applies to all specimens within a container.  Second, to print out
@@ -18,10 +19,18 @@ sets of labels (on paper or adhesive label stock) that can be associated with
 containers such as folders or unit trays.  Third, to take a rough inventory of the
 number of specimens for which pre-capture labels are being generated.  These three 
 functions are reflected on the three main tabs of the application ()</p>
+
 <h1>Configuring the Pre-Capture Application</h1>
 <p>This application is highly configurable.  Some of the configuration is accessed
 through the configuration dialog in the user interface, other elements are in a 
 properties file, others in xml configuration files.</p>
+<h2>Loading a Taxon Authority File</h2>
+<p>Construct a csv file with the following columns:</p>
+<pre>
+Family,Genus,SpecificEpithet,SubspecificEpithet,InfraspecificEpithet,InfraspecificRank,Authorship
+</pre>
+<p>Load this file with <em>File/Load Taxon List</em>.  Restart the application.</p>
+
 <h1>Managing backups</h1>
 <p>The Inventory data set and the loaded taxon authority file are backed up to
 .csv exports each time the program successfully exits.</p>

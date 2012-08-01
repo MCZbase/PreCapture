@@ -49,6 +49,11 @@
             <zipfileset excludes="META-INF/*.SF" src="/home/mole/.m2/repository/com/jgoodies/forms/1.2.1/forms-1.2.1.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="/home/mole/.m2/repository/org/apache/derby/derby/10.9.1.0/derby-10.9.1.0.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="/home/mole/.m2/repository/com/itextpdf/itextpdf/5.3.0/itextpdf-5.3.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="/home/mole/.m2/repository/net/sourceforge/javacsv/javacsv/2.0/javacsv-2.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="/home/mole/.m2/repository/net/sf/json-lib/json-lib/2.4/json-lib-2.4-jdk15.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="/home/mole/.m2/repository/commons-beanutils/commons-beanutils/1.8.0/commons-beanutils-1.8.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="/home/mole/.m2/repository/commons-lang/commons-lang/2.5/commons-lang-2.5.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="/home/mole/.m2/repository/net/sf/ezmorph/ezmorph/1.0.6/ezmorph-1.0.6.jar"/>
         </jar>
     </target>
 </project>
