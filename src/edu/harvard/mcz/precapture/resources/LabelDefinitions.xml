@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tns:LabelDefinitions xmlns:tns="http://mcz.harvard.edu/LabelDefinitionSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://mcz.harvard.edu/LabelDefinitionSchema ../../../../../../supporting/LabelDefinitionSchema.xsd ">
+<tns:LabelDefinitions xmlns:tns="http://mcz.harvard.edu/LabelDefinitionSchema" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://mcz.harvard.edu/LabelDefinitionSchema LabelDefinitionSchema.xsd ">
   <tns:LabelDefinition>
     <tns:Title>Full Sheet</tns:Title>
     <tns:Units>Inches</tns:Units>

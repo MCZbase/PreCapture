@@ -21,6 +21,7 @@ package edu.harvard.mcz.precapture.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -30,9 +31,12 @@ import java.util.Iterator;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.FocusManager;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
@@ -69,6 +73,8 @@ public class FolderEntryPanel extends JPanel {
 	private FilteringJComboBox comboBoxTaxonPicker;
 	private JTextField textNumberToPrint;
 	private ArrayList<FieldPlusText> textFields;
+	private JComboBox comboBoxFamilyFilter;
+	private JComboBox comboBoxGenericFilter;
 
 	/** 
 	 * Default no argument constructor, constructs a new FolderEntryPanel instance.
@@ -103,21 +109,25 @@ public class FolderEntryPanel extends JPanel {
 		JLabel lblFamily = new JLabel("Family");
 		panel_2.add(lblFamily, "3, 2, right, default");
 		
-		JComboBox comboBoxFamilyFilter = new JComboBox();
+		UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
+		comboBoxFamilyFilter = new JComboBox(uls.findDistinctFamilies(true).toArray());
 		panel_2.add(comboBoxFamilyFilter, "4, 2, fill, default");
 		comboBoxFamilyFilter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: Filter by family
+				comboBoxTaxonPicker.setFamilyLimit(comboBoxFamilyFilter.getSelectedItem());
+				comboBoxTaxonPicker.setSelectedItem("");
 			}
 		});
 		
 		JLabel lblNewLabel = new JLabel("Genus");
 		panel_2.add(lblNewLabel, "3, 4, right, default");
 		
-		JComboBox comboBoxGenericFilter = new JComboBox();
+		comboBoxGenericFilter = new JComboBox(uls.findDistinctGenera(true).toArray());
 		comboBoxGenericFilter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// TODO: Filter by genus
+				comboBoxTaxonPicker.setGenusLimit(comboBoxGenericFilter.getSelectedItem());
+				comboBoxTaxonPicker.setSelectedItem("");
 			}
 		});
 		panel_2.add(comboBoxGenericFilter, "4, 4, fill, default");
@@ -150,15 +160,16 @@ public class FolderEntryPanel extends JPanel {
 		JLabel lblTaxon = new JLabel("Taxon");
 		panel_3.add(lblTaxon, "2, 2, right, default");
 		
-		UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
-		
 		comboBoxTaxonPicker = new FilteringJComboBox();
 		comboBoxTaxonPicker.setUTLModel(new UnitTrayLabelComboBoxModel(uls.findAll()));
 		comboBoxTaxonPicker.setEditable(true);
+		// if list has names with too many characters, the width of the combo box forces the panel to be
+		// too large to work effectively as part of a split pane, so limit to a reasonable size.
+		comboBoxTaxonPicker.setMaximumSize(new Dimension(300,comboBoxTaxonPicker.getMaximumSize().height));
+		comboBoxTaxonPicker.setPreferredSize(new Dimension(300,comboBoxTaxonPicker.getPreferredSize().height));
 		comboBoxTaxonPicker.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				log.debug(e.getActionCommand());
-				// TODO: Fill in taxon from picklist
 				comboBoxTaxonPicker.getSelectedIndex();
 				UnitTrayLabel utl = ((UnitTrayLabelComboBoxModel)comboBoxTaxonPicker.getModel()).getSelectedContainerLabel();
 				log.debug(utl.getSpecificEpithet());
@@ -209,7 +220,10 @@ public class FolderEntryPanel extends JPanel {
 		       textFields.get(i).getTextField().setFocusAccelerator(keys[i]);
 		       label.setDisplayedMnemonic(keys[i]);
 		    }
-		
+		    
+		    // TODO: Look to see if the field has a list of default values, if so use
+		    // a combo box instead of a text field.  
+		    
 		    textFields.get(i).getTextField().setColumns(10);
 		    panel_3.add(label, "2, " + Integer.toString(col) + ", right, default");
 		    panel_3.add(textFields.get(i).getTextField(), "4, " + Integer.toString(col) +  " , 3, 1, fill, default");
@@ -242,19 +256,25 @@ public class FolderEntryPanel extends JPanel {
 		return result;
 	}
 	
+	/**
+	 * Produce a PDF document containing the current containerLabel and send it to the printer.
+	 */
 	public void invokePrintOne() { 
 	    try {
-	    	//TODO: See: http://stackoverflow.com/questions/4609667/how-to-print-a-pdf-created-with-itext
 	    	containerLabel.setNumberToPrint(getNumberToPrint());
 	    	ArrayList<ContainerLabel> containers = new ArrayList<ContainerLabel>();
 	    	containers.add(containerLabel);
 			LabelEncoder.printList(containers);
 		} catch (PrintFailedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Printing failed. " + e1.getMessage(), "Print Failed error.", JOptionPane.ERROR_MESSAGE);
+			log.error(e1.getMessage());
 		}
 	}
 	
+	/**
+	 * Add the current container label to the list of container labels for printing, then
+	 * reset the fields on the UI to blank.
+	 */
 	public void invokeAddToList() { 
 	    containerLabel.setNumberToPrint(getNumberToPrint());
 		PreCaptureSingleton.getInstance().getCurrentLabelList().addLabelToList(containerLabel.clone());
@@ -262,7 +282,7 @@ public class FolderEntryPanel extends JPanel {
 	}
 	
 	/** 
-	 * Reset all of the text field values to empty strings.
+	 * Reset all of the text field values to empty strings, or defaults if provided.
 	 */
 	public void resetValues() { 
 		
@@ -271,6 +291,13 @@ public class FolderEntryPanel extends JPanel {
 		int fieldCount = containerLabel.getFields().size();
 	    for (int i=0; i<fieldCount; i++) { 
 	    	containerLabel.getFields().get(i).getTextField().setText("");
+	    	log.debug(containerLabel.getFields().get(i).getField().getDefaultValue().size());
+	    	if (containerLabel.getFields().get(i).getField().getDefaultValue().size()==1) { 
+	    		containerLabel.getFields().get(i).getTextField().setText(
+	    				containerLabel.getFields().get(i).getField().getDefaultValue().get(0)
+	    				);
+	    		log.debug(containerLabel.getFields().get(i).getField().getDefaultValue().get(0));
+	    	}
 	    }
 		
 	}

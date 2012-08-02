@@ -27,12 +27,14 @@ import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.SessionException;
 import org.hibernate.classic.Session;
+import org.hibernate.criterion.Restrictions;
 
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
@@ -40,7 +42,8 @@ import com.csvreader.CsvWriter;
 import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
 /** UnitTrayLabelLifeCycle  Utility class to manage the lifecycle of UnitTrayLabel PDOs,
- * and support various other functions related to UnitTrayLabel objects.
+ * and support various other functions related to UnitTrayLabel objects.  The UnitTrayLabel
+ * data set comprises a taxon authority file.  
  * 
  * @author Paul J. Morris
  *
@@ -269,8 +272,14 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				results = (List<UnitTrayLabel>) session.createCriteria("edu.harvard.mcz.precapture.data.UnitTrayLabel").add(
-						create(instance)).list();
+				Criteria criteria = session.createCriteria("edu.harvard.mcz.precapture.data.UnitTrayLabel");
+				if (instance.getFamily()!=null && instance.getFamily().length()>0) { 
+					criteria.add(Restrictions.eq("family", instance.getFamily()));
+				}
+				if (instance.getGenus()!=null && instance.getGenus().length()>0) { 
+					criteria.add(Restrictions.eq("genus", instance.getGenus()));
+				}
+				results = (List<UnitTrayLabel>) criteria.list();
 				session.getTransaction().commit();
 				log.debug("find by example successful, result size: "
 						+ results.size());
@@ -432,4 +441,66 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 		}
 	}	
 
+	/**
+	 * 
+	 * @param leadingBlank if true, the first item in the return list is an empty string
+	 * @return a list of the distinct family names in the taxon authority file.
+	 */
+	public List<String> findDistinctFamilies(boolean leadingBlank) {
+		List<String> results = new ArrayList<String>();
+		if (leadingBlank) { 
+			results.add("");
+		}
+		log.debug("finding distinct families in UnitTrayLabel");
+		try {
+			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+			session.beginTransaction();
+			try { 
+				results.addAll((List<String>) session.createQuery("select distinct u.family from UnitTrayLabel u order by u.family ").list());
+				session.getTransaction().commit();
+				log.debug("find distinct families successful, result size: " + results.size());
+			} catch (HibernateException e) { 
+				session.getTransaction().rollback();
+				log.error(e.getMessage());
+			} finally { 
+			    try { session.close(); } catch (SessionException e) { }
+			}
+		} catch (RuntimeException re) {
+			log.error("find distinct families failed", re);
+			throw re;
+		}
+		return results;
+	}
+	
+	/**
+	 * @param leadingBlank if true, the first item in the return list is an empty string.
+	 * @return a list of the distinct generic names in the UnitTrayLabel data set.
+	 */
+	public List<String> findDistinctGenera(boolean leadingBlank) {
+		List<String> results = new ArrayList<String>();
+		if (leadingBlank) { 
+			results.add("");
+		}
+		log.debug("finding distinct genera in UnitTrayLabel");
+		try {
+			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+			session.beginTransaction();
+			try { 
+				results.addAll((List<String>) session.createQuery("select distinct u.genus from UnitTrayLabel u order by u.genus ").list());
+				session.getTransaction().commit();
+				log.debug("find distinct families successful, result size: " + results.size());
+			} catch (HibernateException e) { 
+				session.getTransaction().rollback();
+				log.error(e.getMessage());
+			} finally { 
+			    try { session.close(); } catch (SessionException e) { }
+			}
+		} catch (RuntimeException re) {
+			log.error("find distinct genera failed", re);
+			throw re;
+		}
+		return results;
+	}	
+
+	
 }

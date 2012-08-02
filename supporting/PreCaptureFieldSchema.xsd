@@ -59,6 +59,12 @@
     				</documentation>
     			</annotation>
     		</element>    		
+    		<element name="DefaultValue" type="string" maxOccurs="unbounded"
+    			minOccurs="1">
+                <annotation>
+                	<documentation>Default value to populate this field.  Empty for no default value.  Expectation is that a single default value will populate this field in the UI.  Expectation is that a list of default values will populate a pick list in the UI.  Purpose: UI.</documentation>
+                </annotation>
+    		</element>
     	</sequence>
     </complexType>
 

@@ -56,6 +56,12 @@ public class PreCaptureProperties extends AbstractTableModel {
 	public static final String KEY_SELECTED_PRINT_DEFINITION = "config.selectedprintdefinition";
 	/** Key for properties file for which main frame variant to use. */
 	public static final String KEY_MAINFRAME = "config.mainuiframe";
+	/** Key for properties file for the dwc:collection code to use by default.  */
+	public static final String KEY_MY_COLLECTION_CODE = "config.mycollectioncode";
+	/** Key for properties file for the minimum number of characters needed before filtering a
+	 * filtering combo box (Taxon name combo box).
+	 */
+	public static final String KEY_FILTER_LENGTH_THRESHOLD = "config.filterlengththreshold";
 
 	private Properties properties = null;
 	private String propertiesFilename = null;
@@ -183,7 +189,15 @@ public class PreCaptureProperties extends AbstractTableModel {
 		if (!properties.containsKey(KEY_MAINFRAME)) {
 			// name of selected UI main frame 
 			properties.setProperty(KEY_MAINFRAME, "MainFrame");
+		}
+		if (!properties.containsKey(KEY_MY_COLLECTION_CODE)) {
+			// default collection code (empty string is application default) 
+			properties.setProperty(KEY_MY_COLLECTION_CODE, "");
 		}		
+		if (!properties.containsKey(PreCaptureProperties.KEY_FILTER_LENGTH_THRESHOLD)) {
+			// default filtering threshold for filtering combobox
+			properties.setProperty(KEY_FILTER_LENGTH_THRESHOLD, "4");
+		}			
 	}
 
 	/**

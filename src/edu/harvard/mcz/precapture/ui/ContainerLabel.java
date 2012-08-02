@@ -31,6 +31,7 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 
+import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.encoder.LabelEncoder;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
@@ -56,12 +57,22 @@ public class ContainerLabel {
 	public ContainerLabel() {
 		numberToPrint = 1;
         this.fields = new ArrayList<FieldPlusText>();
+        
 	}
 	
 	
 	public ContainerLabel(ArrayList<FieldPlusText> fields) {
 		numberToPrint = 1;
         this.fields = fields;
+		for (int i = 0; i<fields.size(); i++) { 
+			if (fields.get(i).getField().getDefaultValue().size()==1) { 
+			    fields.get(i).getTextField().setText(fields.get(i).getField().getDefaultValue().get(0));
+			}
+			if (fields.get(i).getField().getVocabularyTerm().equals("dwc:collectionCode") && 
+					PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MY_COLLECTION_CODE).length()>0) { 
+			    fields.get(i).getTextField().setText(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MY_COLLECTION_CODE));
+			}
+		}
 	}
 
 
@@ -95,9 +106,20 @@ public class ContainerLabel {
 	 */
 	public void resetToBlank() { 
 		numberToPrint = 1;
-		for (int i = 0; i<fields.size(); i++) { 
+		for (int i = 0; i<fields.size(); i++) {
+			// Set default value for fields that have just one default.
+			if (fields.get(i).getField().getDefaultValue().size()==1) { 
+				if (fields.get(i).getField().getDefaultValue().get(0).length()>0) { 
+				    fields.get(i).getTextField().setText(fields.get(i).getField().getDefaultValue().get(0));
+				}
+			}
+			// TODO: Make user configurable.
 			if (!fields.get(i).getField().getVocabularyTerm().equals("dwc:genus")) { 
 			    fields.get(i).getTextField().setText("");
+			}
+			if (fields.get(i).getField().getVocabularyTerm().equals("dwc:collectionCode") && 
+					PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MY_COLLECTION_CODE).length()>0) { 
+			    fields.get(i).getTextField().setText(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MY_COLLECTION_CODE));
 			}
 		}
 	}

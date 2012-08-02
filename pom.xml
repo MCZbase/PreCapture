@@ -95,4 +95,26 @@
   		<classifier>jdk15</classifier>
   	</dependency>
   </dependencies>
+  <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-antrun-plugin</artifactId>
+  			<version>1.7</version>
+  			<executions>
+    			<execution>
+      				<phase>package</phase>
+      					<configuration>
+        					<tasks>
+          						<ant antfile="buildAppJar.xml" target="create_run_jar"/>
+        					</tasks>
+      					</configuration>
+      					<goals>
+        					<goal>run</goal>
+      					</goals>
+    			</execution>
+  			</executions>  			
+  		</plugin>
+  	</plugins>
+  </build>
 </project>
