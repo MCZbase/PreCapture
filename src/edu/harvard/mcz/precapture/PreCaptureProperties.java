@@ -62,6 +62,8 @@ public class PreCaptureProperties extends AbstractTableModel {
 	 * filtering combo box (Taxon name combo box).
 	 */
 	public static final String KEY_FILTER_LENGTH_THRESHOLD = "config.filterlengththreshold";
+	/** Value to use for QRCode error correction level in hint to Zxing in encoding. */
+	public static final String KEY_QRCODEECLEVEL = "config.qr_errorcorrection";
 
 	private Properties properties = null;
 	private String propertiesFilename = null;
@@ -198,6 +200,10 @@ public class PreCaptureProperties extends AbstractTableModel {
 			// default filtering threshold for filtering combobox
 			properties.setProperty(KEY_FILTER_LENGTH_THRESHOLD, "4");
 		}			
+		if (!properties.containsKey(KEY_QRCODEECLEVEL)) {
+			// name of selected UI main frame 
+			properties.setProperty(KEY_QRCODEECLEVEL, "H");
+		}
 	}
 
 	/**

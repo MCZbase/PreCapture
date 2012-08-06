@@ -20,6 +20,7 @@
 package edu.harvard.mcz.precapture.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -135,6 +136,8 @@ public class ConfigurationDialog extends JDialog {
 						JButton btnLoadTaxonAuthority = new JButton("Load Taxon Authority File");
 						btnLoadTaxonAuthority.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
+								Cursor cursor = frame.getCursor();
+								frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 								JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 								FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV spreadsheets", "csv");
 								fileChooser.setFileFilter(filter);
@@ -150,6 +153,7 @@ public class ConfigurationDialog extends JDialog {
 								}
 								UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
 								textFieldUnitTrayLabelCount.setText(Integer.toString(uls.count()));
+								frame.setCursor(cursor);
 							}
 						});
 						panel.add(btnLoadTaxonAuthority, "4, 6");
@@ -174,6 +178,8 @@ public class ConfigurationDialog extends JDialog {
 						JButton btnReloadInventoryFrom = new JButton("Reload Inventory From Backup");
 						btnReloadInventoryFrom.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
+								Cursor cursor = frame.getCursor();
+								frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 								JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 								FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV spreadsheets", "csv");
 								fileChooser.setFileFilter(filter);
@@ -195,7 +201,8 @@ public class ConfigurationDialog extends JDialog {
 									}
 								}
 								InventoryLifeCycle ils = new InventoryLifeCycle();
-								textFieldInventoryCount.setText(Integer.toString(ils.count()));								
+								textFieldInventoryCount.setText(Integer.toString(ils.count()));	
+								frame.setCursor(cursor);
 							}
 						});
 						panel.add(btnReloadInventoryFrom, "4, 12");

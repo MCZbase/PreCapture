@@ -22,6 +22,7 @@ package edu.harvard.mcz.precapture.data;
 import static org.hibernate.criterion.Example.create;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -83,7 +84,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 	
     public static int loadFromCSV(String filename) throws IOException {
     	int numberLoaded = 0;
-    	CsvReader reader = new CsvReader(filename);
+    	CsvReader reader = new CsvReader(filename,',',Charset.forName("utf-8"));
     	reader.readHeaders();
     	UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
     	uls.deleteAll();

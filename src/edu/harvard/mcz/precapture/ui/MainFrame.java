@@ -41,6 +41,8 @@ import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.BorderLayout;
 
 import javax.swing.JFileChooser;
@@ -68,7 +70,7 @@ import java.util.ArrayList;
  * @author mole
  *
  */
-public class MainFrame {
+public class MainFrame  implements WindowListener {
 
 	private static final Log log = LogFactory.getLog(MainFrame.class);
 	
@@ -110,7 +112,7 @@ public class MainFrame {
 		frame = new JFrame();
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/edu/harvard/mcz/precapture/resources/icon.png")));
 		frame.setBounds(100, 100, 640, 640);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -122,7 +124,7 @@ public class MainFrame {
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				PreCaptureApp.exit();
+				PreCaptureApp.exit(frame);
 			}
 		});
 		
@@ -159,6 +161,17 @@ public class MainFrame {
 		});
 		mntmLoadTaxa.setMnemonic(KeyEvent.VK_T);		
 		mnFile.add(mntmConfiguration);
+		
+		JMenuItem mntmRunTests = new JMenuItem("Run Tests");
+		mntmRunTests.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				BarcodeTestingFrame testFrame = new BarcodeTestingFrame();
+				testFrame.setVisible(true);
+			}
+		});
+		mntmRunTests.setMnemonic(KeyEvent.VK_T);
+		mnFile.add(mntmRunTests);
+		
 		//mnFile.add(mntmLoadTaxa);
 		mntmExit.setMnemonic(KeyEvent.VK_X);
 		mnFile.add(mntmExit);
@@ -333,5 +346,67 @@ public class MainFrame {
 				}
 			});
 		} 
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowClosing(WindowEvent e) {
+		PreCaptureApp.exit(frame);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }

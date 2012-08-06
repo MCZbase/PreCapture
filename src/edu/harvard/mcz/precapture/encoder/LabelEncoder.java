@@ -19,17 +19,24 @@
  */
 package edu.harvard.mcz.precapture.encoder;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.print.PrinterJob;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+
+import javassist.bytecode.ByteArray;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -69,8 +76,10 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import edu.harvard.mcz.precapture.PreCaptureApp;
 import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
+import edu.harvard.mcz.precapture.exceptions.BarcodeCreationException;
 import edu.harvard.mcz.precapture.exceptions.PrintFailedException;
 import edu.harvard.mcz.precapture.ui.ContainerLabel;
 import edu.harvard.mcz.precapture.xml.Field;
@@ -87,9 +96,13 @@ public class LabelEncoder {
 	private static final Log log = LogFactory.getLog(LabelEncoder.class);
 
 	private ContainerLabel label;
-	
+
 	// TODO: Move to a property.
 	private static final String PRINTFILE = "labels.pdf";
+	
+	public static String getPrintFile() {
+		return PRINTFILE;
+	}
 
 	public LabelEncoder (ContainerLabel containerLabel)  {
 		label = containerLabel;
@@ -109,36 +122,64 @@ public class LabelEncoder {
 		return result;
 	}
 
-	private BitMatrix getQRCodeMatrix() { 
+	private BitMatrix getQRCodeMatrix() throws WriterException { 
 		BitMatrix result = null;
 		QRCodeWriter writer = new QRCodeWriter();
+		String data = label.toJSON();
 		try {
-			// String data = label.toJSONString();
-			StringBuffer data = new StringBuffer();
-			data.append(label.toJSON());
-			Hashtable<EncodeHintType, ErrorCorrectionLevel> hints = new Hashtable<EncodeHintType, ErrorCorrectionLevel>();  // set ErrorCorrectionLevel here
-			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-			result = writer.encode(data.toString(), BarcodeFormat.QR_CODE, 200, 200, hints);
-		} catch (WriterException e) {
+			byte[] dataBytes = label.toJSON().getBytes("UTF-8");
+			data = new String(dataBytes,"ISO-8859-1");
+		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();  // set ErrorCorrectionLevel here
+		String correctionLevel = PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_QRCODEECLEVEL, "H");
+		if (correctionLevel.equals("H")) { 
+			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);  //30% loss, 174 char at level 10
+		} 
+		if (correctionLevel.equals("Q")) { 
+			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.Q);  //25% loss, 221 char at level 10
+		} 
+		if (correctionLevel.equals("M")) { 
+			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);  //15% loss, 311 char at level 10
+		} 
+		if (correctionLevel.equals("L")) { 
+			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);  //7% loss, 395 char at level 10
+		} 
+		// Encode hint of UTF-8 appears to force a Kanji encoding in the barcode
+		// which forces every character to be a multi byte character, dramatically
+		// limiting the amount of information that can be encoded.
+		// hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+		hints.put(EncodeHintType.CHARACTER_SET, "ISO-8859-1");
+		// Providing a large preferred height and width results in some barcodes
+		// having a white margin larger than 4 units, thus specifying small numbers.
+		// This is documented in a comment within QRCodeWriter: "Padding includes 
+		// both the quiet zone and the extra white pixels to accommodate the requested
+		// dimensions."   
+		result = writer.encode(data, BarcodeFormat.QR_CODE, 10, 10, hints);
 		return result;
 	}
 
-	public Image getImage() { 
+	public BufferedImage getBufferedImage() throws WriterException { 
 		BitMatrix barcode = getQRCodeMatrix();
-		BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(barcode);
+		return MatrixToImageWriter.toBufferedImage(barcode);
+	}
+
+	public Image getImage() throws BarcodeCreationException {
 		Image image = null;
+		BitMatrix barcode;
 		try {
+			barcode = getQRCodeMatrix();
+			BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(barcode);
 			image = Image.getInstance(bufferedImage,null);
+			//image.setDpi(300, 300);
+		} catch (WriterException e) {
+			throw new BarcodeCreationException(e.getMessage());
 		} catch (BadElementException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new BarcodeCreationException(e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new BarcodeCreationException(e.getMessage());
 		}
 		return image;
 	}
@@ -162,60 +203,60 @@ public class LabelEncoder {
 				}
 			}
 			if (printDefinition==null) {
-				//TODO add error handling dialog for users
 				log.error("No selected print format defintion found.");
+				//TODO change from message to error handling dialog that allows picking a print format.
+				JOptionPane.showMessageDialog(null, "Unable to print.  No print format is selected.");
 			} else { 
 
 				log.debug(printDefinition.getTitle());
 				log.debug(printDefinition.getTextOrentation().toString());
-				
-				//TODO: Refactor to use properties to determine number of labels per page and layout.
+
 				LabelEncoder encoder = new LabelEncoder(containers.get(0));
-				Image image = encoder.getImage();
 				try {
+					Image image = encoder.getImage();
 					Document document = new Document();
-					PdfWriter.getInstance(document, new FileOutputStream(PRINTFILE));
+					PdfWriter.getInstance(document, new FileOutputStream(LabelEncoder.getPrintFile()));
 					// Convert units in print definition to points (72 points/inch, 28.346456 points/cm)
-					
+
 					int paperWidthPoints = 612;  // 8.5"
 					int paperHeightPoints = 792;  // 11"
 					int marginsPoints = 36; // 0.5"
 					int labelWidthPoints = 540;  // 7.5" 
 					int labelHeightPoints = 720; // 10"
 					int numColumns = 1;   // goes with above
-					
+
 					numColumns = printDefinition.getColumns();
-					
+
 					if (printDefinition.getUnits().toString().toLowerCase().equals("inches")) { 
-					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*72f);
-					    paperHeightPoints = (int)Math.floor(printDefinition.getPaperHeight()*72f);
-					    marginsPoints = (int)Math.floor(printDefinition.getMargins()*72f);
-					    labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*72f);
-					    labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*72f);
+						paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*72f);
+						paperHeightPoints = (int)Math.floor(printDefinition.getPaperHeight()*72f);
+						marginsPoints = (int)Math.floor(printDefinition.getMargins()*72f);
+						labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*72f);
+						labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*72f);
 					}
 					if (printDefinition.getUnits().toString().toLowerCase().equals("cm")) { 
-					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*28.346456f);
-					    paperHeightPoints = (int)Math.floor(printDefinition.getPaperHeight()*28.346456f);
-					    marginsPoints = (int)Math.floor(printDefinition.getMargins()*28.346456f);
-					    labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*28.346456f);
-					    labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*28.346456f);
+						paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*28.346456f);
+						paperHeightPoints = (int)Math.floor(printDefinition.getPaperHeight()*28.346456f);
+						marginsPoints = (int)Math.floor(printDefinition.getMargins()*28.346456f);
+						labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*28.346456f);
+						labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*28.346456f);
 					}
 					if (printDefinition.getUnits().toString().toLowerCase().equals("points")) { 
-					    paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*1f);
-					    paperHeightPoints = (int)Math.floor(printDefinition.getPaperHeight()*1f);
-					    marginsPoints = (int)Math.floor(printDefinition.getMargins()*1f);
-					    labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*1f);
-					    labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*1f);
+						paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*1f);
+						paperHeightPoints = (int)Math.floor(printDefinition.getPaperHeight()*1f);
+						marginsPoints = (int)Math.floor(printDefinition.getMargins()*1f);
+						labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*1f);
+						labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*1f);
 					}
-					
+
 					if (paperWidthPoints==612 && paperHeightPoints==792) { 
-					    document.setPageSize(PageSize.LETTER);
+						document.setPageSize(PageSize.LETTER);
 					} else { 
 						document.setPageSize(new Rectangle(paperWidthPoints,paperHeightPoints));
 					}
 					document.setMargins(marginsPoints, marginsPoints, marginsPoints, marginsPoints);
 					document.open();
-					
+
 					// Sanity check
 					if (paperWidthPoints<=0) { paperWidthPoints = 612; }  
 					if (paperHeightPoints<=0) { paperHeightPoints = 792; }  
@@ -230,7 +271,7 @@ public class LabelEncoder {
 						labelHeightPoints = paperHeightPoints+(marginsPoints*2);
 						log.debug("Adjusting label height to fit printable page height");
 					}
-					
+
 					// calculate how many columns will fit on the paper.
 					int columns = (int)Math.floor((paperWidthPoints - (marginsPoints*2))/labelWidthPoints);
 					// if specified column count is smaller, use the specified.
@@ -238,34 +279,34 @@ public class LabelEncoder {
 						columns = numColumns;
 						log.debug("Fewer columns specified in definition than will fit on page, using specified column count of " + numColumns);
 					}
-					
+
 					// define two table cells per column, one for text one for barcode.
-				    int subCellColumnCount = columns * 2;
-					
-				    // set the table, with an absolute width and relative widths of the cells in the table;
+					int subCellColumnCount = columns * 2;
+
+					// set the table, with an absolute width and relative widths of the cells in the table;
 					PdfPTable table = setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, columns, subCellColumnCount);
 					// figure out the width of the cells containing the barcodes.
 					float ratio = ((float)REL_WIDTH_BARCODE_CELL)/(((float)REL_WIDTH_BARCODE_CELL)+((float)REL_WIDTH_TEXT_CELL));
-		            float barcodeCellWidthPoints = (float) Math.floor(labelWidthPoints * ratio);
-		            log.debug("Width of barcode cell in points: " + barcodeCellWidthPoints);
+					float barcodeCellWidthPoints = (float) Math.floor(labelWidthPoints * ratio);
+					log.debug("Width of barcode cell in points: " + barcodeCellWidthPoints);
 
 					//Rectangle pageSizeRectangle = new Rectangle(paperWidthPoints, paperHeightPoints);
 					//table.setWidthPercentage(cellWidthsPoints, pageSizeRectangle);
 					//table.setTotalWidth(cellWidthsPoints);
-					
+
 					// Calculate how many cells fit on a page (two cells per label).
 					int labelsPerColumn = (int)Math.floor((paperHeightPoints-(marginsPoints*2))/labelHeightPoints);
 					int cellsPerPage = subCellColumnCount * labelsPerColumn; 
 					log.debug("Labels per column = " + labelsPerColumn);
 					log.debug("Cells per page = " + cellsPerPage);
-			
+
 					Iterator<ContainerLabel> iterLabels = containers.iterator();
-					
+
 					int cellCounter = 0;  // counts number of cells filled on a page.
 					int counter = 0;      // counts number of pre capture label data rows to print (each of which may request more than one copy).
-					
+
 					// TODO: Doesn't fit on page.
-					
+
 					while (iterLabels.hasNext()) {
 						// Loop through all of the container labels found to print 
 						label = iterLabels.next();
@@ -297,7 +338,7 @@ public class LabelEncoder {
 
 							cellCounter = cellCounter + 2;  // we've added two cells to the page (two cells per label).
 							log.debug("Cells " + cellCounter + " of " + cellsPerPage + " cells per page.");
-							
+
 							// If we have hit a full set of labels for the page, add them to the document
 							// in each column, filling left to right
 							if (cellCounter>=cellsPerPage-1) {
@@ -328,72 +369,11 @@ public class LabelEncoder {
 						table.setLockedWidth(true);
 						document.add(table);
 					}
-					try { 
+					document.close();
+					
+					// send to printer
+					PrintingUtility.sendPDFToPrinter(printDefinition, paperWidthPoints, paperHeightPoints);
 
-						//TODO: Send to printer. 
-						//See: http://stackoverflow.com/questions/4609667/how-to-print-a-pdf-created-with-itext
-
-						document.close();
-						
-						try {
-							FileInputStream pdfInputStream = new FileInputStream(PRINTFILE);
-
-							DocFlavor psInFormat = DocFlavor.INPUT_STREAM.PDF;
-							Doc myDoc = new SimpleDoc(pdfInputStream, psInFormat, null);  
-							PrintRequestAttributeSet atset = new HashPrintRequestAttributeSet();
-							atset.add(new Copies(1));
-							// Set paper size
-							if (paperWidthPoints==612 && paperHeightPoints==792) { 
-							    atset.add(MediaSizeName.NA_LETTER);
-							} else { 
-								float x = printDefinition.getPaperWidth();
-								float y = printDefinition.getPaperHeight();
-								if (printDefinition.getUnits().toString().toLowerCase().equals("inches")) { 
-									atset.add(MediaSize.findMedia(x, y, Size2DSyntax.INCH));
-								}
-								if (printDefinition.getUnits().toString().toLowerCase().equals("cm")) { 
-									x=x*10f;
-									y=y*10f;
-									atset.add(MediaSize.findMedia(x, y, Size2DSyntax.INCH));
-								}
-								if (printDefinition.getUnits().toString().toLowerCase().equals("points")) { 
-									x=x/72f;
-									y=y/72f;
-									atset.add(MediaSize.findMedia(x, y, Size2DSyntax.INCH));
-								}
-							}
-							atset.add(Sides.ONE_SIDED);
-							PrintService[] services = PrintServiceLookup.lookupPrintServices(psInFormat, atset);
-							if (services.length > 0) {
-
-								Object selectedService = JOptionPane.showInputDialog(null,
-										"Send labels to which printer?", "Input",
-										JOptionPane.INFORMATION_MESSAGE, null,
-										services, services[0]);
-
-								if (selectedService!=null) { 
-									DocPrintJob job = ((PrintService)selectedService).createPrintJob();
-									try {
-										job.print(myDoc, atset);
-									} catch (PrintException pe) {
-										log.error("Printing Error: " + pe.getMessage());
-									}
-								}
-								log.debug("Available printing services " + services.length);
-								for (int i =0; i< services.length; i++) { 
-									log.debug(services[i].getName());
-								}
-							} else { 
-								log.error("No available printing services");
-							}
-						} catch (FileNotFoundException e) {
-							log.error(e.getMessage());
-						}
-						
-
-					} catch (Exception e) { 
-						throw new PrintFailedException("No labels to print." + e.getMessage());
-					}
 					// Check to see if there was content in the document.
 					if (counter==0) { 
 						result = false;
@@ -402,17 +382,20 @@ public class LabelEncoder {
 						result = true;
 					}
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
+					log.debug(e.getMessage());
 					e.printStackTrace();
 					throw new PrintFailedException("File not found.");
 				} catch (DocumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					throw new PrintFailedException("Error buiding PDF document.");
+					log.debug(e.getMessage());
+					throw new PrintFailedException("Error building/printing PDF document. " + e.getMessage());
 				} catch (OutOfMemoryError e ) { 
 					System.out.println("Out of memory error. " + e.getMessage());
 					System.out.println("Failed.  Too many labels.");
 					throw new PrintFailedException("Ran out of memory, too many labels at once.");
+				} catch (BarcodeCreationException e) {
+					System.out.println("BarcodeCreationException. " + e.getMessage());
+					System.out.println("Failed.  Couldn't create barcode.");
+					throw new PrintFailedException("Unable to create barcode.  Probably too many characters to encode. " + e.getMessage());
 				}
 			}
 			log.debug("printList Done. Success = " + result);
@@ -423,7 +406,7 @@ public class LabelEncoder {
 	// TODO: Move to print definition configuration;
 	public static final int REL_WIDTH_TEXT_CELL = 2;
 	public static final int REL_WIDTH_BARCODE_CELL = 3;
-	
+
 	private static PdfPTable setupTable(int paperWidthPoints, int marginsPoints, int labelWidthPoints, int columns, int subCellColumnCount) throws DocumentException { 
 		PdfPTable table = new PdfPTable(subCellColumnCount);
 		table.setLockedWidth(true);   // force use of totalWidth in points, rather than percentWidth.
@@ -434,10 +417,10 @@ public class LabelEncoder {
 		float[] cellWidthsRatio = new float[subCellColumnCount];
 		int cellNumber = 0;
 		for (int c=0;c<columns;c++) { 
-		    cellWidthsRatio[cellNumber] = REL_WIDTH_TEXT_CELL; // width of text cell
-		    cellNumber++;
-		    cellWidthsRatio[cellNumber] = REL_WIDTH_BARCODE_CELL; // width of barcode cell
-		    cellNumber++;
+			cellWidthsRatio[cellNumber] = REL_WIDTH_TEXT_CELL; // width of text cell
+			cellNumber++;
+			cellWidthsRatio[cellNumber] = REL_WIDTH_BARCODE_CELL; // width of barcode cell
+			cellNumber++;
 		}
 		table.setTotalWidth(paperWidthPoints - 2* marginsPoints);
 		// must set total width before setting relative cell widths.
@@ -445,6 +428,30 @@ public class LabelEncoder {
 		log.debug("Width:" + table.getTotalWidth());
 		return table;
 	}
-		
-	
+
+	public static BufferedImage resizeImage(java.awt.Image originalImage, int newWidth, int newHeight) {
+		BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_BYTE_GRAY);
+		Graphics2D graphics = scaledImage.createGraphics();
+		//graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		graphics.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
+		graphics.dispose();   	
+		return scaledImage;
+	}	
+
+	public static BufferedImage resizeImage(java.awt.Image originalImage, int newWidth, int newHeight, int padding) {
+		BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_BYTE_GRAY);
+		Graphics2D graphics = scaledImage.createGraphics();
+		//graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		graphics.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
+		graphics.dispose();
+		BufferedImage scaledImage2 = new BufferedImage(newWidth+4, newHeight+4, BufferedImage.TYPE_BYTE_GRAY);
+		Graphics2D graphics2 = scaledImage2.createGraphics();
+		graphics2.setBackground(Color.WHITE);
+		graphics2.setColor(Color.WHITE);
+		graphics2.fillRect(0, 0, newWidth+padding, newHeight+padding);
+		graphics2.drawImage(scaledImage, padding/2, padding/2, newWidth, newHeight, null);
+		graphics2.dispose();    	
+		return scaledImage2;
+	}		
+
 }

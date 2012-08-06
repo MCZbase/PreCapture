@@ -19,12 +19,14 @@
  */
 package edu.harvard.mcz.precapture;
 
+import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -59,7 +61,7 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "0.8";
+	public static final String VERSION = "0.9";
 	public static final String SVN_ID = "$Id$";
 	public static final String AUTHORS = "Paul J. Morris";
 	public static final String COPYRIGHT = "Copyright © 2012 President and Fellows of Harvard College";
@@ -227,7 +229,7 @@ public class PreCaptureApp {
 		} catch (StartupFailedException sfe) {
 			// Fatal startup error, alert user and exit.
 			JOptionPane.showMessageDialog(null, "Unable to start " + PreCaptureApp.NAME +". \n" + sfe.getMessage());
-			exit();
+			System.exit(1);
 		}
 
 	}
@@ -235,7 +237,9 @@ public class PreCaptureApp {
 	/**
 	 * Save properties, write log message, and exit application normally. 
 	 */
-	public static void exit() {
+	public static void exit(JFrame frame) {
+		Cursor cursor = frame.getCursor();
+		frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		try {
 			// Write current properties to properties file (creating file 
 			// with default properties if it does not yet exist).
@@ -259,6 +263,7 @@ public class PreCaptureApp {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		frame.setCursor(cursor);
 		log.debug("Exiting.");
 		System.exit(0);
 	}
