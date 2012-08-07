@@ -32,6 +32,7 @@ import javax.swing.JMenuItem;
 import edu.harvard.mcz.precapture.PreCaptureApp;
 import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
+import edu.harvard.mcz.precapture.SplashScreen;
 import edu.harvard.mcz.precapture.data.Inventory;
 import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
 import edu.harvard.mcz.precapture.data.UnitTrayLabelLifeCycle;
@@ -398,7 +399,6 @@ public class MainFrame  implements WindowListener {
 	@Override
 	public void windowActivated(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	/* (non-Javadoc)

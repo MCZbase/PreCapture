@@ -5,20 +5,53 @@
 <title>Help for PreCapture Application</title>
 </head>
 <body>
-<h1>Purpose the Pre-Capture Application</h1>
+<h1>Purpose of the Pre-Capture Application</h1>
 <p>This application is designed to create human and machine readable labels to 
 accompany containers of collection objects (Folders of Herbarium Sheets, 
 Unit Trays of Insects, etc.) into a digitization apparatus where the machine
 readable information can be extracted at the container level and applied to the
-digital records of each of the contained collection objects.</p>
+digital records of each of the contained collection objects.  The purpose of
+this is to reduce redundant capture of information.  For example, all 
+the herbarium sheets in a folder are likely to share a current filed under
+identification.  An initial pre-data-capture pass through the collection can 
+capture this current identification once, print it in machine readable form, and 
+associate that printed information with the folder.  Thus, when that folder is 
+brought to a station in a workflow, the machine readable information can be 
+scanned and associated with the image and database record of each specimen 
+in the folder, without the current identification having to be retyped for each 
+sheet.  This concept of capturing information from the storage of collection 
+objects prior to data capture and then applying the information to all collection 
+objects from within a given container can be applied within any discipline 
+where multiple collection objects sharing similar information are stored
+in the same container.</p>
+
+<img src="overview_diagram.png">
 
 <h1>Using the Pre-Capture Application</h1>
 <p>The pre-capture application has three main functions: First, to capture the
 information that applies to all specimens within a container.  Second, to print out
-sets of labels (on paper or adhesive label stock) that can be associated with 
+sets of labels or pages (on paper or adhesive label stock) that can be associated with 
 containers such as folders or unit trays.  Third, to take a rough inventory of the
 number of specimens for which pre-capture labels are being generated.  These three 
-functions are reflected on the three main tabs of the application ()</p>
+functions are reflected on the three main tabs of the application.</p>
+
+<img src="ScreenshotMainWindow.png">
+
+<p>An alternative view places the form to capture the fields pertaining to a container 
+next to the spreadsheet list of the set of labels to be printed.</p>
+
+<img src="ScreenshotSplitScreenMainWindow.png">
+
+<h3>Basic Workflow</h3>
+<ul>
+<li>Select a taxon name from the picklist.   The atomic taxon name fields are filled in.</li>
+<li>Add additional information that applies to all sheets in folder</li>
+<li>If more than one folder contains the same information, increase the number of labels to print.</li>
+<li>Press Add To List.</li>
+<li>When you are ready to print several labels, go to the Folders tab.</li>
+<li>Adjust any information you wish to change</li>
+<li>Press Print (The labels will be written to a PDF file named labels.pdf, and a printer dialog will be invoked.)</li>
+</ul>
 
 <h1>Configuring the Pre-Capture Application</h1>
 <p>This application is highly configurable.  Some of the configuration is accessed
@@ -34,6 +67,14 @@ properties file, others in xml configuration files.</p>
 <li>Changing the list of fields for the container labels (through an XML Configuration file).</li> 
 </ul>
 <h2>Selecting a configured Print Format</h2>
+
+<p>Open the configuration dialog with <em>File/Configuration</em>.  Select the <strong>Printing</strong> tab.
+From the picklist select the desired configured print format to use.  If you need a different format that isn't
+listed on this screen, see the Editing XML formats section below.  You can set the default print format
+from the Properties tab, by setting the value of the <em>config.selectedprintdefinition</em> property to match the
+desired default format name.</p>
+
+<img src="PrintFormatDialog.png">
 
 <h2>Loading a Taxon Authority File</h2>
 <p>Construct a csv file with the following columns:</p>

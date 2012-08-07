@@ -77,10 +77,17 @@ public class PreCaptureApp {
 	public static void main(String[] args) {
 
 		try { 
+			
+			SplashScreen splashScreen = new SplashScreen();
+			splashScreen.pack();
+			splashScreen.setVisible(true);
+			PreCaptureSingleton.getInstance().setSplashScreen(splashScreen);
 
 			// Load configuration properties
 			PreCaptureSingleton.getInstance().setProperties(new PreCaptureProperties());
 
+			PreCaptureSingleton.getInstance().getSplashScreen().setProgress(10);
+			
 			// Load field mappings from XML 
 			String resource = PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_FIELDMAPPING);
 			InputStream stream = PreCaptureApp.class.getResourceAsStream(resource);
@@ -114,6 +121,7 @@ public class PreCaptureApp {
 				// getResourceAsStream returns null if loader has an IO exception.
 				log.error("Couldn't find resource file: " + resource);
 			}	
+			PreCaptureSingleton.getInstance().getSplashScreen().setProgress(20);
 
 			// Load printing definitions from XML
 			String printresource = PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_PRINTDEFINITIONS);
@@ -158,6 +166,7 @@ public class PreCaptureApp {
 				// getResourceAsStream returns null if loader has an IO exception.
 				log.error("Couldn't find resource file: " + resource);
 			}		
+			PreCaptureSingleton.getInstance().getSplashScreen().setProgress(30);
 
 			LabelList labelList = new LabelList();
 			PreCaptureSingleton.getInstance().setCurrentLabelList(labelList);
@@ -194,6 +203,8 @@ public class PreCaptureApp {
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						try {
+							PreCaptureSingleton.getInstance().getSplashScreen().setProgress(SplashScreen.END_PROGRESS);
+							PreCaptureSingleton.getInstance().getSplashScreen().setVisible(false);
 							// Launch user interface
 							if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MAINFRAME).equals("MainFrame")) {
 							    MainFrame window = new MainFrame();

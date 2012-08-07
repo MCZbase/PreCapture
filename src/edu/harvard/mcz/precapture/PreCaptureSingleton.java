@@ -38,6 +38,7 @@ public class PreCaptureSingleton {
 	private MappingList mappingList;
 	private LabelList currentLabelList;
 	private LabelDefinitionListType printFormatDefintionList;
+	private SplashScreen splashScreen;
 	
 	// Eagerly create an instance to let the JVM create the unique instance 
 	// during class load, this prevents the creation of multiple instances 
@@ -109,6 +110,18 @@ public class PreCaptureSingleton {
 	
 	public LabelDefinitionListType getPrintFormatDefinitionList() { 
 		return this.printFormatDefintionList;
+	}
+	/**
+	 * @return the splashScreen
+	 */
+	public SplashScreen getSplashScreen() {
+		return splashScreen;
+	}
+	/**
+	 * @param splashScreen the splashScreen to set
+	 */
+	public void setSplashScreen(SplashScreen splashScreen) {
+		this.splashScreen = splashScreen;
 	}
 	
 }

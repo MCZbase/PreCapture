@@ -403,7 +403,7 @@ public class BarcodeTestingFrame extends JFrame {
 		progressBar.setValue(stop);
 		labelResult.setText("Successes=" + successes + ", failures=" + failures);
 		table.setModel(testResults);
-		table.setRowHeight(200);
+		table.setRowHeight(300);
 		table.doLayout();
 		} // end label definition is not null
 	}

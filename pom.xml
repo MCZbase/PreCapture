@@ -94,6 +94,11 @@
   		<version>2.4</version>
   		<classifier>jdk15</classifier>
   	</dependency>
+  	<dependency>
+  		<groupId>org.swinglabs</groupId>
+  		<artifactId>pdf-renderer</artifactId>
+  		<version>1.0.5</version>
+  	</dependency>
   </dependencies>
   <build>
   	<plugins>
