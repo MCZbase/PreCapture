@@ -49,6 +49,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JEditorPane;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import javax.swing.JTextArea;
 
 /**
  * UI Display of information about the application.
@@ -57,6 +58,7 @@ import java.awt.Toolkit;
  *
  */
 public class AboutFrame extends JFrame {
+	private static final long serialVersionUID = 6681758841979694874L;
 	private static final Log log = LogFactory.getLog(AboutFrame.class);
 	private JPanel contentPane;
 	private JFrame frame;
@@ -66,6 +68,7 @@ public class AboutFrame extends JFrame {
 	private JTextField textFieldLicense;
 	private JTextField textFieldCopyright;
 	private JTextField textFieldName;
+	private JTextArea textAreaHistory;
 
 	/** 
 	 * Default no argument constructor, constructs a new AboutFrame instance.
@@ -101,7 +104,7 @@ public class AboutFrame extends JFrame {
 				FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("max(250dlu;pref)"),},
+				ColumnSpec.decode("max(250dlu;pref):grow"),},
 			new RowSpec[] {
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
@@ -113,6 +116,10 @@ public class AboutFrame extends JFrame {
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
+				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,
+				FormFactory.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("default:grow"),
 				FormFactory.RELATED_GAP_ROWSPEC,
 				FormFactory.DEFAULT_ROWSPEC,
 				FormFactory.RELATED_GAP_ROWSPEC,
@@ -167,10 +174,33 @@ public class AboutFrame extends JFrame {
 		textFieldLicense.setColumns(10);
 		
 		URL helpURL = PreCaptureApp.class.getResource("resources/gpl-2.0.txt");
+		
+		JLabel lblLibraries = new JLabel("Libraries");
+		panel_1.add(lblLibraries, "2, 14, right, default");
+		
+		JTextArea textAreaLibraries = new JTextArea();
+		textAreaLibraries.setEditable(false);
+		textAreaLibraries.setLineWrap(true);
+		textAreaLibraries.setWrapStyleWord(true);
+		textAreaLibraries.setText(PreCaptureApp.LIBRARIES);
+		textAreaLibraries.setRows(3);
+		panel_1.add(textAreaLibraries, "4, 14, fill, fill");
+		
+		JLabel lblHistory = new JLabel("History");
+		panel_1.add(lblHistory, "2, 16, right, default");
+		
+		textAreaHistory = new JTextArea();
+		textAreaHistory.setEditable(false);
+		textAreaHistory.setLineWrap(true);
+		textAreaHistory.setWrapStyleWord(true);
+		textAreaHistory.setText(PreCaptureApp.NARATIVE);
+		textAreaHistory.setRows(4);
+		panel_1.add(textAreaHistory, "4, 16, fill, default");
+		textAreaHistory.setColumns(10);
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setMinimumSize(new Dimension(600, 400));
 		scrollPane.setMaximumSize(new Dimension(600, 600));
-		panel_1.add(scrollPane, "2, 14, 3, 1, fill, top");
+		panel_1.add(scrollPane, "2, 18, 3, 1, fill, top");
 		
 		JEditorPane editorPane;
 		try {

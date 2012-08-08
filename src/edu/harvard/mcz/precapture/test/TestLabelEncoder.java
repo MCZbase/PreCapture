@@ -131,7 +131,6 @@ public class TestLabelEncoder {
 	@Test
 	public void testGetBufferedImage() {
 		// test round trip JSON read write from image (really testing zxing)
-        ArrayList<ContainerLabel> labels = new ArrayList<ContainerLabel>();
 		ArrayList<FieldPlusText> textFields = new ArrayList<FieldPlusText>(); 
         int fieldCount = PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size();
 	    for (int i=0; i<fieldCount; i++) { 

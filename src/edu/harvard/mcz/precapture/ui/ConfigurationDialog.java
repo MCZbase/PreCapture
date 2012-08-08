@@ -190,8 +190,8 @@ public class ConfigurationDialog extends JDialog {
 										InventoryLifeCycle ils = new InventoryLifeCycle();
 										if (ils.count()>0) { 
 											String date = new Date().toString();
-											date.replace(" ", "");
-											date.replace(":", "");
+											date = date.replace(" ", "");
+											date = date.replace(":", "");
 										    InventoryLifeCycle.exportToCSV("Inventory_backup_"+ date +".csv");
 										} 
 										InventoryLifeCycle.loadFromCSV(file.getCanonicalPath(), true);

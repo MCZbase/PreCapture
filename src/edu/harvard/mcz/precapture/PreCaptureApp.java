@@ -62,11 +62,13 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "0.11";
+	public static final String VERSION = "0.12";
 	public static final String SVN_ID = "$Id$";
 	public static final String AUTHORS = "Paul J. Morris";
 	public static final String COPYRIGHT = "Copyright © 2012 President and Fellows of Harvard College";
+	public static final String NARATIVE = "This code originates with the Museum of Compative Zoology's internally funded Lepidoptera project workflow and data capture application, DataShot.  It has been extended to this PreCapture application with support from the US National Science Foundation funded NE Vascular Plant TCN, NSF:DBI 1209149.";
 	public static final String LICENSE = "Version 2 of the GNU General Public License";
+	public static final String LIBRARIES = "Apache commons-collections, Apache derby, Hibernate, iText, javassist, javacsv, jgoodies, json-lib, pdf-renderer, zxing";
 
 	private static final Log log = LogFactory.getLog(PreCaptureApp.class);
 
@@ -268,7 +270,7 @@ public class PreCaptureApp {
 			    InventoryLifeCycle.exportToCSV("backups"+File.separator+"Inventory_backup.csv");
 			    Date now = new Date();
 				String date = Long.toString(now.getTime());
-				date.replace(" ", "");
+				date = date.replace(" ", "");
 			    InventoryLifeCycle.exportToCSV("backups"+File.separator+"Inventory_backup_"+date+".csv");
 			} 
 			// Test to see if UnitTrayLabel table is non-empty, if so, backup.

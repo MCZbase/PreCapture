@@ -22,7 +22,6 @@ package edu.harvard.mcz.precapture.ui;
 
 import java.awt.EventQueue;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -64,12 +63,8 @@ import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -197,7 +192,6 @@ public class BarcodeTestingFrame extends JFrame {
 	}
 
 	private void runTests() {
-        ArrayList<ContainerLabel> labels = new ArrayList<ContainerLabel>();
 		ArrayList<FieldPlusText> textFields = new ArrayList<FieldPlusText>(); 
         int fieldCount = PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size();
 	    for (int i=0; i<fieldCount; i++) { 

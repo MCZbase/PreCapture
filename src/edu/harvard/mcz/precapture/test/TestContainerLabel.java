@@ -24,7 +24,6 @@ import static org.junit.Assert.*;
 import javax.swing.JTextField;
 
 import net.sf.json.JSONException;
-import net.sf.json.JSONFunction;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.logging.Log;

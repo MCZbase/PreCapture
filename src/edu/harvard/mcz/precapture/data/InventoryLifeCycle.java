@@ -22,7 +22,6 @@ package edu.harvard.mcz.precapture.data;
 import static org.hibernate.criterion.Example.create;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +30,6 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.SessionException;
 import org.hibernate.classic.Session;
 
