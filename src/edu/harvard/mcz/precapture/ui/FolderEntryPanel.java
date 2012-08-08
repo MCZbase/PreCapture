@@ -181,25 +181,27 @@ public class FolderEntryPanel extends JPanel {
 				log.debug(e.getActionCommand());
 				comboBoxTaxonPicker.getSelectedIndex();
 				UnitTrayLabel utl = ((UnitTrayLabelComboBoxModel)comboBoxTaxonPicker.getModel()).getSelectedContainerLabel();
-				log.debug(utl.getSpecificEpithet());
-				Iterator<FieldPlusText> i = textFields.iterator();
-				while (i.hasNext()) { 
-					FieldPlusText field = i.next();
-					log.debug(field.getField().getVocabularyTerm());
-					if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:genus")) { 
-						field.getTextField().setText(utl.getGenus());
-					}
-					if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:specificEpithet")) { 
-						field.getTextField().setText(utl.getSpecificEpithet());
-					}
-					if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
-						field.getTextField().setText(utl.getInfraspecificRank());
-					}
-					if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
-						field.getTextField().setText(utl.getInfraspecificEpithet());
-					}
-					if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:scientificNameAuthorship")) { 
-						field.getTextField().setText(utl.getAuthorship());
+				if (utl!=null) { 
+					log.debug(utl.getSpecificEpithet());
+					Iterator<FieldPlusText> i = textFields.iterator();
+					while (i.hasNext()) { 
+						FieldPlusText field = i.next();
+						log.debug(field.getField().getVocabularyTerm());
+						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:genus")) { 
+							field.getTextField().setText(utl.getGenus());
+						}
+						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:specificEpithet")) { 
+							field.getTextField().setText(utl.getSpecificEpithet());
+						}
+						if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
+							field.getTextField().setText(utl.getInfraspecificRank());
+						}
+						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
+							field.getTextField().setText(utl.getInfraspecificEpithet());
+						}
+						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:scientificNameAuthorship")) { 
+							field.getTextField().setText(utl.getAuthorship());
+						}
 					}
 				}
 				if (textNumberToPrint.getText().isEmpty()) { 

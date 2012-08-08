@@ -19,11 +19,7 @@
  */
 package edu.harvard.mcz.precapture;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import javax.swing.JLabel;

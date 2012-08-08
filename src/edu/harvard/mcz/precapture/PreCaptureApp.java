@@ -21,7 +21,6 @@ package edu.harvard.mcz.precapture;
 
 import java.awt.Cursor;
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Date;
@@ -63,7 +62,7 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "0.10";
+	public static final String VERSION = "0.11";
 	public static final String SVN_ID = "$Id$";
 	public static final String AUTHORS = "Paul J. Morris";
 	public static final String COPYRIGHT = "Copyright © 2012 President and Fellows of Harvard College";

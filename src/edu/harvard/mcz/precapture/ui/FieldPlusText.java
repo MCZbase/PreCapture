@@ -19,8 +19,6 @@
  */
 package edu.harvard.mcz.precapture.ui;
 
-import java.awt.TextField;
-
 import javax.swing.JTextField;
 
 import org.apache.commons.logging.Log;

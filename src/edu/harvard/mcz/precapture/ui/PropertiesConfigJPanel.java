@@ -33,7 +33,6 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.data.HibernateUtil;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import java.awt.BorderLayout;
 

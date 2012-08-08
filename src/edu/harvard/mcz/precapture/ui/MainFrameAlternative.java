@@ -23,21 +23,15 @@ package edu.harvard.mcz.precapture.ui;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
-import javax.swing.JMenu;
 import javax.swing.UIManager;
 
 import java.awt.event.KeyEvent;
-import javax.swing.JMenuItem;
 
 import edu.harvard.mcz.precapture.PreCaptureApp;
 import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
-import edu.harvard.mcz.precapture.data.Inventory;
-import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
-import edu.harvard.mcz.precapture.data.UnitTrayLabelLifeCycle;
 import edu.harvard.mcz.precapture.encoder.LabelEncoder;
 import edu.harvard.mcz.precapture.exceptions.PrintFailedException;
-import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -45,7 +39,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.BorderLayout;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
@@ -53,18 +46,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
-import java.io.File;
-import java.util.ArrayList;
 import javax.swing.JSplitPane;
 
 /**

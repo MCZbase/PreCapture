@@ -39,7 +39,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import net.sf.json.JSONObject;
-import net.sf.json.util.JSONTokener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,10 +53,8 @@ import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.decoder.LabelDecoder;
 import edu.harvard.mcz.precapture.encoder.LabelEncoder;
-import edu.harvard.mcz.precapture.exceptions.StartupFailedException;
 import edu.harvard.mcz.precapture.ui.ContainerLabel;
 import edu.harvard.mcz.precapture.ui.FieldPlusText;
-import edu.harvard.mcz.precapture.xml.Field;
 import edu.harvard.mcz.precapture.xml.MappingList;
 
 /**

@@ -34,13 +34,14 @@ import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.xml.MappingTableModel;
 import javax.swing.JLabel;
 import java.awt.FlowLayout;
-import javax.swing.JTextField;
 
 /**
  * @author mole
  *
  */
 public class FieldsConfigJPanel extends JPanel {
+	private static final long serialVersionUID = -7371846617414565995L;
+
 	private static final Log log = LogFactory.getLog(FieldsConfigJPanel.class);
 
 	private JTable table;

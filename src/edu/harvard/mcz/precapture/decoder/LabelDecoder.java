@@ -19,11 +19,9 @@
  */
 package edu.harvard.mcz.precapture.decoder;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;

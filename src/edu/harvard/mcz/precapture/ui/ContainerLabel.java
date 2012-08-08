@@ -19,7 +19,6 @@
  */
 package edu.harvard.mcz.precapture.ui;
 
-import java.awt.Color;
 import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
@@ -33,7 +32,6 @@ import com.itextpdf.text.pdf.PdfPCell;
 
 import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
-import edu.harvard.mcz.precapture.encoder.LabelEncoder;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 import edu.harvard.mcz.precapture.xml.labels.TextOrentationType;
 

@@ -113,6 +113,9 @@ public class FilteringJComboBox extends JComboBox implements FocusListener {
     		    super.setModel(new UnitTrayLabelComboBoxModel(uls.findByExample(pattern)));
     		}
     	}
+    	if (!changePopupState) { 
+    		this.firePopupMenuCanceled();
+    	}
     	if (changePopupState && !this.isPopupVisible()) {
     		this.showPopup();
     	}
@@ -127,19 +130,15 @@ public class FilteringJComboBox extends JComboBox implements FocusListener {
     		filterArray.removeAllElements();
     		log.debug("Model size: " + super.getModel().getSize());
     		for (int i = 0; i < super.getModel().getSize(); i++) {
-    			log.debug(((UnitTrayLabelComboBoxModel) super.getModel())
-    					.getDataElementAt(i).toString());
     			if (((UnitTrayLabelComboBoxModel) super.getModel())
     					.getDataElementAt(i).toString().toLowerCase()
     					.contains(enteredText.toLowerCase())) {
-    				log.debug("Matched");
     				filterArray.addElement(((UnitTrayLabelComboBoxModel) super
     						.getModel()).getDataElementAt(i));
     			}
     			if (((UnitTrayLabelComboBoxModel) super.getModel())
     					.getDataElementAt(i).toString()
     					.equalsIgnoreCase(enteredText)) {
-    				log.debug("Exact Match");
     				isExactMatch = true;
     				super.getModel().setSelectedItem(
     						((UnitTrayLabelComboBoxModel) super.getModel())
@@ -160,12 +159,12 @@ public class FilteringJComboBox extends JComboBox implements FocusListener {
     			super.setModel(model);
     		}
     		if (changePopupState) { 
-    		this.hidePopup();
-    		if (isExactMatch) {
-    			super.firePopupMenuCanceled();
-    		} else {
-    			this.showPopup();
-    		}
+    			this.hidePopup();
+    			if (isExactMatch) {
+    				super.firePopupMenuCanceled();
+    			} else {
+    				this.showPopup();
+    			}
     		} 
     	}
 

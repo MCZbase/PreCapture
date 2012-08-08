@@ -1,9 +1,5 @@
 package edu.harvard.mcz.precapture.data;
 
-import java.awt.Cursor;
-import java.awt.Dialog.ModalityType;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.*;

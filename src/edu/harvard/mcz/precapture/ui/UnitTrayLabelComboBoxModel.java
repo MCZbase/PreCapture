@@ -49,6 +49,8 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
 	 */
 	public UnitTrayLabelComboBoxModel() {
         model = new ArrayList<UnitTrayLabel>();
+        // add a blank row
+        model.add(new UnitTrayLabel());
         dataListeners = new ArrayList<ListDataListener>();
 	}
 
@@ -61,11 +63,13 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
 		model = (ArrayList<UnitTrayLabel>) unitTrayLabelList;
 		if (model==null) { 
             model = new ArrayList<UnitTrayLabel>();
+            // add a blank row.
+            model.add(new UnitTrayLabel());
 		}
         dataListeners = new ArrayList<ListDataListener>();
-        if (model.size()>0) { 
-        	selectedItem = model.get(0);
-        }
+        //if (model.size()>0) { 
+        //	selectedItem = model.get(0);
+        //}
 	}
 	
 	/**

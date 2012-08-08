@@ -45,26 +45,94 @@ next to the spreadsheet list of the set of labels to be printed.</p>
 <h3>Basic Workflow</h3>
 <ul>
 <li>Select a taxon name from the picklist.   The atomic taxon name fields are filled in.</li>
-<li>Add additional information that applies to all sheets in folder</li>
-<li>If more than one folder contains the same information, increase the number of labels to print.</li>
+<li>Add additional information that applies to all sheets in the folder/container</li>
+<li>If more than one folder/container contains the same information, increase the number of labels to print.</li>
 <li>Press Add To List.</li>
-<li>When you are ready to print several labels, go to the Folders tab.</li>
+<li>When you are ready to print several different labels, go to the Folders tab.</li>
 <li>Adjust any information you wish to change</li>
 <li>Press Print (The labels will be written to a PDF file named labels.pdf, and a printer dialog will be invoked.)</li>
 </ul>
+
+<p>The organization of folders of herbarium sheets in cabinets (and other sorts of collection objects in other collections) often
+follows a taxonomic heirarchy.  The taxon pick list can be filtered to reflect this organization.  If you are working with 
+a cabinet of herbarium sheets that contains a single family, you can select the family name on the Filter by Family picklist</p>
+
+<img src="ScreenShotPickAFamily.png">
+
+<p>Once you have selected a family, you can tab into the taxon name picklist and begin to enter any part of the taxon name 
+that is the filed under name for a folder.  The taxon name picklist will open showing the taxa within the family, and as you type
+will filter that list down to names that contain the part of the name that you are typing.</p>
+
+<img src="ScreenShotFilterTaxa.png"> 
+
+<p>The arrow keys will move you down into the taxon pick list, and tab will pick the current selection (or you can click on
+a name in the list).  Once you have selected a name from the taxon pick list, the fields for that taxon name will be 
+automatically filled in, and you can tab (or use alt and a number key to move directly to a field in the list Alt-9 goes to
+the 9th item in the list (you can use these key combinations instead of tab to leave the taxon picklist)) to other 
+fields that you want to populate with information that applies to all sheets within  the folder.  The list of fields is 
+configurable for a project and the number and specific fields present on the form may be different from the screenshots.
+If you have more than one folder with identical information, you can set the number to print field to the number of copies
+of the label for that folder that you want to print.</p>
+
+<img src="ScreenshotTaxonPicked.png">
+
+<p>Once you have filled in all the fields that apply to all sheets in the folder that you are working on, you can press Print to 
+print the single label that you have just filled in (in the number of copies specified with by number to print field), at which 
+point a printer dialog will pop up and a pdf file named <em>labels.pdf</em> will be written to the current folder.  The pdf file
+will be written even if you hit cancel on the printer dialog.</p>
+
+<img src="screenshot_print_dialog.png">
+
+<p>The resulting label will print in the currently selected print format (see Print format configuration below).</p>
+
+<img src="ExampleLabel_Malaxis_monophyllos.png">
+
+<p>Alternatively, you can press the Add to Print List button (Alt-A), and add the current label to the list on the Print List tab, 
+where you can modify the information and print larger sets of labels as desired.  As with printing a single label, printing a 
+set of labels will bring up the printer dialog and write the labels to <em>labels.pdf</em></p>
+
+<img src="ScreenshotPrintListTab.png">
+
+<p>If you switch to the split screen view <strong>Window/Change to...</strong>, the field list will appear on the left side of 
+the screen, and the print list on the right, all in the same tab.  You can switch back and forth between views while retaining 
+the same print list.  The print list does not persist between restarts of the program.  It is cleared when you exit or when you
+press the <strong>Clear</strong> button.</p>
+
+<img src="ScreenshotSplitScreenFilterTaxa.png">
+
+<h3>Inventory</h3>
+
+<p>If the inventory functionality has been enabled in your installation (property config.showinventorytab=true), then a tab 
+will show up in the main program screen labeled <strong>Inventory</strong>.  This tab allows you to estimate the number of 
+specimens that are to be imaged within a container.  The default configuration is for herbarium cabinets, organized by 
+family, with measurements of how many inches thickness of sheets are present for the folders covered by your project in
+this cabinet in this family, along with an estimate of how many sheets are found per inch in this family.  Follow project
+protocols for how to use this inventory if your project includes an inventory estimation in the precapture phase.  
+</p>
+
+<h3>Editing the Taxon Authority File</h3>
+
+<p>This functionality is not yet available inside the PreCapture application, see Loading a Taxon Authority File</p>
+
+<h3>Exiting the application</h3>
+
+<p>To exit, use <strong>File/Exit</strong>from the main menu.  During a normal exit, backups of the taxon authority file 
+and inventory are made.  See: managing backups.</p>
 
 <h1>Configuring the Pre-Capture Application</h1>
 <p>This application is highly configurable.  Some of the configuration is accessed
 through the configuration dialog in the user interface, other elements are in a 
 properties file, others in xml configuration files.</p>
 <h2>Configuration</h2>
-<p>Configuration can be changed in the following places:</p>
+<p>Configuration can be changed in the following places.  User marks configurations that are expected
+to be set by individual users.  Administrator marks configurations that are expected to be set at
+particular deployment sites or for particular projects.</p>
 <ul>
-<li>Selecting a configured print format (through the Configuration Dialog)</li>
-<li>Loading a new Taxon Authority file (through the Configuration Dialog)</li>
-<li>Properties (in properties file, editable from the Configuration Dialog)</li>
-<li>Changing available print formats through an XML Configuration file).</li>
-<li>Changing the list of fields for the container labels (through an XML Configuration file).</li> 
+<li>Selecting a configured print format (through the Configuration Dialog) <strong>User</strong></li>
+<li>Loading a new Taxon Authority file (through the Configuration Dialog) <strong>User</strong></li>
+<li>Properties (in properties file, editable from the Configuration Dialog) <strong>User & Administrator</strong></li>
+<li>Changing available print formats through an XML Configuration file). <strong>Administrator</strong></li>
+<li>Changing the list of fields for the container labels (through an XML Configuration file).  <strong>Administrator</strong></li> 
 </ul>
 <h2>Selecting a configured Print Format</h2>
 
@@ -94,7 +162,16 @@ application directory.  You can edit this file directly, or with the Properties 
 change the property config.mainuiframe from "MainFrame" to "MainFrameAlternative"</p>
 <img src="ScreenshotConfigurationDialogProperties.png">
 
-<h3>Available properties</h3>
+<h3>Properties that users may wish to set</h3>
+
+<ul>
+<li>config.selectedprintdefinition The print definition to use by default from the print format definition file.</li>
+<li>config.mainuiframe The variant of the user interface to use.  MainFrame is the default with folder details and the print list in separate tabs, MainFrameAlternative includes the folder details and print lists in a split pane within a single tab.</li>
+<li>config.mycollectioncode  The collection code/Herbarium Acronym for the collection. The default value to use for a field that is mapped to the concept dwc:collectionCode.</li>
+<li>config.filterlengththreshold The number of characters to type into the taxon picker box before it starts filtering.  3 is probably a good choice.</li>
+</ul>
+
+<h3>All Available properties</h3>
 
 <ul>
 <li>print.papersize Not currently in use.</li>
@@ -144,8 +221,24 @@ barcode and will be used to match the rest of the barcode to the correct configu
 
 <h1>Managing backups</h1>
 <p>The Inventory data set and the loaded taxon authority file are backed up to
-.csv exports each time the program successfully exits.</p>
+.csv exports each time the program successfully exits.  These files are placed in a folder called <em>backups</em> inside
+the current directory.  A new timestamped backup of the inventory file is written each time the program
+exits, and the inventory and taxon authority file are also both backed up to files named Inventory_backup.csv and 
+TaxonAuthorityFile_backup.csv, overwriting the existing file each time the program exits.</p>
 <p>Backups of the taxon authority file and inventory can be reloaded from the 
 <strong>Data Sources</strong> tab of the Configuration Dialog (accessed with <em>File/Configuration</em>). 
+
+<h1>Development</h1>
+
+<p>Source code for this application can be found in the SourceForge repository for the MCZ's DataShot project.
+If you wish to help develop this application, please make a request to join the SourceForge project.  http://sourceforge.net/projects/datashot/
+The source code for the project can be found under precapture_app in the DataShot trunk: 
+http://datashot.svn.sourceforge.net/viewvc/datashot/trunk/precapture_app/   
+</p>
+
+
+
+
+
 </body>
 </html>

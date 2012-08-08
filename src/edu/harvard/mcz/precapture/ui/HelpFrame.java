@@ -19,8 +19,6 @@
  */
 package edu.harvard.mcz.precapture.ui;
 
-import java.awt.EventQueue;
-
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -39,12 +37,8 @@ import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.StyledDocument;
-import javax.swing.text.html.HTMLDocument;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -54,6 +48,7 @@ import java.awt.Toolkit;
  *
  */
 public class HelpFrame extends JFrame {
+	private static final long serialVersionUID = 897844978585110911L;
 	private static final Log log = LogFactory.getLog(HelpFrame.class);
 	private JPanel contentPane;
 	private JFrame frame;

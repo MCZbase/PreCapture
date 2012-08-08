@@ -1,0 +1,31 @@
+Libraries:
+
+Apache commons-collections
+Apache Software License, Version 2.0
+
+Hibernate
+LGPL v2.1
+
+javassist
+MPL, the LGPL, and the Apache License
+
+zxing
+Apache License v2.0
+
+jgoodies
+BSD
+
+Apache derby
+Apache License v2.0
+
+itext
+GNU Affero General Public License
+
+javacsv
+LGPL
+
+json-lib
+Apache License v2.0
+
+pdf-renderer
+GPL v3, MIT
