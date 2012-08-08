@@ -94,26 +94,14 @@ public class LabelList extends AbstractTableModel {
 		this.fireTableDataChanged();
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getRowCount()
-	 */
-	@Override
 	public int getRowCount() {
 		return labels.size();
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getColumnCount()
-	 */
-	@Override
 	public int getColumnCount() {
 		return PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size() + 1;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getValueAt(int, int)
-	 */
-	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		// Determine if this is a column in the mapping list or the number to print column.
 		Object result = labels.get(rowIndex).getNumberToPrint();

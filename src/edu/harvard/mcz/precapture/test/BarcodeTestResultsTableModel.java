@@ -48,26 +48,14 @@ public class BarcodeTestResultsTableModel extends AbstractTableModel {
 		results = resultList;
 	}
 	
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getRowCount()
-	 */
-	@Override
 	public int getRowCount() {
 		return results.size();
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getColumnCount()
-	 */
-	@Override
 	public int getColumnCount() {
 		return 6;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getValueAt(int, int)
-	 */
-	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Object result = null;
 		switch (columnIndex) { 

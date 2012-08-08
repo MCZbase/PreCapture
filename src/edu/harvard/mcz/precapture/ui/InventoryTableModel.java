@@ -58,26 +58,14 @@ public class InventoryTableModel extends AbstractTableModel {
 		inventoryList = list;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getRowCount()
-	 */
-	@Override
 	public int getRowCount() {
 		return inventoryList.size();
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getColumnCount()
-	 */
-	@Override
 	public int getColumnCount() {
 		return 4;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getValueAt(int, int)
-	 */
-	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Object result = null;
 		switch (columnIndex) { 

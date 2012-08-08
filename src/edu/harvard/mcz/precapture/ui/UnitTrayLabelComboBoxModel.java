@@ -86,18 +86,10 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
 		return (List<UnitTrayLabel>) model.clone();
 	}
 	
-	/* (non-Javadoc)
-	 * @see javax.swing.ListModel#getSize()
-	 */
-	@Override
 	public int getSize() {
 		return model.size();
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.ListModel#getElementAt(int)
-	 */
-	@Override
 	public Object getElementAt(int index) {
 		return UnitTrayLabelLifeCycle.getScientificName(model.get(index));
 	}
@@ -113,26 +105,14 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.ListModel#addListDataListener(javax.swing.event.ListDataListener)
-	 */
-	@Override
 	public void addListDataListener(ListDataListener l) {
         dataListeners.add(l);
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.ListModel#removeListDataListener(javax.swing.event.ListDataListener)
-	 */
-	@Override
 	public void removeListDataListener(ListDataListener l) {
         dataListeners.remove(l);
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.ComboBoxModel#setSelectedItem(java.lang.Object)
-	 */
-	@Override
 	public void setSelectedItem(Object anItem) {
 		Iterator<UnitTrayLabel> i = model.iterator();
 		boolean done = false;
@@ -145,10 +125,6 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.ComboBoxModel#getSelectedItem()
-	 */
-	@Override
 	public Object getSelectedItem() {
 		return UnitTrayLabelLifeCycle.getScientificName(selectedItem);
 	}

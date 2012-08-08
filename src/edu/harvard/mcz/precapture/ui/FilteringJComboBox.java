@@ -78,7 +78,7 @@ public class FilteringJComboBox extends JComboBox implements FocusListener {
             	log.debug(keyEvent);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        filter(textfield.getText());
+                        filter(textfield.getText(), true);
                     }
                 });
             }
@@ -90,11 +90,11 @@ public class FilteringJComboBox extends JComboBox implements FocusListener {
     	super.setModel(model);
     }
     
-    public void resetFilter() { 
-    	filter(null);
+    public void resetFilter(boolean changePopupState) { 
+    	filter(null, changePopupState);
     }
     
-    protected void filter(String enteredText) {
+    protected void filter(String enteredText, boolean changePopupState) {
     	if (enteredText == null || enteredText.length() == 0) {
     		// If entry is blank, show full list.
     		// TODO: Filter by family/genus.
@@ -113,7 +113,7 @@ public class FilteringJComboBox extends JComboBox implements FocusListener {
     		    super.setModel(new UnitTrayLabelComboBoxModel(uls.findByExample(pattern)));
     		}
     	}
-    	if (!this.isPopupVisible()) {
+    	if (changePopupState && !this.isPopupVisible()) {
     		this.showPopup();
     	}
 
@@ -159,30 +159,24 @@ public class FilteringJComboBox extends JComboBox implements FocusListener {
     			textfield.setText(enteredText);
     			super.setModel(model);
     		}
+    		if (changePopupState) { 
     		this.hidePopup();
     		if (isExactMatch) {
     			super.firePopupMenuCanceled();
     		} else {
     			this.showPopup();
     		}
-
+    		} 
     	}
 
     }
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
-	 */
-	@Override
 	public void focusGained(FocusEvent e) {
-		// TODO Auto-generated method stub
-		
+		super.getModel().setSelectedItem("");
+		JTextField textfield = (JTextField) this.getEditor().getEditorComponent();
+        textfield.setText("");
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
-	 */
-	@Override
 	public void focusLost(FocusEvent e) {
 		// when focus is lost on the text field (editor box part of the combo box),
 		// set the value of the text field to the selected item on the list, if any.
@@ -205,7 +199,7 @@ public class FilteringJComboBox extends JComboBox implements FocusListener {
 		} else { 
 			selectedFamily = null;
 		}
-		resetFilter();
+		resetFilter(false);
 	}
 	
 	/**
@@ -220,7 +214,7 @@ public class FilteringJComboBox extends JComboBox implements FocusListener {
 		} else { 
 			genusLimit = null;
 		}
-		resetFilter();
+		resetFilter(false);
 	}
     
 }

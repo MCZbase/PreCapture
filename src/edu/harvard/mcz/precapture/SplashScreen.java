@@ -48,18 +48,13 @@ public class SplashScreen extends JFrame {
 	 * Default no argument constructor, constructs a new SplashScreen instance.
 	 */
 	public SplashScreen() {
-		getContentPane().setPreferredSize(new Dimension(300, 200));
 		// no borders
 		setUndecorated(true);
 		// center on screen
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension upperLeft = new Dimension((int)Math.round((screen.getWidth()-300)/2), (int)Math.round((screen.getHeight()-200)/2));
+		Dimension upperLeft = new Dimension((int)Math.round((screen.getWidth()-500)/2), (int)Math.round((screen.getHeight()-500)/2));
 		this.setLocation(upperLeft.width, upperLeft.height);  // to center on screen
 		setIconImage(Toolkit.getDefaultToolkit().getImage(SplashScreen.class.getResource("/edu/harvard/mcz/precapture/resources/icon.png")));
-		
-		JLabel label = new JLabel("");
-		label.setIcon(new ImageIcon(SplashScreen.class.getResource("/edu/harvard/mcz/precapture/resources/icon.png")));
-		getContentPane().add(label, BorderLayout.EAST);
 		
 		JLabel lblNewLabel = new JLabel(PreCaptureApp.NAME + " " + PreCaptureApp.VERSION);
 		getContentPane().add(lblNewLabel, BorderLayout.NORTH);
@@ -67,6 +62,10 @@ public class SplashScreen extends JFrame {
 		progressBar = new JProgressBar();
 		getContentPane().add(progressBar, BorderLayout.SOUTH);
 		progressBar.setValue(START_PROGRESS);
+		
+		JLabel label = new JLabel("");
+		label.setIcon(new ImageIcon(SplashScreen.class.getResource("/edu/harvard/mcz/precapture/resources/splashscreen.png")));
+		getContentPane().add(label, BorderLayout.CENTER);
 	}
 	
 	public void setProgress(int progress) {

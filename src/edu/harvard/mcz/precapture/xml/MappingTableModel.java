@@ -50,10 +50,6 @@ public class MappingTableModel extends AbstractTableModel {
 		this.mappingList = mappingList;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getRowCount()
-	 */
-	@Override
 	public int getRowCount() {
 		int result = 0;
 		if (mappingList!=null) { 
@@ -68,16 +64,11 @@ public class MappingTableModel extends AbstractTableModel {
 	 * @see edu.harvard.mcz.precapture.xml.Field
 	 * @see javax.swing.table.TableModel#getColumnCount()
 	 */
-	@Override
 	public int getColumnCount() {
 		// number of properties in Field
 		return 5;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getValueAt(int, int)
-	 */
-	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Object result = null;
 		if (mappingList!=null) {

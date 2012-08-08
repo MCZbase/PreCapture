@@ -51,26 +51,14 @@ public class LabelDefinitionListTypeTableModel extends AbstractTableModel {
 	}
 	
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getRowCount()
-	 */
-	@Override
 	public int getRowCount() {
 		return definitionList.getLabelDefinition().size();
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getColumnCount()
-	 */
-	@Override
 	public int getColumnCount() {
 		return 4;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.table.TableModel#getValueAt(int, int)
-	 */
-	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Object result = null;
 		if (definitionList!=null) {

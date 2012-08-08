@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -115,7 +116,12 @@ public class FolderEntryPanel extends JPanel {
 		comboBoxFamilyFilter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				comboBoxTaxonPicker.setFamilyLimit(comboBoxFamilyFilter.getSelectedItem());
-				comboBoxTaxonPicker.setSelectedItem("");
+				if (! comboBoxFamilyFilter.getSelectedItem().equals("")) { 
+					comboBoxTaxonPicker.setSelectedItem("");
+					((JTextField)comboBoxGenericFilter.getEditor().getEditorComponent()).setText("");
+				    comboBoxGenericFilter.setSelectedItem("");
+				}
+				comboBoxFamilyFilter.grabFocus();
 			}
 		});
 		
@@ -125,13 +131,16 @@ public class FolderEntryPanel extends JPanel {
 		comboBoxGenericFilter = new JComboBox(uls.findDistinctGenera(true).toArray());
 		comboBoxGenericFilter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: Filter by genus
 				comboBoxTaxonPicker.setGenusLimit(comboBoxGenericFilter.getSelectedItem());
-				comboBoxTaxonPicker.setSelectedItem("");
+				if (!comboBoxGenericFilter.getSelectedItem().equals("")) { 
+					comboBoxTaxonPicker.setSelectedItem("");
+					((JTextField)comboBoxFamilyFilter.getEditor().getEditorComponent()).setText("");
+					comboBoxFamilyFilter.setSelectedItem("");
+				}
+				comboBoxGenericFilter.grabFocus();
 			}
 		});
 		panel_2.add(comboBoxGenericFilter, "4, 4, fill, default");
-		
 		
 		int fieldCount = PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size();
 		

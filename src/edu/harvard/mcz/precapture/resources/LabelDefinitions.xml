@@ -36,6 +36,17 @@
     <tns:TextOrentation>Horizontal</tns:TextOrentation>
   </tns:LabelDefinition>
   <tns:LabelDefinition>
+    <tns:Title>2.3x4" Dymo LabelWriter</tns:Title>
+    <tns:Units>Inches</tns:Units>
+    <tns:PaperHeight>3.9</tns:PaperHeight>
+    <tns:PaperWidth>2.3125</tns:PaperWidth>
+    <tns:Margins>.1</tns:Margins>
+    <tns:Columns>1</tns:Columns>
+    <tns:LabelWidth>2.1125</tns:LabelWidth>
+    <tns:LabelHeight>3.7</tns:LabelHeight>
+    <tns:TextOrentation>Vertical</tns:TextOrentation>
+  </tns:LabelDefinition>    
+  <tns:LabelDefinition>
     <tns:Title>4x2.3"Label</tns:Title>
     <tns:Units>Inches</tns:Units>
     <tns:PaperHeight>2.3125</tns:PaperHeight>

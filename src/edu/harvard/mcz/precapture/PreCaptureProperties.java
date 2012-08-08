@@ -26,7 +26,6 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -267,32 +266,14 @@ public class PreCaptureProperties extends AbstractTableModel {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.TableModel#getRowCount()
-	 */
-	@Override
 	public int getRowCount() {
 		return properties.size();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.TableModel#getColumnCount()
-	 */
-	@Override
 	public int getColumnCount() {
 		return 2;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.TableModel#getValueAt(int, int)
-	 */
-	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		String value = "";
 		Enumeration<Object> p = properties.keys();

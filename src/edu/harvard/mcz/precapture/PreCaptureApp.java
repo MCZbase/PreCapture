@@ -21,6 +21,8 @@ package edu.harvard.mcz.precapture;
 
 import java.awt.Cursor;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.io.File;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
@@ -46,7 +48,7 @@ import edu.harvard.mcz.precapture.data.UnitTrayLabelLifeCycle;
 import edu.harvard.mcz.precapture.exceptions.StartupFailedException;
 import edu.harvard.mcz.precapture.ui.LabelList;
 import edu.harvard.mcz.precapture.ui.MainFrame;
-import edu.harvard.mcz.precapture.ui.MainFrameAltenative;
+import edu.harvard.mcz.precapture.ui.MainFrameAlternative;
 import edu.harvard.mcz.precapture.xml.MappingList;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionListType;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
@@ -61,7 +63,7 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "0.9";
+	public static final String VERSION = "0.10";
 	public static final String SVN_ID = "$Id$";
 	public static final String AUTHORS = "Paul J. Morris";
 	public static final String COPYRIGHT = "Copyright © 2012 President and Fellows of Harvard College";
@@ -209,7 +211,7 @@ public class PreCaptureApp {
 							if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MAINFRAME).equals("MainFrame")) {
 							    MainFrame window = new MainFrame();
 							} else { 
-							    MainFrameAltenative window = new MainFrameAltenative();
+							    MainFrameAlternative window = new MainFrameAlternative();
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -255,19 +257,25 @@ public class PreCaptureApp {
 			// Write current properties to properties file (creating file 
 			// with default properties if it does not yet exist).
 			PreCaptureSingleton.getInstance().getProperties().saveProperties();
+			
+			File backupDirectory = new File("backups");
+			if (!backupDirectory.exists()) {
+				backupDirectory.mkdir();
+			}
+			
 			// Test to see if inventory table is non-empty, if so, backup.
 			InventoryLifeCycle ils = new InventoryLifeCycle();
 			if (ils.count()>0) { 
-			    InventoryLifeCycle.exportToCSV("Inventory_backup.csv");
+			    InventoryLifeCycle.exportToCSV("backups"+File.separator+"Inventory_backup.csv");
 			    Date now = new Date();
 				String date = Long.toString(now.getTime());
 				date.replace(" ", "");
-			    InventoryLifeCycle.exportToCSV("Inventory_backup_"+date+".csv");
+			    InventoryLifeCycle.exportToCSV("backups"+File.separator+"Inventory_backup_"+date+".csv");
 			} 
 			// Test to see if UnitTrayLabel table is non-empty, if so, backup.
 			UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
 			if (uls.count()>0) { 
-			    UnitTrayLabelLifeCycle.exportToCSV("TaxonAuthorityFile_backup.csv");
+			    UnitTrayLabelLifeCycle.exportToCSV("backups"+File.separator+"TaxonAuthorityFile_backup.csv");
 			} 
 			HibernateUtil.terminateSessionFactory();
 		} catch (Exception e) {

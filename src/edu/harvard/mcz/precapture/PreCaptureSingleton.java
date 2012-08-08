@@ -124,4 +124,14 @@ public class PreCaptureSingleton {
 		this.splashScreen = splashScreen;
 	}
 	
+	/**
+	 * Whether or not the napkin Look and Feel should be used.
+	 * 
+	 * @return 
+	 */
+	public static boolean useNapkin() {
+		// Set to true to use the Napkin Look and Feel
+		return false;
+	}
+	
 }
