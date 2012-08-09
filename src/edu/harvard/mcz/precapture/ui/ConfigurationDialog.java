@@ -136,16 +136,17 @@ public class ConfigurationDialog extends JDialog {
 						JButton btnLoadTaxonAuthority = new JButton("Load Taxon Authority File");
 						btnLoadTaxonAuthority.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
-								Cursor cursor = frame.getCursor();
-								frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 								JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 								FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV spreadsheets", "csv");
 								fileChooser.setFileFilter(filter);
 								int returnVal = fileChooser.showOpenDialog(frame);
+								Cursor cursor = getCursor();
+								setCursor(new Cursor(Cursor.WAIT_CURSOR));
 								if (returnVal == JFileChooser.APPROVE_OPTION) {
 									File file = fileChooser.getSelectedFile();
 									try { 
 										UnitTrayLabelLifeCycle.loadFromCSV(file.getCanonicalPath());
+										JOptionPane.showMessageDialog(frame, "Taxon Authority File load complete. ");
 									} catch (Exception ex) { 
 										log.error(ex.getMessage());
 										JOptionPane.showMessageDialog(frame, "Failed to load taxon list. " + ex.getMessage());
@@ -153,7 +154,7 @@ public class ConfigurationDialog extends JDialog {
 								}
 								UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
 								textFieldUnitTrayLabelCount.setText(Integer.toString(uls.count()));
-								frame.setCursor(cursor);
+								setCursor(cursor);
 							}
 						});
 						panel.add(btnLoadTaxonAuthority, "4, 6");
@@ -178,12 +179,12 @@ public class ConfigurationDialog extends JDialog {
 						JButton btnReloadInventoryFrom = new JButton("Reload Inventory From Backup");
 						btnReloadInventoryFrom.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
-								Cursor cursor = frame.getCursor();
-								frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 								JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 								FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV spreadsheets", "csv");
 								fileChooser.setFileFilter(filter);
 								int returnVal = fileChooser.showOpenDialog(frame);
+								Cursor cursor = getCursor();
+								setCursor(new Cursor(Cursor.WAIT_CURSOR));
 								if (returnVal == JFileChooser.APPROVE_OPTION) {
 									File file = fileChooser.getSelectedFile();
 									try { 
@@ -193,6 +194,7 @@ public class ConfigurationDialog extends JDialog {
 											date = date.replace(" ", "");
 											date = date.replace(":", "");
 										    InventoryLifeCycle.exportToCSV("Inventory_backup_"+ date +".csv");
+										    JOptionPane.showMessageDialog(frame, "Inventory load complete. ");
 										} 
 										InventoryLifeCycle.loadFromCSV(file.getCanonicalPath(), true);
 									} catch (Exception ex) { 
@@ -202,7 +204,7 @@ public class ConfigurationDialog extends JDialog {
 								}
 								InventoryLifeCycle ils = new InventoryLifeCycle();
 								textFieldInventoryCount.setText(Integer.toString(ils.count()));	
-								frame.setCursor(cursor);
+								setCursor(cursor);
 							}
 						});
 						panel.add(btnReloadInventoryFrom, "4, 12");
