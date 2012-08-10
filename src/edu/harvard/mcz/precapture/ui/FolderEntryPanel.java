@@ -162,7 +162,9 @@ public class FolderEntryPanel extends JPanel {
 		panel_3.add(lblTaxon, "2, 2, right, default");
 		
 		comboBoxTaxonPicker = new FilteringJComboBox();
-		comboBoxTaxonPicker.setUTLModel(new UnitTrayLabelComboBoxModel(uls.findAll()));
+		log.debug("About to create model for taxon picker");
+		comboBoxTaxonPicker.setUTLModel(new UnitTrayLabelComboBoxModel(uls.findAll(),true));
+		log.debug("Created model for taxon picker");
 		comboBoxTaxonPicker.setEditable(true);
 		// if list has names with too many characters, the width of the combo box forces the panel to be
 		// too large to work effectively as part of a split pane, so limit to a reasonable size.
@@ -203,6 +205,7 @@ public class FolderEntryPanel extends JPanel {
 		});
 		panel_3.add(comboBoxTaxonPicker, "4, 2, 3, 1, fill, default");
 	
+		log.debug("Iterating through field list");
 		textFields = new ArrayList<FieldPlusText>(); 
 	
 		char[] keys = {'1','2','3','4','5','6','7','8','9','0'};

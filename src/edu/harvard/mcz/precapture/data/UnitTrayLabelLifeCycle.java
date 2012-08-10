@@ -22,6 +22,8 @@ package edu.harvard.mcz.precapture.data;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.logging.Log;
@@ -300,13 +302,13 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 	 */
 	@SuppressWarnings("unchecked")
 	public List<UnitTrayLabel> findAll() {
-		log.debug("finding all UnitTrayLabel");
+		log.debug("finding all UnitTrayLabel start " + new Date());
 		try {
 			List<UnitTrayLabel> results = null;
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				results = (List<UnitTrayLabel>) session.createQuery("from UnitTrayLabel u order by u.ordinal, u.family, u.subfamily, u.tribe, u.genus, u.specificEpithet ").list();
+				results = (List<UnitTrayLabel>) session.createQuery("from UnitTrayLabel u order by u.genus, u.specificEpithet ").list();
 				session.getTransaction().commit();
 				log.debug("find all successful, result size: " + results.size());
 			} catch (HibernateException e) { 
@@ -315,6 +317,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			} finally { 
 			    try { session.close(); } catch (SessionException e) { }
 			}
+			log.debug("finding all UnitTrayLabel end " + new Date());
 			return results;
 		} catch (RuntimeException re) {
 			log.error("find all failed", re);

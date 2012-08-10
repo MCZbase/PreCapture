@@ -28,6 +28,7 @@
             <zipfileset dir="/home/mole/.m2/repository/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1" includes="plexus-container-default-1.0-alpha-9-stable-1*.jar"/>
             <zipfileset dir="/home/mole/.m2/repository/classworlds/classworlds/1.1-alpha-2" includes="classworlds-1.1-alpha-2*.jar"/>
             <zipfileset dir="/home/mole/.m2/repository/org/hibernate/hibernate-core/3.3.1.GA" includes="hibernate-core-3.3.1.GA*.jar"/>
+            <zipfileset dir="/home/mole/.m2/repository/javax/transaction/jta/1.1" includes="jta-1.1*.jar"/>
             <zipfileset dir="/home/mole/.m2/repository/antlr/antlr/2.7.6" includes="antlr-2.7.6*.jar"/>
             <zipfileset dir="/home/mole/.m2/repository/dom4j/dom4j/1.6.1" includes="dom4j-1.6.1*.jar"/>
             <zipfileset dir="/home/mole/.m2/repository/org/hibernate/hibernate-tools/3.2.3.GA" includes="hibernate-tools-3.2.3.GA*.jar"/>

@@ -48,6 +48,7 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
 	 * Default no argument constructor, constructs a new UnitTrayLabelComboBoxModel instance.
 	 */
 	public UnitTrayLabelComboBoxModel() {
+		log.debug("invoked UnitTrayLabelComboBoxModel()");
         model = new ArrayList<UnitTrayLabel>();
         // add a blank row
         model.add(new UnitTrayLabel());
@@ -60,17 +61,32 @@ public class UnitTrayLabelComboBoxModel implements ComboBoxModel {
 	 * @param unitTrayLabelList
 	 */
 	public UnitTrayLabelComboBoxModel(List<UnitTrayLabel> unitTrayLabelList) { 
+		log.debug("invoked UnitTrayLabelComboBoxModel(list unit tray label");
 		model = (ArrayList<UnitTrayLabel>) unitTrayLabelList;
 		if (model==null) { 
             model = new ArrayList<UnitTrayLabel>();
             // add a blank row.
-            model.add(new UnitTrayLabel());
+            model.add(0,new UnitTrayLabel());
 		}
         dataListeners = new ArrayList<ListDataListener>();
         //if (model.size()>0) { 
         //	selectedItem = model.get(0);
         //}
 	}
+	
+	public UnitTrayLabelComboBoxModel(List<UnitTrayLabel> unitTrayLabelList, boolean selectFirst) { 
+		log.debug("invoked UnitTrayLabelComboBoxModel(list unit tray label");
+		model = (ArrayList<UnitTrayLabel>) unitTrayLabelList;
+        // add a blank row.
+        model.add(0,new UnitTrayLabel());
+		if (model==null) { 
+            model = new ArrayList<UnitTrayLabel>();
+		}
+        dataListeners = new ArrayList<ListDataListener>();
+        if (selectFirst && model.size()>0) { 
+        	selectedItem = model.get(0);
+        }
+	}	
 	
 	/**
 	 * Add a unit tray label to the model. 
