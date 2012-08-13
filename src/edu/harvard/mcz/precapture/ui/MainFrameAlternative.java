@@ -69,7 +69,7 @@ public class MainFrameAlternative implements WindowListener {
 	private JFrame frame;
 	private JTable tablePrintList;
 	
-	private FolderEntryPanel folderPanel;
+	private ContainerEntryPanel folderPanel;
 
 	/**
 	 * Create the user interface.
@@ -129,7 +129,7 @@ public class MainFrameAlternative implements WindowListener {
 		JScrollPane scrollPaneFolder = new JScrollPane();
 		scrollPaneFolder.setMinimumSize(new Dimension(400, 22));
 		panel_2.add(scrollPaneFolder, BorderLayout.CENTER);
-		folderPanel = new FolderEntryPanel();
+		folderPanel = new ContainerEntryPanel();
 		scrollPaneFolder.setViewportView(folderPanel);
 		
 		JPanel panel_5 = new JPanel();
@@ -156,43 +156,8 @@ public class MainFrameAlternative implements WindowListener {
 			}
 		});
 		
-		JPanel panel_3 = new JPanel();
+		JPanel panel_3 = new ContainerListPanel(frame);
 		splitPane.setRightComponent(panel_3);
-		panel_3.setLayout(new BorderLayout(0, 0));
-		
-		JScrollPane scrollPane = new JScrollPane();
-		panel_3.add(scrollPane, BorderLayout.CENTER);
-		
-		tablePrintList = new JTable();
-		tablePrintList.setModel(PreCaptureSingleton.getInstance().getCurrentLabelList());
-		scrollPane.setViewportView(tablePrintList);
-		
-		JPanel panel_6 = new JPanel();
-		panel_3.add(panel_6, BorderLayout.SOUTH);
-		FlowLayout flowLayout_1 = (FlowLayout) panel_6.getLayout();
-		flowLayout_1.setAlignment(FlowLayout.RIGHT);
-		
-		JButton btnPrint_1 = new JButton("Print All");
-		panel_6.add(btnPrint_1);
-		btnPrint_1.setMnemonic(KeyEvent.VK_P);
-		btnPrint_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) { 
-				try {
-					LabelEncoder.printList(PreCaptureSingleton.getInstance().getCurrentLabelList().getLabels());
-				} catch (PrintFailedException e1) {
-					log.error(e1.getMessage());
-					JOptionPane.showMessageDialog(frame, "Failed to print. " + e1.getMessage());
-				}				
-			}
-		});
-		
-		JButton btnClear = new JButton("Clear");
-		btnClear.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) { 
-				PreCaptureSingleton.getInstance().getCurrentLabelList().clearList();
-			}
-		});
-		panel_6.add(btnClear);
 		
 		if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_SHOW_INVENTORY).equals("true"))  {
 			tabbedPane.addTab("Inventory", null, new InventoryPanel(frame), null);

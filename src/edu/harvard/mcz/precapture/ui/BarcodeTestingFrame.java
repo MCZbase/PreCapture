@@ -29,6 +29,7 @@ import javax.swing.JTextField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.awt.Cursor;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.BorderLayout;
@@ -73,6 +74,7 @@ import javax.swing.JProgressBar;
 import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 
 /**
  * @author mole
@@ -106,16 +108,20 @@ public class BarcodeTestingFrame extends JFrame {
 		JButton btnRunTests = new JButton("Run Tests");
 		btnRunTests.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				EventQueue.invokeLater(new Runnable() {
+				Thread worker = new Thread() {
 					public void run() {
 						try {
+							Cursor cursor = frame.getCursor();
+							frame.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 							runTests();
+							frame.setCursor(cursor);
 						} catch (Exception e) {
 							log.error(e.getMessage());
 							e.printStackTrace();
 						}
 					}
-				});		
+				};
+				worker.start();
 			}
 		});
 		panel.add(btnRunTests);
@@ -189,6 +195,8 @@ public class BarcodeTestingFrame extends JFrame {
 		table = new JTable(new BarcodeTestResultsTableModel());
 		scrollPane.setViewportView(table);
 
+		pack();
+		setVisible(true);
 	}
 
 	private void runTests() {
@@ -250,12 +258,25 @@ public class BarcodeTestingFrame extends JFrame {
 		
 		StringBuffer report = new StringBuffer();
 		
-		progressBar.setMaximum(stop);
+		final JProgressBar progressBarF = progressBar;
+		final int stopF = stop;
+		SwingUtilities.invokeLater(new Runnable() { 
+			public void run() { 
+		        progressBarF.setMaximum(stopF);
+			}
+		});
 		String lastSuccess = "";
 		BarcodeTestResultsTableModel testResults = new BarcodeTestResultsTableModel();
 		for (int x=0; x<stop; x++) { 
 			BarcodeTestResult testResult = new BarcodeTestResult();
-			progressBar.setValue(x);
+			final int xF = x;
+			SwingUtilities.invokeLater(new Runnable() { 
+				public void run() { 
+			        progressBarF.setValue(xF);
+			        log.debug(xF);
+			        frame.repaint();
+				}
+			});
 			i = containerLabel.getFields().iterator();
 			counter = 0;
 			int byteSize = 0;
@@ -276,6 +297,7 @@ public class BarcodeTestingFrame extends JFrame {
 			encoder = new LabelEncoder(containerLabel);
 			int scaleWidth = 0;
 			int imageNeedsWidth = 0;
+			String errorMessage = null;
 			try {
 				// Create a barcode image
 				BufferedImage image = encoder.getBufferedImage();
@@ -317,7 +339,12 @@ public class BarcodeTestingFrame extends JFrame {
 				testResult.setScaledImage(rescaledIconLocal);
 				if (x==0) { 
 				   //labelImage.setIcon(new ImageIcon(rescaledImage));
-					labelImage.setIcon(rescaledIconLocal);
+					final ImageIcon rescaledIconLocalF = rescaledIconLocal;
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() { 
+					        labelImage.setIcon(rescaledIconLocalF);
+						}
+					});
 				}
 				BufferedImage toDecode = (BufferedImage) rescaledIcon.getImage();
 				decodedJson = LabelDecoder.decodeImage(toDecode);
@@ -336,7 +363,7 @@ public class BarcodeTestingFrame extends JFrame {
 				testResult.setMessage("Generation Failed " + wex.getMessage());
 				failures++;
 				if (failures==1) { 
-					labelFirstError.setText("Failed to generate QRCode, too many characters: " + json.length() );
+					errorMessage="Failed to generate QRCode, too many characters: " + json.length();
 				}
 			} catch (BarcodeReadException e) {
 				report.append("Failure.  Bytes=" + byteSize +  " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth).append(e.getMessage()).append("\n");
@@ -349,7 +376,7 @@ public class BarcodeTestingFrame extends JFrame {
 				testResult.setMessage("Failed " + message);
 				failures++;
 				if (failures==1) { 
-					labelFirstError.setText("Bytes = " + byteSize + ", Last " + lastSuccess);
+					errorMessage = "Bytes = " + byteSize + ", Last " + lastSuccess;
 				}
 			} catch (BarcodeCreationException e) {
 				report.append("Failure.  Bytes=" + byteSize +  " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth).append(e.getMessage()).append("\n");
@@ -362,7 +389,7 @@ public class BarcodeTestingFrame extends JFrame {
 				testResult.setMessage("Failed " + message);
 				failures++;
 				if (failures==1) { 
-					labelFirstError.setText("Bytes = " + byteSize + ", Last " + lastSuccess);
+					errorMessage = "Bytes = " + byteSize + ", Last " + lastSuccess;
 				}
 			} catch (IOException e) {
 				report.append("Failure [IO Exception].  Bytes=" + byteSize +  " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth).append(e.getMessage()).append("\n");
@@ -375,7 +402,7 @@ public class BarcodeTestingFrame extends JFrame {
 				testResult.setMessage("Failed " + message);
 				failures++;
 				if (failures==1) { 
-					labelFirstError.setText("Bytes = " + byteSize + ", Last " + lastSuccess);
+					errorMessage = "Bytes = " + byteSize + ", Last " + lastSuccess;
 				}
 			} catch (DocumentException e) {
 				report.append("Failure [document exception].  Bytes=" + byteSize +  " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth).append(e.getMessage()).append("\n");
@@ -388,17 +415,32 @@ public class BarcodeTestingFrame extends JFrame {
 				testResult.setMessage("Failed " + message);
 				failures++;
 				if (failures==1) { 
-					labelFirstError.setText("Bytes = " + byteSize + ", Last " + lastSuccess);
+				     errorMessage = "Bytes = " + byteSize + ", Last " + lastSuccess;
+				}
+			} finally {
+				if (errorMessage!=null) {
+					final String errorMessageF = errorMessage;
+				SwingUtilities.invokeLater(new Runnable() { 
+					public void run() { 
+					      labelFirstError.setText(errorMessageF);
+					}
+				});
 				}
 			}
 		    testResults.addResult(testResult);
-		    frame.repaint();
 		}
-		progressBar.setValue(stop);
-		labelResult.setText("Successes=" + successes + ", failures=" + failures);
-		table.setModel(testResults);
-		table.setRowHeight(300);
-		table.doLayout();
+		final int successesF = successes;
+		final int failuresF = failures;
+		final BarcodeTestResultsTableModel testResultsF = testResults;
+		SwingUtilities.invokeLater(new Runnable() { 
+			public void run() { 
+		        progressBarF.setValue(stopF);
+		        labelResult.setText("Successes=" + successesF + ", failures=" + failuresF);
+		        table.setModel(testResultsF);
+		        table.setRowHeight(300);
+		        table.doLayout();
+			}
+		});
 		} // end label definition is not null
 	}
 	

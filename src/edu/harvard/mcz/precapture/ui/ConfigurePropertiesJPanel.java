@@ -1,5 +1,5 @@
 /**
- * PropertiesConfigJPanel.java
+ * ConfigurePropertiesJPanel.java
  * edu.harvard.mcz.precapture.ui
  * Copyright © 2012 President and Fellows of Harvard College
  *
@@ -40,18 +40,18 @@ import java.awt.BorderLayout;
  * @author mole
  *
  */
-public class PropertiesConfigJPanel extends JPanel {
+public class ConfigurePropertiesJPanel extends JPanel {
 	private static final long serialVersionUID = 5193156023117363717L;
 
-	private static final Log log = LogFactory.getLog(PropertiesConfigJPanel.class);
+	private static final Log log = LogFactory.getLog(ConfigurePropertiesJPanel.class);
 
 	private JTextField txtDerby;
 	private JTable table;
 	
 	/** 
-	 * Default no argument constructor, constructs a new PropertiesConfigJPanel instance.
+	 * Default no argument constructor, constructs a new ConfigurePropertiesJPanel instance.
 	 */
-	public PropertiesConfigJPanel() {
+	public ConfigurePropertiesJPanel() {
        init();
 	}
 	

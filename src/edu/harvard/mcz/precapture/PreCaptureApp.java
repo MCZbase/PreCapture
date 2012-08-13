@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -45,7 +46,7 @@ import edu.harvard.mcz.precapture.data.HibernateUtil;
 import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
 import edu.harvard.mcz.precapture.data.UnitTrayLabelLifeCycle;
 import edu.harvard.mcz.precapture.exceptions.StartupFailedException;
-import edu.harvard.mcz.precapture.ui.LabelList;
+import edu.harvard.mcz.precapture.ui.ContainerListTableModel;
 import edu.harvard.mcz.precapture.ui.MainFrame;
 import edu.harvard.mcz.precapture.ui.MainFrameAlternative;
 import edu.harvard.mcz.precapture.xml.MappingList;
@@ -62,7 +63,7 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "0.12.1";
+	public static final String VERSION = "0.12.2";
 	public static final String SVN_ID = "$Id$";
 	public static final String AUTHORS = "Paul J. Morris";
 	public static final String COPYRIGHT = "Copyright © 2012 President and Fellows of Harvard College";
@@ -171,7 +172,7 @@ public class PreCaptureApp {
 			}		
 			PreCaptureSingleton.getInstance().getSplashScreen().setProgress(30);
 
-			LabelList labelList = new LabelList();
+			ContainerListTableModel labelList = new ContainerListTableModel();
 			PreCaptureSingleton.getInstance().setCurrentLabelList(labelList);
 
 			// Test database 
@@ -208,6 +209,9 @@ public class PreCaptureApp {
 						try {
 							PreCaptureSingleton.getInstance().getSplashScreen().setProgress(SplashScreen.END_PROGRESS);
 							PreCaptureSingleton.getInstance().getSplashScreen().setVisible(false);
+							
+							UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+							
 							// Launch user interface
 							if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MAINFRAME).equals("MainFrame")) {
 							    MainFrame window = new MainFrame();

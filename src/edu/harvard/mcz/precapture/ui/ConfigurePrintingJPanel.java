@@ -1,5 +1,5 @@
 /**
- * PrintingConfigJPanel.java
+ * ConfigurePrintingJPanel.java
  * edu.harvard.mcz.precapture.ui
  * Copyright © 2012 President and Fellows of Harvard College
  *
@@ -47,17 +47,17 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
  * @author mole
  *
  */
-public class PrintingConfigJPanel extends JPanel {
+public class ConfigurePrintingJPanel extends JPanel {
 	private static final long serialVersionUID = 2771323865516346762L;
-	private static final Log log = LogFactory.getLog(PrintingConfigJPanel.class);
+	private static final Log log = LogFactory.getLog(ConfigurePrintingJPanel.class);
 
 	private JComboBox comboBoxPrintFormat;
 	private JTable tablePrintFormatList;
 	
 	/** 
-	 * Default no argument constructor, constructs a new PrintingConfigJPanel instance.
+	 * Default no argument constructor, constructs a new ConfigurePrintingJPanel instance.
 	 */
-	public PrintingConfigJPanel() {
+	public ConfigurePrintingJPanel() {
        init();
 	}
 	

@@ -1,5 +1,5 @@
 /**
- * LabelList.java
+ * ContainerListTableModel.java
  * edu.harvard.mcz.precapture.ui
  * Copyright © 2012 President and Fellows of Harvard College
  *
@@ -28,11 +28,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
+import edu.harvard.mcz.precapture.data.Inventory;
+import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
+import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
 /**
  * A list of container labels, each of which has a number to print and a list of fields.
  * 
- * A LabelList is a list of ContainerLabel, each of which has a list of FieldPlusText 
+ * A ContainerListTableModel is a list of ContainerLabel, each of which has a list of FieldPlusText 
  * and a number to print.
  * 
  * A ContainerLabel corresponds with a MappingList, and each Field in the MappingList
@@ -41,11 +44,11 @@ import edu.harvard.mcz.precapture.PreCaptureSingleton;
  * @author mole
  *
  */
-public class LabelList extends AbstractTableModel {
+public class ContainerListTableModel extends AbstractTableModel {
 	
 	private static final long serialVersionUID = -4269045283222334588L;
 
-	private static final Log log = LogFactory.getLog(LabelList.class);
+	private static final Log log = LogFactory.getLog(ContainerListTableModel.class);
 
 	private ArrayList<ContainerLabel> labels;
 	
@@ -53,9 +56,9 @@ public class LabelList extends AbstractTableModel {
 	private int fieldCount = 0;
 	
 	/** 
-	 * Default no argument constructor, constructs a new LabelList instance.
+	 * Default no argument constructor, constructs a new ContainerListTableModel instance.
 	 */
-	public LabelList() {
+	public ContainerListTableModel() {
         labels = new ArrayList<ContainerLabel>();
 		ArrayList<FieldPlusText> textFields = new ArrayList<FieldPlusText>(); 
         fieldCount = PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size();
@@ -154,6 +157,33 @@ public class LabelList extends AbstractTableModel {
 		} else { 
 			 labels.get(rowIndex).setNumberToPrint(Integer.valueOf(aValue.toString()));
 		}
+	}
+	
+	/**
+	 * Creates a new row with the taxon and cabinet of another row.
+	 * 
+	 * @param clickedOnRow
+	 */
+	public void cloneRow(int clickedOnRow) {
+		ContainerLabel container =  labels.get(clickedOnRow);
+		ContainerLabel newContainerRecord = new ContainerLabel();
+		// TODO: iterate through fields to clone.
+		//newContainerRecord.setCabinet(container.getCabinet());
+		//newContainerRecord.setTaxon(container.getTaxon());
+		labels.add(newContainerRecord);
+		fireTableDataChanged();
+	}
+
+	/**
+	 * @param clickedOnRow
+	 * @throws SaveFailedException 
+	 */
+	public void deleteRow(int clickedOnRow) throws SaveFailedException {
+		//InventoryLifeCycle ils = new InventoryLifeCycle();
+		//ils.delete(inventoryList.get(clickedOnRow));
+		labels.get(clickedOnRow);
+	    labels.remove(clickedOnRow);
+		fireTableDataChanged();
 	}
 	
 	

@@ -35,10 +35,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLDecoder;
 
 import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.html.HTMLDocument;
+
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -90,7 +93,18 @@ public class HelpFrame extends JFrame {
 		URL helpURL = PreCaptureApp.class.getResource("resources/ApplicationHelp.html");
 		JEditorPane textPane;
 		try {
-			textPane = new JEditorPane(helpURL);
+			textPane = new JEditorPane();
+			textPane.setContentType("text/html");
+			textPane.setPage(helpURL);
+			log.debug(((HTMLDocument)textPane.getDocument()).getBase());
+			if (helpURL.getProtocol().equals("rsrc")) { 
+				// invoked from a jar built with eclipse's jarinjarloader
+				helpURL = new URL("http://datashot.sourceforge.net/precapture/ApplicationHelp.html");
+				textPane.setPage(helpURL);
+			} else { 
+			    ((HTMLDocument)textPane.getDocument()).setBase(helpURL);
+			    log.debug(((HTMLDocument)textPane.getDocument()).getBase());
+			} 
 		} catch (IOException e1) {
 			log.error(e1.getMessage());
 			textPane = new JEditorPane();

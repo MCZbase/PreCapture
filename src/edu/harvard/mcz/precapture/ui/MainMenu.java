@@ -22,6 +22,7 @@ package edu.harvard.mcz.precapture.ui;
 import javax.swing.JMenuBar;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
+import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -77,9 +78,9 @@ public class MainMenu extends JMenuBar {
 		JMenuItem mntmRunTests = new JMenuItem("Run Tests");
 		mntmRunTests.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BarcodeTestingFrame testFrame = new BarcodeTestingFrame();
-				testFrame.pack();
-				testFrame.setVisible(true);
+				SwingUtilities.invokeLater(new Runnable(){ public void run(){
+				    BarcodeTestingFrame testFrame = new BarcodeTestingFrame();
+				} });
 			}
 		});
 		mntmRunTests.setMnemonic(KeyEvent.VK_T);

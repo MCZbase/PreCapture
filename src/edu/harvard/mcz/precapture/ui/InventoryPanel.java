@@ -42,16 +42,23 @@ import org.apache.commons.logging.LogFactory;
 import edu.harvard.mcz.precapture.data.Inventory;
 import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
 import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
 
 /**
  * @author mole
  *
  */
 public class InventoryPanel extends JPanel {
+	private static final long serialVersionUID = 1697467900993700439L;
 	private static final Log log = LogFactory.getLog(InventoryPanel.class);
 
 	private JTable tableInventory;
 	private JFrame frame;
+	private JPopupMenu popupMenu;
+	private int clickedOnRow;
 	
 	public InventoryPanel(JFrame containingFrame) {
 		frame = containingFrame;
@@ -65,10 +72,75 @@ public class InventoryPanel extends JPanel {
 		add(scrollPane_1, BorderLayout.CENTER);
 
 		tableInventory = new JTable();
+		tableInventory.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) { 
+					 clickedOnRow = ((JTable)e.getComponent()).getSelectedRow();
+				     popupMenu.show(e.getComponent(),e.getX(),e.getY());
+				}
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) { 
+					 clickedOnRow = ((JTable)e.getComponent()).getSelectedRow();
+				     popupMenu.show(e.getComponent(),e.getX(),e.getY());
+				}
+			}
+		});
 		InventoryLifeCycle ils = new InventoryLifeCycle();
 		InventoryTableModel iTableModel = new InventoryTableModel((ArrayList<Inventory>)ils.findAll());
 		tableInventory.setModel(iTableModel);
 		scrollPane_1.setViewportView(tableInventory);
+		
+		popupMenu = new JPopupMenu();
+		
+		JMenuItem mntmCloneRow = new JMenuItem("Clone Row");
+		mntmCloneRow.setMnemonic(KeyEvent.VK_C);
+		mntmCloneRow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) { 
+				try { 
+					if (clickedOnRow<0) { 
+				       ((InventoryTableModel)tableInventory.getModel()).addRow();
+					} else { 
+				       ((InventoryTableModel)tableInventory.getModel()).cloneRow(clickedOnRow);
+					}
+				} catch (Exception ex) { 
+					log.error(ex.getMessage());
+					JOptionPane.showMessageDialog(frame, "Failed to clone an Inventory row. " + ex.getMessage());
+				}
+			}
+		});	
+		popupMenu.add(mntmCloneRow);
+		
+		JMenuItem mntmDeleteRow = new JMenuItem("Delete Row");
+		mntmDeleteRow.setMnemonic(KeyEvent.VK_C);
+		mntmDeleteRow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) { 
+				try { 
+					if (clickedOnRow>=0) { 
+				       ((InventoryTableModel)tableInventory.getModel()).deleteRow(clickedOnRow);
+					}
+				} catch (Exception ex) { 
+					log.error(ex.getMessage());
+					JOptionPane.showMessageDialog(frame, "Failed to delete an Inventory row. " + ex.getMessage());
+				}
+			}
+		});	
+		popupMenu.add(mntmDeleteRow);		
+		
+		JMenuItem mntmAddRow = new JMenuItem("Add Row");
+		mntmAddRow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) { 
+				try { 
+				    ((InventoryTableModel)tableInventory.getModel()).addRow();
+				} catch (Exception ex) { 
+					log.error(ex.getMessage());
+					JOptionPane.showMessageDialog(frame, "Failed to add an Inventory row. " + ex.getMessage());
+				}
+			}
+		});	
+		popupMenu.add(mntmAddRow);
 		
 		JPanel panel_8 = new JPanel();
 		FlowLayout flowLayout_8 = (FlowLayout) panel_8.getLayout();

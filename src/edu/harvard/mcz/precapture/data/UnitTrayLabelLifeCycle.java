@@ -26,6 +26,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -83,7 +87,30 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 	}
 	
     public static int loadFromCSV(String filename) throws IOException {
+    	return loadFromCSV(filename,null);
+    }	    	
+    	
+    /**
+    * @param canonicalPath
+    * @param taxonProgressBar
+    */
+    public static int loadFromCSV(String filename, JProgressBar taxonProgressBar) throws IOException {
     	int numberLoaded = 0;
+    	int totalLines = 0;
+    	final JProgressBar jpb = taxonProgressBar;
+    	if (taxonProgressBar!=null) { 
+    		CsvReader readerTest = new CsvReader(filename,',',Charset.forName("utf-8"));
+    		while (readerTest.readRecord()) { 
+    			totalLines++;
+    		}
+    		readerTest.close();
+    		final int totalLinesF = totalLines;
+    		SwingUtilities.invokeLater(new Runnable() {
+    			public void run() { 
+    		         jpb.setMaximum(totalLinesF);
+    			}
+    		});
+    	}
     	CsvReader reader = new CsvReader(filename,',',Charset.forName("utf-8"));
     	reader.readHeaders();
     	UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
@@ -103,8 +130,19 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			} catch (SaveFailedException e) {
 				log.error(e.getMessage());
 			}
+    	    if (taxonProgressBar!=null) {
+    	    	final int numberLoadedF = numberLoaded;
+    	    	SwingUtilities.invokeLater(new Runnable() { 
+    	    		public void run() {
+    	    	        jpb.setValue(numberLoadedF);
+    	    	   } 
+    	    	});
+    	    }
     	}
     	reader.close();
+    	if (taxonProgressBar!=null) {
+    	    taxonProgressBar.setValue(totalLines);
+    	}
     	return numberLoaded;
     }
 
@@ -502,7 +540,9 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			throw re;
 		}
 		return results;
-	}	
+	}
+
+
 
 	
 }

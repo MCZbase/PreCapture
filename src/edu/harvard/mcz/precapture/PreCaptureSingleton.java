@@ -22,7 +22,7 @@ package edu.harvard.mcz.precapture;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.harvard.mcz.precapture.ui.LabelList;
+import edu.harvard.mcz.precapture.ui.ContainerListTableModel;
 import edu.harvard.mcz.precapture.xml.MappingList;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionListType;
 
@@ -35,7 +35,7 @@ public class PreCaptureSingleton {
 
 	private PreCaptureProperties properties;
 	private MappingList mappingList;
-	private LabelList currentLabelList;
+	private ContainerListTableModel currentLabelList;
 	private LabelDefinitionListType printFormatDefintionList;
 	private SplashScreen splashScreen;
 	
@@ -90,13 +90,13 @@ public class PreCaptureSingleton {
 	/**
 	 * @return the currentLabelList
 	 */
-	public LabelList getCurrentLabelList() {
+	public ContainerListTableModel getCurrentLabelList() {
 		return currentLabelList;
 	}
 	/**
 	 * @param currentLabelList the currentLabelList to set
 	 */
-	public void setCurrentLabelList(LabelList currentLabelList) {
+	public void setCurrentLabelList(ContainerListTableModel currentLabelList) {
 		this.currentLabelList = currentLabelList;
 	}
 	/**

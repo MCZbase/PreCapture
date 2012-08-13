@@ -1,5 +1,5 @@
 /**
- * FolderEntryPanel.java
+ * ContainerEntryPanel.java
  * edu.harvard.mcz.precapture.ui
  * Copyright © 2012 President and Fellows of Harvard College
  *
@@ -55,11 +55,11 @@ import edu.harvard.mcz.precapture.exceptions.PrintFailedException;
  * @author mole
  *
  */
-public class FolderEntryPanel extends JPanel {
+public class ContainerEntryPanel extends JPanel {
 	
 	private static final long serialVersionUID = -7835985799794074075L;
 
-	private static final Log log = LogFactory.getLog(FolderEntryPanel.class);
+	private static final Log log = LogFactory.getLog(ContainerEntryPanel.class);
 
 	//private ArrayList<FieldPlusText> textFields;
 	private ContainerLabel containerLabel;
@@ -70,9 +70,9 @@ public class FolderEntryPanel extends JPanel {
 	private JComboBox comboBoxGenericFilter;
 
 	/** 
-	 * Default no argument constructor, constructs a new FolderEntryPanel instance.
+	 * Default no argument constructor, constructs a new ContainerEntryPanel instance.
 	 */
-	public FolderEntryPanel() {
+	public ContainerEntryPanel() {
 		init();
 		
 	}

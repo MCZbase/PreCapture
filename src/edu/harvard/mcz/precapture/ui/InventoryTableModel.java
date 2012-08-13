@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.harvard.mcz.precapture.data.Inventory;
 import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
+import edu.harvard.mcz.precapture.data.UnitTrayLabelLifeCycle;
 import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
 /**
@@ -244,6 +245,32 @@ public class InventoryTableModel extends AbstractTableModel {
 				throw new SaveFailedException("Unable to write to file " + filename.getName() + e.getMessage());
 			}
 		}
+	}
+
+	/**
+	 * Creates a new row with the taxon and cabinet of another row.
+	 * 
+	 * @param clickedOnRow
+	 */
+	public void cloneRow(int clickedOnRow) {
+		Inventory inventory =  inventoryList.get(clickedOnRow);
+		Inventory newInventoryRecord = new Inventory();
+		newInventoryRecord.setCabinet(inventory.getCabinet());
+		newInventoryRecord.setTaxon(inventory.getTaxon());
+		inventoryList.add(newInventoryRecord);
+		fireTableDataChanged();
+	}
+
+	/**
+	 * @param clickedOnRow
+	 * @throws SaveFailedException 
+	 */
+	public void deleteRow(int clickedOnRow) throws SaveFailedException {
+		InventoryLifeCycle ils = new InventoryLifeCycle();
+		ils.delete(inventoryList.get(clickedOnRow));
+		inventoryList.get(clickedOnRow);
+	    inventoryList.remove(clickedOnRow);
+		fireTableDataChanged();
 	}
 	
 }

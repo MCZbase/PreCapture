@@ -1,5 +1,5 @@
 /**
- * FieldsConfigJPanel.java
+ * ConfigureFieldsJPanel.java
  * edu.harvard.mcz.precapture.ui
  * Copyright © 2012 President and Fellows of Harvard College
  *
@@ -39,18 +39,18 @@ import java.awt.FlowLayout;
  * @author mole
  *
  */
-public class FieldsConfigJPanel extends JPanel {
+public class ConfigureFieldsJPanel extends JPanel {
 	private static final long serialVersionUID = -7371846617414565995L;
 
-	private static final Log log = LogFactory.getLog(FieldsConfigJPanel.class);
+	private static final Log log = LogFactory.getLog(ConfigureFieldsJPanel.class);
 
 	private JTable table;
 	private JLabel textField;
 	
 	/** 
-	 * Default no argument constructor, constructs a new FieldsConfigJPanel instance.
+	 * Default no argument constructor, constructs a new ConfigureFieldsJPanel instance.
 	 */
-	public FieldsConfigJPanel() {
+	public ConfigureFieldsJPanel() {
        init();
 	}
 	
