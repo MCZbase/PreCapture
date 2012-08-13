@@ -24,11 +24,15 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
@@ -48,6 +52,8 @@ public class ContainerListPanel extends JPanel {
 
 	private JTable tablePrintList;
 	private JFrame parent;
+	private JPopupMenu popupMenu;
+	private int clickedOnRow;
 	
 	public ContainerListPanel(JFrame parent) {
 		this.parent = parent;
@@ -62,6 +68,22 @@ public class ContainerListPanel extends JPanel {
 		
 		tablePrintList = new JTable();
 		tablePrintList.setModel(PreCaptureSingleton.getInstance().getCurrentLabelList());
+		tablePrintList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) { 
+					 clickedOnRow = ((JTable)e.getComponent()).getSelectedRow();
+				     popupMenu.show(e.getComponent(),e.getX(),e.getY());
+				}
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) { 
+					 clickedOnRow = ((JTable)e.getComponent()).getSelectedRow();
+				     popupMenu.show(e.getComponent(),e.getX(),e.getY());
+				}
+			}
+		});
 		scrollPane.setViewportView(tablePrintList);
 		
 		JPanel panel_6 = new JPanel();
@@ -92,6 +114,55 @@ public class ContainerListPanel extends JPanel {
 		panel_6.add(btnClear);
 		
 		//TODO: Add popup menu to clone/delete rows.
+		
+		popupMenu = new JPopupMenu();
+		
+		JMenuItem mntmCloneRow = new JMenuItem("Clone Row");
+		mntmCloneRow.setMnemonic(KeyEvent.VK_C);
+		mntmCloneRow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) { 
+				try { 
+					if (clickedOnRow<0) { 
+				       ((ContainerListTableModel)tablePrintList.getModel()).addRow();
+					} else { 
+				       ((ContainerListTableModel)tablePrintList.getModel()).cloneRow(clickedOnRow);
+					}
+				} catch (Exception ex) { 
+					log.error(ex.getMessage());
+					JOptionPane.showMessageDialog(parent, "Failed to clone an Inventory row. " + ex.getMessage());
+				}
+			}
+		});	
+		popupMenu.add(mntmCloneRow);
+		
+		JMenuItem mntmDeleteRow = new JMenuItem("Delete Row");
+		mntmDeleteRow.setMnemonic(KeyEvent.VK_C);
+		mntmDeleteRow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) { 
+				try { 
+					if (clickedOnRow>=0) { 
+				       ((ContainerListTableModel)tablePrintList.getModel()).deleteRow(clickedOnRow);
+					}
+				} catch (Exception ex) { 
+					log.error(ex.getMessage());
+					JOptionPane.showMessageDialog(parent, "Failed to delete an Inventory row. " + ex.getMessage());
+				}
+			}
+		});	
+		popupMenu.add(mntmDeleteRow);		
+		
+		JMenuItem mntmAddRow = new JMenuItem("Add Row");
+		mntmAddRow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) { 
+				try { 
+				    ((ContainerListTableModel)tablePrintList.getModel()).addRow();
+				} catch (Exception ex) { 
+					log.error(ex.getMessage());
+					JOptionPane.showMessageDialog(parent, "Failed to add an Inventory row. " + ex.getMessage());
+				}
+			}
+		});	
+		popupMenu.add(mntmAddRow);
 		
 	}
 }

@@ -20,6 +20,7 @@
 package edu.harvard.mcz.precapture.ui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
@@ -164,12 +165,31 @@ public class ContainerListTableModel extends AbstractTableModel {
 	 * 
 	 * @param clickedOnRow
 	 */
+	public void addRow() {
+		ContainerLabel newContainerRecord = new ContainerLabel();
+        fieldCount = PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size();
+	    for (int i=0; i<fieldCount; i++) { 
+	    	newContainerRecord.getFields().add(new FieldPlusText(PreCaptureSingleton.getInstance().getMappingList().getFieldInList().get(i), new JTextField()));
+	    } 
+		labels.add(newContainerRecord);
+		fireTableDataChanged();
+	}	
+	
+	/**
+	 * Creates a new row with the taxon and cabinet of another row.
+	 * 
+	 * @param clickedOnRow
+	 */
 	public void cloneRow(int clickedOnRow) {
 		ContainerLabel container =  labels.get(clickedOnRow);
 		ContainerLabel newContainerRecord = new ContainerLabel();
 		// TODO: iterate through fields to clone.
-		//newContainerRecord.setCabinet(container.getCabinet());
-		//newContainerRecord.setTaxon(container.getTaxon());
+		newContainerRecord.setNumberToPrint(container.getNumberToPrint());
+		Iterator<FieldPlusText> i = container.getFields().iterator();
+		while(i.hasNext()) {
+			FieldPlusText f = i.next();
+			newContainerRecord.getFields().add(f);
+		} 
 		labels.add(newContainerRecord);
 		fireTableDataChanged();
 	}
