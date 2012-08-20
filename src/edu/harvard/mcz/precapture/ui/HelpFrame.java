@@ -60,12 +60,12 @@ public class HelpFrame extends JFrame {
 	 * Default no argument constructor, constructs a new HelpFrame instance.
 	 */
 	public HelpFrame() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(HelpFrame.class.getResource("/edu/harvard/mcz/precapture/resources/icon.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(HelpFrame.class.getResource("resources/icon.png")));
 		setTitle("Application Help");
 		frame = this;
 		init();
 		this.pack();
-		
+		log.debug("help frame packed");
 	} 
 	
 	private void init(){ 
@@ -116,7 +116,13 @@ public class HelpFrame extends JFrame {
 				e2.printStackTrace();
 			}
 		}
+		
+		log.debug(textPane.getDocument().getLength());
+		try { 
 		scrollPane.setViewportView(textPane);
+		} catch (Exception e) { 
+			log.error(e.getMessage());
+		}
 
 	}
 

@@ -20,6 +20,7 @@
 package edu.harvard.mcz.precapture.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -90,6 +91,10 @@ public class ConfigurationDialog extends JDialog {
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						// Grab focus to make sure that changes
+						// in table rows get saved.
+						((JButton)e.getSource()).grabFocus();
+						
 						// Save Preferences
 
 						// Close preferences dialog window
@@ -102,6 +107,7 @@ public class ConfigurationDialog extends JDialog {
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
+				// TODO: This doesn't actually do anything, remove?
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {

@@ -63,6 +63,9 @@ public class PreCaptureProperties extends AbstractTableModel {
 	public static final String KEY_FILTER_LENGTH_THRESHOLD = "config.filterlengththreshold";
 	/** Value to use for QRCode error correction level in hint to Zxing in encoding. */
 	public static final String KEY_QRCODEECLEVEL = "config.qr_errorcorrection";
+	/** Key for properties file for wheter or not the edit panel should be shown for 
+	 * unit tray label (authority file records).  */
+	public static final String KEY_EDITVIEWUTL = "config.ediableunittraylabeldb";
 
 	private Properties properties = null;
 	private String propertiesFilename = null;
@@ -203,6 +206,10 @@ public class PreCaptureProperties extends AbstractTableModel {
 			// name of selected UI main frame 
 			properties.setProperty(KEY_QRCODEECLEVEL, "H");
 		}
+		if (!properties.containsKey(KEY_EDITVIEWUTL)) {
+			// by default don't show the unit tray label db editor panel
+			properties.setProperty(KEY_EDITVIEWUTL, "false");
+		}		
 	}
 
 	/**

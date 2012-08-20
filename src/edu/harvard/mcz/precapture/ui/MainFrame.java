@@ -147,6 +147,12 @@ public class MainFrame  implements WindowListener {
 			tabbedPane.addTab("Inventory", null, new InventoryPanel(frame), null);
 			tabbedPane.setMnemonicAt(1, KeyEvent.VK_I);
 		} 
+
+		if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_EDITVIEWUTL).equals("true"))  {
+			tabbedPane.addTab("Taxon Authority File", null, new UnitTrayLabelEditPanel(frame), null);
+			tabbedPane.setMnemonicAt(1, KeyEvent.VK_T);
+		} 
+		
 	}
 
 	public void windowOpened(WindowEvent e) {

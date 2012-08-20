@@ -19,6 +19,9 @@
  */
 package edu.harvard.mcz.precapture.ui;
 
+import javax.help.CSH;
+import javax.help.HelpSet;
+import javax.help.HelpSetException;
 import javax.swing.JMenuBar;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -27,14 +30,18 @@ import javax.swing.SwingUtilities;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.swing.JMenuItem;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader;
 
 import edu.harvard.mcz.precapture.PreCaptureApp;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
+import edu.harvard.mcz.precapture.resources.help.HelpLoaderClass;
 
 /**
  * @author mole
@@ -117,6 +124,30 @@ public class MainMenu extends JMenuBar {
 		
 		JMenuItem mntmApplicationHelp = new JMenuItem("Using " + PreCaptureApp.NAME);
 		mntmApplicationHelp.setMnemonic(KeyEvent.VK_U);
+		try {
+			//URL hsURL = PreCaptureApp.class.getResource("resources/help/helpset.hs");
+			URL hsURL = ClassLoader.getSystemResource("helpset.hs");
+			//hsURL = new URL("jar:rsrc:jar:precaptureHelp.jar!/helpset.hs");
+			if (hsURL==null) { 
+				hsURL =  JarRsrcLoader.class.getClassLoader().getResource("helpset.hs");
+			}
+			if (hsURL==null) { 
+				hsURL =  JarRsrcLoader.class.getClassLoader().getSystemResource("helpset.hs");
+			}			
+			if (hsURL==null) { 
+				//hsURL =  JarRsrcLoader.class.getClassLoader().getResourceAsStream("helpset.hs");
+			}			
+			log.debug(hsURL);
+			
+			//HelpSet hs = new HelpSet(HelpLoaderClass.class.getClassLoader(),hsURL);
+			//HelpSet hs = new HelpSet(ClassLoader.getSystemClassLoader(),hsURL);
+			HelpSet hs = new HelpSet(null,hsURL);
+			mntmApplicationHelp.addActionListener(new CSH.DisplayHelpFromSource(hs.createHelpBroker()));
+		} catch (HelpSetException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		/*
 		mntmApplicationHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				log.debug("Help selected");
@@ -124,6 +155,7 @@ public class MainMenu extends JMenuBar {
 				help.setVisible(true);
 			}
 		});
+		*/
 		mnHelp.add(mntmApplicationHelp);
 		
 		JMenuItem mntmAbout = new JMenuItem("About");

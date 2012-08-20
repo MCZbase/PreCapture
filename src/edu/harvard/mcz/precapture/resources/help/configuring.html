@@ -1,0 +1,125 @@
+<html>
+<head>
+<title>Help for PreCapture Application</title>
+</head>
+<body>
+
+<h1>Configuring the Pre-Capture Application</h1>
+<p>This application is highly configurable.  Some of the configuration is accessed
+through the configuration dialog in the user interface, other elements are in a 
+properties file, others in xml configuration files.</p>
+<h2>Configuration</h2>
+<p>Configuration can be changed in the following places.  User marks configurations that are expected
+to be set by individual users.  Administrator marks configurations that are expected to be set at
+particular deployment sites or for particular projects.</p>
+<ul>
+<li>Selecting a configured print format (through the Configuration Dialog) <strong>User</strong></li>
+<li>Loading a new Taxon Authority file (through the Configuration Dialog) <strong>User</strong></li>
+<li>Properties (in properties file, editable from the Configuration Dialog) <strong>User &amp; Administrator</strong></li>
+<li>Changing available print formats through an XML Configuration file). <strong>Administrator</strong></li>
+<li>Changing the list of fields for the container labels (through an XML Configuration file).  <strong>Administrator</strong></li> 
+</ul>
+<h2>Selecting a configured Print Format</h2>
+
+<p>Open the configuration dialog with <em>File/Configuration</em>.  Select the <strong>Printing</strong> tab.
+From the picklist select the desired configured print format to use.  If you need a different format that isn't
+listed on this screen, see the Editing XML formats section below.  You can set the default print format
+from the Properties tab, by setting the value of the <em>config.selectedprintdefinition</em> property to match the
+desired default format name.</p>
+
+<img src="PrintFormatDialog.png">
+
+<h2>Loading a Taxon Authority File</h2>
+<p>Construct a csv file with the following columns:</p>
+<pre>
+Family,Genus,SpecificEpithet,SubspecificEpithet,InfraspecificEpithet,InfraspecificRank,Authorship
+</pre>
+<p>This file must be comma separated, the text fields may optionally be enclosed in quotes.  Encoding must be utf-8.</p>
+<p>Load this file from the <strong>Data Sources</strong> tab of the Configuration Dialog 
+(accessed with <em>File/Configuration</em>), by pressing the <strong>Load Taxon Authority File</strong> 
+button and picking a csv file.  The new authority list will be available in the Taxon combo box when
+you delete all text from the box.</p>
+
+<h2>Editing properties</h2>
+<p>Properties are store in a text file called PreCapture.properties which is created in the
+application directory.  You can edit this file directly, or with the Properties tab of the Configuration Dialog.</p>
+<p>To change the main frame from separate tabs for Label and Print List to a split pane, 
+change the property config.mainuiframe from "MainFrame" to "MainFrameAlternative"</p>
+<img src="ScreenshotConfigurationDialogProperties.png">
+
+<h3>Properties that users may wish to set</h3>
+
+<ul>
+<li>config.selectedprintdefinition The print definition to use by default from the print format definition file.</li>
+<li>config.mainuiframe The variant of the user interface to use.  MainFrame is the default with folder details and the print list in separate tabs, MainFrameAlternative includes the folder details and print lists in a split pane within a single tab.</li>
+<li>config.mycollectioncode  The collection code/Herbarium Acronym for the collection. The default value to use for a field that is mapped to the concept dwc:collectionCode.</li>
+<li>config.filterlengththreshold The number of characters to type into the taxon picker box before it starts filtering.  3 is probably a good choice.</li>
+</ul>
+
+<h3>All Available properties</h3>
+
+<ul>
+<li>print.papersize Not currently in use.</li>
+<li>config.fieldmap The location of the XML configuration file for fields to print on container labels.  A relative path is inside the jar, an absolute path on the local filesystem.</li>
+<li>config.editableauthorityfile Not currently in use.</li>
+<li>config.showinventorytab true to include the Inventory tab in the application, false to hide it.</li>
+<li>config.printdefinitions The location of the XML configuration file for print format definitions.  A relative path is inside the jar, an absolute path on the local filesystem.</li>
+<li>config.selectedprintdefinition The print definition to use by default from the print format definition file.</li>
+<li>config.mainuiframe The variant of the user interface to use.  MainFrame is the default with folder details and the print list in separate tabs, MainFrameAlternative includes the folder details and print lists in a split pane within a single tab.</li>
+<li>config.mycollectioncode  The collection code/Herbarium Acronym for the collection. The default value to use for a field that is mapped to the concept dwc:collectionCode.</li>
+<li>config.filterlengththreshold The number of characters to type into the taxon picker box before it starts filtering.  3 is probably a good choice.</li>
+<li>config.qr_errorcorrection The QRCode redundancy level to use.  One of L, M, Q, H.  H is recommended.  L allows about a 7% loss, H about a 30% loss.  H makes for more reliable reading, but more bits in the barcode.</li>
+</ul>
+
+<h2>Editing XML Configurations</h2>
+
+<p>Print formats and fields on container labels are controled by XML configuration files.  These XML configuration files
+follow XML schema documents present in the repository.   </p>
+<ul>
+<li>http://datashot.svn.sourceforge.net/viewvc/datashot/trunk/precapture_app/supporting/LabelDefinitionSchema.xsd</li>
+<li>http://datashot.svn.sourceforge.net/viewvc/datashot/trunk/precapture_app/supporting/PreCaptureFieldSchema.xsd</li>
+</ul> 
+
+<p>Default configurations for print format and field list are included in the packaged jar file.  
+Additional configurations can be created and either package in the jar file or placed on the local 
+file system.  The PreCapture.properties file contains a property for the location of each of these
+two configuration files.  A relative path will be within the jar, and absolute path on the local 
+file system.</p>
+
+<h3>Editing the Print Format configuration</h3>
+
+<p>Obtain a copy of the default print format configuration file: http://datashot.svn.sourceforge.net/viewvc/datashot/trunk/precapture_app/src/edu/harvard/mcz/precapture/resources/LabelDefinitions.xml</p>
+<p>Save this file to your local file system and edit as desired (e.g. by adding new configurations).  See the schema for documentation of each element.</p>
+<p>Edit the property config.printdefinitions in PreCapture.properties to point to the absolute path to your new file on your file system.</p>
+<p>Test barcode generation using the longest text strings that you expect to generate, and see if the barcodes that are produced are consistently readable from
+the printer(s) that you are using</p> 
+
+<h3>Editing the field list configuration</h3>
+
+<p>Obtain a copy of the default field list configuration file: http://datashot.svn.sourceforge.net/viewvc/datashot/trunk/precapture_app/src/edu/harvard/mcz/precapture/resources/NEVP_TCN_PrecaptureFields.xml</p>
+<p>Save this file to your local file system and edit as desired.  See the schema for documentation of each element.   <strong>You must set a new version number
+in this file if you make any changes.</strong></p>
+<p>Edit the property config.fieldmap in PreCapture.properties to point to the absolute path to your new file on your file system.</p>
+<p><strong>You Must make a copy of this file available to the software running the digitization apparatus to allow the encoded information to be 
+correctly decoded when the barcodes are read during digitization.</strong>  The project and version of the configuration file are encoded in the
+barcode and will be used to match the rest of the barcode to the correct configuration file and the correct decoding of the barcodes into fields.</p> 
+
+<h1>Managing backups</h1>
+<p>The Inventory data set and the loaded taxon authority file are backed up to
+.csv exports each time the program successfully exits.  These files are placed in a folder called <em>backups</em> inside
+the current directory.  A new timestamped backup of the inventory file is written each time the program
+exits, and the inventory and taxon authority file are also both backed up to files named Inventory_backup.csv and 
+TaxonAuthorityFile_backup.csv, overwriting the existing file each time the program exits.</p>
+<p>Backups of the taxon authority file and inventory can be reloaded from the 
+<strong>Data Sources</strong> tab of the Configuration Dialog (accessed with <em>File/Configuration</em>). 
+
+<h1>Development</h1>
+
+<p>Source code for this application can be found in the SourceForge repository for the MCZ's DataShot project.
+If you wish to help develop this application, please make a request to join the SourceForge project.  http://sourceforge.net/projects/datashot/
+The source code for the project can be found under precapture_app in the DataShot trunk: 
+http://datashot.svn.sourceforge.net/viewvc/datashot/trunk/precapture_app/   
+</p>
+
+</body>
+</html>
