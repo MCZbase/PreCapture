@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project nevp_precapture with Jar-in-Jar Loader">
-    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
-    <!--ANT 1.7 is required                                        -->
-    <target name="create_run_jar">
-        <jar destfile="/home/mole/workspace/nevp_precapture/PreCaptureApp.jar">
+<project default="create_run_jar" 
+    name="Create Runnable Jar for Project nevp_precapture with Jar-in-Jar Loader"
+    basedir="." >
+    
+    <!--  Specify path to the maven repository -->
+    <property name="m2.dir" value="../../.m2/repository" />
+    
+    <!--ANT 1.7 is required   -->
+    
+    <target name="create_help_jar">
+        <!-- Create the java help file, needed as the jar in jar loader breaks embedded links in loaded resources -->
+        <jar destfile="help/precaptureHelp.jar">
+            <fileset dir="src/edu/harvard/mcz/precapture/resources/help" />
+        </jar>
+    </target>
+    <target name="create_run_jar" depends="create_help_jar">
+        <jar destfile="PreCaptureApp.jar">
+            <!-- Use the eclipse jar-in-jar loader, which rewrites class and resource URIs to use rsrc: and the JarRsrcLoader -->
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="edu.harvard.mcz.precapture.PreCaptureApp"/>
@@ -11,52 +24,54 @@
                 <attribute name="Rsrc-Class-Path" value="./ commons-collections-3.2.1.jar maven-hibernate3-api-2.2.jar xml-apis-1.0.b2.jar maven-plugin-api-2.0.6.jar maven-project-2.0.6.jar maven-settings-2.0.6.jar maven-profile-2.0.6.jar maven-model-2.0.6.jar maven-artifact-manager-2.0.6.jar maven-repository-metadata-2.0.6.jar wagon-provider-api-1.0-beta-2.jar maven-plugin-registry-2.0.6.jar maven-artifact-2.0.6.jar plexus-container-default-1.0-alpha-9-stable-1.jar classworlds-1.1-alpha-2.jar hibernate-core-3.3.1.GA.jar antlr-2.7.6.jar dom4j-1.6.1.jar hibernate-tools-3.2.3.GA.jar bsh-2.0b4.jar freemarker-2.3.8.jar jtidy-r8-20060801.jar geronimo-jta_1.0.1B_spec-1.1.1.jar slf4j-log4j12-1.5.6.jar log4j-1.2.14.jar slf4j-api-1.5.6.jar jcl-over-slf4j-1.5.6.jar plexus-utils-1.5.6.jar javassist-3.4.GA.jar core-2.0.jar javase-2.0.jar forms-1.2.1.jar derby-10.9.1.0.jar itextpdf-5.3.0.jar javacsv-2.0.jar json-lib-2.4-jdk15.jar commons-beanutils-1.8.0.jar commons-lang-2.5.jar commons-logging-1.1.1.jar ezmorph-1.0.6.jar pdf-renderer-1.0.5.jar h2-1.3.167.jar javahelp-2.0.05.jar precaptureHelp.jar"/>
             </manifest>
             <zipfileset src="jar-in-jar-loader.zip"/>
-            <fileset dir="/home/mole/workspace/nevp_precapture/target/classes" excludes="**/resources/help/**" />
-            <zipfileset dir="/home/mole/workspace/nevp_precapture/help" includes="precaptureHelp.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/commons-collections/commons-collections/3.2.1" includes="commons-collections-3.2.1*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/codehaus/mojo/hibernate3/maven-hibernate3-api/2.2" includes="maven-hibernate3-api-2.2*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/xml-apis/xml-apis/1.0.b2" includes="xml-apis-1.0.b2*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/maven/maven-plugin-api/2.0.6" includes="maven-plugin-api-2.0.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/maven/maven-project/2.0.6" includes="maven-project-2.0.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/maven/maven-settings/2.0.6" includes="maven-settings-2.0.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/maven/maven-profile/2.0.6" includes="maven-profile-2.0.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/maven/maven-model/2.0.6" includes="maven-model-2.0.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/maven/maven-artifact-manager/2.0.6" includes="maven-artifact-manager-2.0.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/maven/maven-repository-metadata/2.0.6" includes="maven-repository-metadata-2.0.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/maven/wagon/wagon-provider-api/1.0-beta-2" includes="wagon-provider-api-1.0-beta-2*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/maven/maven-plugin-registry/2.0.6" includes="maven-plugin-registry-2.0.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/maven/maven-artifact/2.0.6" includes="maven-artifact-2.0.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1" includes="plexus-container-default-1.0-alpha-9-stable-1*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/classworlds/classworlds/1.1-alpha-2" includes="classworlds-1.1-alpha-2*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/hibernate/hibernate-core/3.3.1.GA" includes="hibernate-core-3.3.1.GA*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/javax/transaction/jta/1.1" includes="jta-1.1*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/antlr/antlr/2.7.6" includes="antlr-2.7.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/dom4j/dom4j/1.6.1" includes="dom4j-1.6.1*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/hibernate/hibernate-tools/3.2.3.GA" includes="hibernate-tools-3.2.3.GA*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/beanshell/bsh/2.0b4" includes="bsh-2.0b4*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/freemarker/freemarker/2.3.8" includes="freemarker-2.3.8*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/hibernate/jtidy/r8-20060801" includes="jtidy-r8-20060801*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/geronimo/specs/geronimo-jta_1.0.1B_spec/1.1.1" includes="geronimo-jta_1.0.1B_spec-1.1.1*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/slf4j/slf4j-log4j12/1.5.6" includes="slf4j-log4j12-1.5.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/log4j/log4j/1.2.14" includes="log4j-1.2.14*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/slf4j/slf4j-api/1.5.6" includes="slf4j-api-1.5.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/slf4j/jcl-over-slf4j/1.5.6" includes="jcl-over-slf4j-1.5.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/codehaus/plexus/plexus-utils/1.5.6" includes="plexus-utils-1.5.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/javassist/javassist/3.4.GA" includes="javassist-3.4.GA*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/com/google/zxing/core/2.0" includes="core-2.0*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/com/google/zxing/javase/2.0" includes="javase-2.0*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/com/jgoodies/forms/1.2.1" includes="forms-1.2.1*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/apache/derby/derby/10.9.1.0" includes="derby-10.9.1.0*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/com/itextpdf/itextpdf/5.3.0" includes="itextpdf-5.3.0*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/net/sourceforge/javacsv/javacsv/2.0" includes="javacsv-2.0*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/net/sf/json-lib/json-lib/2.4" includes="json-lib-2.4-jdk15*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/commons-beanutils/commons-beanutils/1.8.0" includes="commons-beanutils-1.8.0*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/commons-lang/commons-lang/2.5" includes="commons-lang-2.5*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/commons-logging/commons-logging/1.1.1" includes="commons-logging-1.1.1*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/net/sf/ezmorph/ezmorph/1.0.6" includes="ezmorph-1.0.6*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/org/swinglabs/pdf-renderer/1.0.5" includes="pdf-renderer-1.0.5*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/com/h2database/h2/1.3.167" includes="h2-1.3.167*.jar"/>
-            <zipfileset dir="/home/mole/.m2/repository/javax/help/javahelp/2.0.05" includes="javahelp-2.0.05*.jar"/>
+            <!--  Class files and resources from build, but don't include the files used to build the help jar. -->
+            <fileset dir="target/classes" excludes="**/resources/help/**" />
+            <!-- zipfileset includes use *.jar to includes the source jars in the build, thus distributing the sources to satisfy redistribution license requirements -->
+            <zipfileset dir="help" includes="precaptureHelp.jar"/>
+            <zipfileset dir="${m2.dir}/commons-collections/commons-collections/3.2.1" includes="commons-collections-3.2.1*.jar"/>
+            <zipfileset dir="${m2.dir}/org/codehaus/mojo/hibernate3/maven-hibernate3-api/2.2" includes="maven-hibernate3-api-2.2*.jar"/>
+            <zipfileset dir="${m2.dir}/xml-apis/xml-apis/1.0.b2" includes="xml-apis-1.0.b2*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/maven/maven-plugin-api/2.0.6" includes="maven-plugin-api-2.0.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/maven/maven-project/2.0.6" includes="maven-project-2.0.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/maven/maven-settings/2.0.6" includes="maven-settings-2.0.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/maven/maven-profile/2.0.6" includes="maven-profile-2.0.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/maven/maven-model/2.0.6" includes="maven-model-2.0.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/maven/maven-artifact-manager/2.0.6" includes="maven-artifact-manager-2.0.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/maven/maven-repository-metadata/2.0.6" includes="maven-repository-metadata-2.0.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/maven/wagon/wagon-provider-api/1.0-beta-2" includes="wagon-provider-api-1.0-beta-2*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/maven/maven-plugin-registry/2.0.6" includes="maven-plugin-registry-2.0.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/maven/maven-artifact/2.0.6" includes="maven-artifact-2.0.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1" includes="plexus-container-default-1.0-alpha-9-stable-1*.jar"/>
+            <zipfileset dir="${m2.dir}/classworlds/classworlds/1.1-alpha-2" includes="classworlds-1.1-alpha-2*.jar"/>
+            <zipfileset dir="${m2.dir}/org/hibernate/hibernate-core/3.3.1.GA" includes="hibernate-core-3.3.1.GA*.jar"/>
+            <zipfileset dir="${m2.dir}/javax/transaction/jta/1.1" includes="jta-1.1*.jar"/>
+            <zipfileset dir="${m2.dir}/antlr/antlr/2.7.6" includes="antlr-2.7.6*.jar"/>
+            <zipfileset dir="${m2.dir}/dom4j/dom4j/1.6.1" includes="dom4j-1.6.1*.jar"/>
+            <zipfileset dir="${m2.dir}/org/hibernate/hibernate-tools/3.2.3.GA" includes="hibernate-tools-3.2.3.GA*.jar"/>
+            <zipfileset dir="${m2.dir}/org/beanshell/bsh/2.0b4" includes="bsh-2.0b4*.jar"/>
+            <zipfileset dir="${m2.dir}/freemarker/freemarker/2.3.8" includes="freemarker-2.3.8*.jar"/>
+            <zipfileset dir="${m2.dir}/org/hibernate/jtidy/r8-20060801" includes="jtidy-r8-20060801*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/geronimo/specs/geronimo-jta_1.0.1B_spec/1.1.1" includes="geronimo-jta_1.0.1B_spec-1.1.1*.jar"/>
+            <zipfileset dir="${m2.dir}/org/slf4j/slf4j-log4j12/1.5.6" includes="slf4j-log4j12-1.5.6*.jar"/>
+            <zipfileset dir="${m2.dir}/log4j/log4j/1.2.14" includes="log4j-1.2.14*.jar"/>
+            <zipfileset dir="${m2.dir}/org/slf4j/slf4j-api/1.5.6" includes="slf4j-api-1.5.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/slf4j/jcl-over-slf4j/1.5.6" includes="jcl-over-slf4j-1.5.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/codehaus/plexus/plexus-utils/1.5.6" includes="plexus-utils-1.5.6*.jar"/>
+            <zipfileset dir="${m2.dir}/javassist/javassist/3.4.GA" includes="javassist-3.4.GA*.jar"/>
+            <zipfileset dir="${m2.dir}/com/google/zxing/core/2.0" includes="core-2.0*.jar"/>
+            <zipfileset dir="${m2.dir}/com/google/zxing/javase/2.0" includes="javase-2.0*.jar"/>
+            <zipfileset dir="${m2.dir}/com/jgoodies/forms/1.2.1" includes="forms-1.2.1*.jar"/>
+            <zipfileset dir="${m2.dir}/org/apache/derby/derby/10.9.1.0" includes="derby-10.9.1.0*.jar"/>
+            <zipfileset dir="${m2.dir}/com/itextpdf/itextpdf/5.3.0" includes="itextpdf-5.3.0*.jar"/>
+            <zipfileset dir="${m2.dir}/net/sourceforge/javacsv/javacsv/2.0" includes="javacsv-2.0*.jar"/>
+            <zipfileset dir="${m2.dir}/net/sf/json-lib/json-lib/2.4" includes="json-lib-2.4-jdk15*.jar"/>
+            <zipfileset dir="${m2.dir}/commons-beanutils/commons-beanutils/1.8.0" includes="commons-beanutils-1.8.0*.jar"/>
+            <zipfileset dir="${m2.dir}/commons-lang/commons-lang/2.5" includes="commons-lang-2.5*.jar"/>
+            <zipfileset dir="${m2.dir}/commons-logging/commons-logging/1.1.1" includes="commons-logging-1.1.1*.jar"/>
+            <zipfileset dir="${m2.dir}/net/sf/ezmorph/ezmorph/1.0.6" includes="ezmorph-1.0.6*.jar"/>
+            <zipfileset dir="${m2.dir}/org/swinglabs/pdf-renderer/1.0.5" includes="pdf-renderer-1.0.5*.jar"/>
+            <zipfileset dir="${m2.dir}/com/h2database/h2/1.3.167" includes="h2-1.3.167*.jar"/>
+            <zipfileset dir="${m2.dir}/javax/help/javahelp/2.0.05" includes="javahelp-2.0.05*.jar"/>
         </jar>
     </target>
 </project>
