@@ -3,7 +3,7 @@
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
      xsi:schemaLocation="http://mcz.harvard.edu/PreCaptureFieldSchema PreCaptureFieldSchema.xsd ">
   <tns:SupportedProject>NEVP TCN</tns:SupportedProject>
-  <tns:Version>0.3</tns:Version>
+  <tns:Version>1.0</tns:Version>
   <tns:FieldInList>
   <tns:FieldInList>
     <tns:Label>Identification Qualifier</tns:Label>
@@ -118,7 +118,7 @@
     <tns:Label>Storage Location</tns:Label>
     <tns:Code>sr</tns:Code>
     <tns:Type>String</tns:Type>
-    <tns:VocabularyTerm></tns:VocabularyTerm>
+    <tns:VocabularyTerm>obo:OBI_0000967</tns:VocabularyTerm>
     <tns:Optional>true</tns:Optional>
     <tns:UseItalic>false</tns:UseItalic>
     <tns:NewLine>true</tns:NewLine>

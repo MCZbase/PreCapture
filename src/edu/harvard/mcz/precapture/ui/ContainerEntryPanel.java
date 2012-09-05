@@ -285,6 +285,7 @@ public class ContainerEntryPanel extends JPanel {
 	    containerLabel.setNumberToPrint(getNumberToPrint());
 		PreCaptureSingleton.getInstance().getCurrentLabelList().addLabelToList(containerLabel.clone());
 		containerLabel.resetToBlank();
+		textNumberToPrint.setText(Integer.toString(containerLabel.getNumberToPrint()));
 	}
 	
 	/** 

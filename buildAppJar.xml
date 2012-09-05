@@ -26,6 +26,7 @@
             <zipfileset src="jar-in-jar-loader.zip"/>
             <!--  Class files and resources from build, but don't include the files used to build the help jar. -->
             <fileset dir="target/classes" excludes="**/resources/help/**" />
+            <fileset file="gpl-2.0.txt" />
             <!-- zipfileset includes use *.jar to includes the source jars in the build, thus distributing the sources to satisfy redistribution license requirements -->
             <zipfileset dir="help" includes="precaptureHelp.jar"/>
             <zipfileset dir="${m2.dir}/commons-collections/commons-collections/3.2.1" includes="commons-collections-3.2.1*.jar"/>
