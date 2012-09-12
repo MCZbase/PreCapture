@@ -63,6 +63,7 @@ public class MainFrame  implements WindowListener {
 	
 	private JFrame frame;
 	private JTable tablePrintList;
+	private boolean closing = false;
 	/** Set to true to use Napkin Look and Feel.
 	*/
 	private ContainerEntryPanel folderPanel;
@@ -92,9 +93,11 @@ public class MainFrame  implements WindowListener {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setTitle(PreCaptureApp.NAME);
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/edu/harvard/mcz/precapture/resources/icon.png")));
 		frame.setBounds(100, 100, 640, 640);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);   // handled by window listener
+		frame.addWindowListener(this);  
 		
 		JMenuBar menuBar = new MainMenu(frame, MainFrame.class);
 		frame.setJMenuBar(menuBar);
@@ -157,7 +160,6 @@ public class MainFrame  implements WindowListener {
 
 	public void windowOpened(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void windowClosing(WindowEvent e) {
@@ -166,17 +168,14 @@ public class MainFrame  implements WindowListener {
 
 	public void windowClosed(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void windowIconified(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void windowDeiconified(WindowEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void windowActivated(WindowEvent e) {

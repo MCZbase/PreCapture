@@ -242,6 +242,10 @@ public class ContainerLabel {
 		if (!added) { 
 			cell.addElement(higher);
 		}
+		String extraText = PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_EXTRAHUMANTEXT);
+		if (extraText!=null && extraText.length()>0) { 
+		    cell.addElement(new Chunk(extraText));
+		}
 
 		return cell;
 	}

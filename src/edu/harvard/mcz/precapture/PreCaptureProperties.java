@@ -66,6 +66,12 @@ public class PreCaptureProperties extends AbstractTableModel {
 	/** Key for properties file for wheter or not the edit panel should be shown for 
 	 * unit tray label (authority file records).  */
 	public static final String KEY_EDITVIEWUTL = "config.ediableunittraylabeldb";
+	/** Key for property to handle infraspecific names. */
+	public static final String KEY_USEQUADRANOMIALS = "config.usequadranomials";
+	/** Key for properties file for extra human readable text to put on all slips/labels by default */
+	public static final String KEY_EXTRAHUMANTEXT = "config.extrahumantext";
+	
+	
 
 	private Properties properties = null;
 	private String propertiesFilename = null;
@@ -188,7 +194,7 @@ public class PreCaptureProperties extends AbstractTableModel {
 		}		
 		if (!properties.containsKey(KEY_SELECTED_PRINT_DEFINITION)) {
 			// name of selected print layout definition
-			properties.setProperty(KEY_SELECTED_PRINT_DEFINITION, "Half Sheet");
+			properties.setProperty(KEY_SELECTED_PRINT_DEFINITION, "Two Half Sheets on 8.5x11");
 		}
 		if (!properties.containsKey(KEY_MAINFRAME)) {
 			// name of selected UI main frame 
@@ -209,6 +215,15 @@ public class PreCaptureProperties extends AbstractTableModel {
 		if (!properties.containsKey(KEY_EDITVIEWUTL)) {
 			// by default don't show the unit tray label db editor panel
 			properties.setProperty(KEY_EDITVIEWUTL, "false");
+		}		
+		if (!properties.containsKey(KEY_USEQUADRANOMIALS)) {
+			// by default don't use subspecific epithet as different field from 
+			// infraspecific epithet
+			properties.setProperty(KEY_USEQUADRANOMIALS, "false");
+		}		
+		if (!properties.containsKey(KEY_EXTRAHUMANTEXT)) {
+			// by default print "don't remove slip" in human readable form
+			properties.setProperty(KEY_EXTRAHUMANTEXT, "Do not remove this slip from this folder.");
 		}		
 	}
 

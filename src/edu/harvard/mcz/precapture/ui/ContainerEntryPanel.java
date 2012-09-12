@@ -43,6 +43,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.data.UnitTrayLabel;
 import edu.harvard.mcz.precapture.data.UnitTrayLabelLifeCycle;
@@ -175,6 +176,7 @@ public class ContainerEntryPanel extends JPanel {
 				log.debug(e.getActionCommand());
 				comboBoxTaxonPicker.getSelectedIndex();
 				UnitTrayLabel utl = ((UnitTrayLabelComboBoxModel)comboBoxTaxonPicker.getModel()).getSelectedContainerLabel();
+				// TODO: refactor out into a method.
 				if (utl!=null) { 
 					log.debug(utl.getSpecificEpithet());
 					Iterator<FieldPlusText> i = textFields.iterator();
@@ -187,14 +189,40 @@ public class ContainerEntryPanel extends JPanel {
 						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:specificEpithet")) { 
 							field.getTextField().setText(utl.getSpecificEpithet());
 						}
-						if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
-							field.getTextField().setText(utl.getInfraspecificRank());
-						}
-						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
-							field.getTextField().setText(utl.getInfraspecificEpithet());
+						if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_USEQUADRANOMIALS).equals("true")) { 
+							if (field.getField().getVocabularyTerm().equalsIgnoreCase("abcd:SubspeciesEpithet")) { 
+								field.getTextField().setText(utl.getSubspecificEpithet());
+							}
+							if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
+								field.getTextField().setText(utl.getInfraspecificRank());
+							}
+							if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
+								field.getTextField().setText(utl.getInfraspecificEpithet());
+							}
+						} else { 
+							String rank = utl.getInfraspecificRank();
+							String epithet = utl.getInfraspecificEpithet();
+							if (utl.getSubspecificEpithet()!=null && utl.getSubspecificEpithet().length()>0 && (utl.getInfraspecificEpithet()==null || utl.getInfraspecificEpithet().length()==0)) { 
+								rank = "subspecies";
+								epithet = utl.getSubspecificEpithet();
+							}
+							if (rank==null) { rank = ""; } 
+							if (epithet==null) { epithet = ""; }
+							if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
+								field.getTextField().setText(rank);
+							}
+							if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
+								field.getTextField().setText(epithet);
+							}
+							if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificRank")) { 
+								field.getTextField().setText(rank);
+							}
 						}
 						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:scientificNameAuthorship")) { 
 							field.getTextField().setText(utl.getAuthorship());
+						}
+						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:scientificName")) {
+							// TODO: Handle putting hybrids into the scientific name field
 						}
 					}
 				}

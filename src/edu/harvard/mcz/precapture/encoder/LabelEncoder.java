@@ -329,6 +329,7 @@ public class LabelEncoder {
 								log.debug("Adding new page");
 								document.newPage();
 								table = setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, columns, subCellColumnCount);
+								log.debug("Setup new table");
 							}
 						} // end loop through toPrint (for a taxon/precapture label data row)
 						counter ++;  // Increment number of pre capture label data rows.
@@ -360,11 +361,10 @@ public class LabelEncoder {
 						result = true;
 					}
 				} catch (FileNotFoundException e) {
-					log.debug(e.getMessage());
-					e.printStackTrace();
+					log.debug(e.getMessage(),e);
 					throw new PrintFailedException("File not found.");
 				} catch (DocumentException e) {
-					log.debug(e.getMessage());
+			        log.error(e.getMessage(), e);
 					throw new PrintFailedException("Error building/printing PDF document. " + e.getMessage());
 				} catch (OutOfMemoryError e ) { 
 					System.out.println("Out of memory error. " + e.getMessage());

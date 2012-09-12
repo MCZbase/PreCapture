@@ -96,7 +96,9 @@ public class MainFrameAlternative implements WindowListener {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setTitle(PreCaptureApp.NAME);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // handled by window listener
+		frame.addWindowListener(this);  
 		// Maximize 
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrameAlternative.class.getResource("/edu/harvard/mcz/precapture/resources/icon.png")));
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
