@@ -37,12 +37,15 @@ import java.awt.event.KeyEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.harvard.mcz.precapture.interfaces.JPanelWithEditableTable;
+
 public class ConfigurationDialog extends JDialog {
 
 	private static final long serialVersionUID = -8059759034783154405L;
 	private static final Log log = LogFactory.getLog(ConfigurationDialog.class);
 
 	private final JPanel contentPanel = new JPanel();
+	private JPanel panel_1;  
 
 	/**
 	 * Create the dialog.
@@ -71,7 +74,7 @@ public class ConfigurationDialog extends JDialog {
 					tabbedPane.setMnemonicAt(1, KeyEvent.VK_R);
 				}
 				{
-					JPanel panel_1 = new ConfigurePropertiesJPanel();
+					panel_1 = new ConfigurePropertiesJPanel();
 					tabbedPane.addTab("Properties", null, panel_1, null);
 					tabbedPane.setMnemonicAt(2, KeyEvent.VK_P);
 				}
@@ -91,12 +94,15 @@ public class ConfigurationDialog extends JDialog {
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						// Force save of any currently editing table cells
+						((JPanelWithEditableTable)panel_1).saveInProgressTableChanges();	
 						// Grab focus to make sure that changes
-						// in table rows get saved.
+						// in currently modal fields get saved
 						((JButton)e.getSource()).grabFocus();
 						
 						// Save Preferences
-
+                        // TODO: Save to file here.
+						
 						// Close preferences dialog window
 						setVisible(false);
 					}

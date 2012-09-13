@@ -116,6 +116,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     	UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
     	uls.deleteAll();
     	while (reader.readRecord()) { 
+    		//  TODO: If scientificName is added, it will need to be added here as well.
     		UnitTrayLabel unitTrayLabel = new UnitTrayLabel();
     		unitTrayLabel.setFamily(reader.get("Family"));
     		unitTrayLabel.setGenus(reader.get("Genus"));
@@ -155,6 +156,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     	List<UnitTrayLabel> list = uls.findAll();
     	Iterator<UnitTrayLabel> i = list.iterator();
     	while (i.hasNext()) { 
+    		//  TODO: If scientificName is added, it will need to be added here as well.
     		UnitTrayLabel unitTrayLabel = i.next();
     		ArrayList<String> row = new ArrayList<String>();
     		row.add(unitTrayLabel.getFamily());

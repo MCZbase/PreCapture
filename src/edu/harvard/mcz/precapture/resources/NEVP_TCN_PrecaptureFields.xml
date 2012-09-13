@@ -110,7 +110,7 @@
     <tns:VocabularyTerm>dwc:recordedBy</tns:VocabularyTerm>
     <tns:Optional>true</tns:Optional>
     <tns:UseItalic>false</tns:UseItalic>
-    <tns:NewLine>false</tns:NewLine>
+    <tns:NewLine>true</tns:NewLine>
     <tns:FontSize>12</tns:FontSize>
     <tns:DefaultValue></tns:DefaultValue>
   </tns:FieldInList>

@@ -18,6 +18,11 @@
         <property name="tribe" type="string">
             <column name="Tribe" length="40" />
         </property>
+        <!-- 
+        <property name="scientificName" type="string">
+            <column name="ScientificName" length="255" />
+        </property>        
+         -->
         <property name="genus" type="string">
             <column name="Genus" length="40" />
         </property>

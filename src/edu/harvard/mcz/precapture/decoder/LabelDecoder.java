@@ -58,10 +58,29 @@ public class LabelDecoder {
 		
 	}
 	
+	/**
+	 * LabelDecoder for a particular container label.
+	 * 
+	 * No supporting functionality implemented yet.  
+	 * Use the static decodeImage and decodeImageToResult methods.
+	 * 
+	 * May be removed.
+	 * 
+	 * @param containerLabel
+	 */
 	public LabelDecoder(ContainerLabel containerLabel) { 
+		// TODO: Implement or remove.
 		this.label = containerLabel;
 	}
 	
+	/**
+	 * Given an image, returns the decoded text of a QRCode within that image.
+	 * 
+	 * @param image a bufferedimage containing a QRCode barcode 
+	 * @return the text encoded in the QRCode.
+	 * @throws BarcodeReadException if unable to read the barcode, recasts 4 different 
+	 * of ZXing exceptions as common BarcodeReadException.
+	 */
 	public static String decodeImage(BufferedImage image) throws BarcodeReadException { 
 		String result = null;
 		try { 
@@ -86,6 +105,15 @@ public class LabelDecoder {
 		return result;
 	}
 	
+	/**
+	 * Given an image containing a QRCode, returns a ZXing result object that 
+	 * wraps the text of the QRCode in metadata about the read.
+	 * 
+	 * @param image a buffered image in which to look for a barcode.
+	 * @return a Result object, from which Result.getText() will return the text
+	 * of the barcode. @see com.google.zxing.Result
+	 * @throws Exception if there is a problem with the image or barcode.
+	 */
 	public static Result decodeImageToResult(BufferedImage image) throws Exception { 
 		Result result = null;
 		LuminanceSource source = new BufferedImageLuminanceSource(image);

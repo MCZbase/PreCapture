@@ -33,6 +33,8 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.data.HibernateUtil;
+import edu.harvard.mcz.precapture.interfaces.JPanelWithEditableTable;
+
 import javax.swing.JTable;
 import java.awt.BorderLayout;
 
@@ -40,7 +42,7 @@ import java.awt.BorderLayout;
  * @author mole
  *
  */
-public class ConfigurePropertiesJPanel extends JPanel {
+public class ConfigurePropertiesJPanel extends JPanel implements JPanelWithEditableTable {
 	private static final long serialVersionUID = 5193156023117363717L;
 
 	private static final Log log = LogFactory.getLog(ConfigurePropertiesJPanel.class);
@@ -98,6 +100,16 @@ public class ConfigurePropertiesJPanel extends JPanel {
 				table = new JTable(PreCaptureSingleton.getInstance().getProperties());
 				panel.add(table,BorderLayout.CENTER);
 			}
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.harvard.mcz.precapture.ui.JPanelWithEditableTable#saveInProgressTableChanges()
+	 */
+	@Override
+	public void saveInProgressTableChanges() { 
+		if (table.getCellEditor() != null) { 
+			table.getCellEditor().stopCellEditing(); 
 		}
 	}
 }

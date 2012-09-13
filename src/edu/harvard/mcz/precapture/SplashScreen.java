@@ -34,6 +34,7 @@ import java.awt.Dimension;
  *
  */
 public class SplashScreen extends JFrame {
+	private static final long serialVersionUID = 8177152658621395267L;
 	private static final Log log = LogFactory.getLog(SplashScreen.class);
 	private JProgressBar progressBar;
 	

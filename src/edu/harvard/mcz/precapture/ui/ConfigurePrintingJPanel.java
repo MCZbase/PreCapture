@@ -108,6 +108,8 @@ public class ConfigurePrintingJPanel extends JPanel {
 			{
 				tablePrintFormatList = new JTable();
 				tablePrintFormatList.setModel(new LabelDefinitionListTypeTableModel(PreCaptureSingleton.getInstance().getPrintFormatDefinitionList()));
+				// disabling table so that users don't try to select a print format by selecting a row in the table.
+				tablePrintFormatList.setEnabled(false);
 				scrollPane_1.setViewportView(tablePrintFormatList);
 			}
 		}

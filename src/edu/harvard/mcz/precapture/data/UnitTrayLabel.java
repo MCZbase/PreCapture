@@ -44,6 +44,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	private String family;
 	private String subfamily;
 	private String tribe;
+	// private String scientificName;
 	private String genus;
 	private String specificEpithet;
 	private String subspecificEpithet;
@@ -373,6 +374,20 @@ public class UnitTrayLabel implements TaxonNameReturner {
 			this.tribe = this.tribe.trim();
 		}
 	}
+
+//	/**
+//	 * @return the scientificName
+//	 */
+//	public String getScientificName() {
+//		return scientificName;
+//	}
+//
+//	/**
+//	 * @param scientificName the scientificName to set
+//	 */
+//	public void setScientificName(String scientificName) {
+//		this.scientificName = scientificName;
+//	}
 
 	/**
 	 * @return the genus

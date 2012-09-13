@@ -67,10 +67,12 @@ public class PrintingUtility {
 			
 			FileInputStream pdfInputStream = new FileInputStream(LabelEncoder.getPrintFile());
 
-			//DocFlavor psInFormat = DocFlavor.INPUT_STREAM.PDF;
+			DocFlavor psInFormat = DocFlavor.INPUT_STREAM.PDF;
 			
-			// TODO: No printers listed... Try autosense instead of PDF
-		    DocFlavor psInFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
+			// No printers listed... Try autosense instead of PDF
+		    // DocFlavor psInFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
+			// Ends up listing printers that can't take the PDF, failing over to using 
+			// a pdf printing library instead and having it pull up the printer dialog.
 			
 			Doc myDoc = new SimpleDoc(pdfInputStream, DocFlavor.INPUT_STREAM.PDF, null); 
 			PrintRequestAttributeSet atset = new HashPrintRequestAttributeSet();

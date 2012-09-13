@@ -75,18 +75,6 @@ public class MainFrameAlternative implements WindowListener {
 	 * Create the user interface.
 	 */
 	public MainFrameAlternative() {
-		
-		if (PreCaptureSingleton.useNapkin()) { 
-
-			try {
-				// Use the Napkin look and feel
-				UIManager.setLookAndFeel("net.sourceforge.napkinlaf.NapkinLookAndFeel");
-			} catch (Exception e) {
-				// Expected if Napkin look and feel isn't on build path.
-			}		
-
-		}
-		
 		initialize();
 		frame.setVisible(true);
 	}

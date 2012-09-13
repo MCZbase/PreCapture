@@ -86,19 +86,19 @@ public class LabelEncoder {
 		label = containerLabel;
 	}
 
-	/** Test fields for darwin core concepts that should be italicized in presentation.
-	 * @deprecated moved to configuration, IsItalic.
-	 * @param aField field to test.
-	 * @return true if field vocabularyTerm is one that should be italicized.
-	 * 
-	 */
-	public static boolean useItalic(Field aField) { 
-		boolean result = false;
-		if (aField.getVocabularyTerm().equals("dwc:genus")) { result = true; } 		
-		if (aField.getVocabularyTerm().equals("dwc:specificEpithet")) { result = true; } 		
-		if (aField.getVocabularyTerm().equals("dwc:infraspecificEpithet")) { result = true; } 		
-		return result;
-	}
+//	/** Test fields for darwin core concepts that should be italicized in presentation.
+//	 * @deprecated moved to configuration, IsItalic.
+//	 * @param aField field to test.
+//	 * @return true if field vocabularyTerm is one that should be italicized.
+//	 * 
+//	 */
+//	public static boolean useItalic(Field aField) { 
+//		boolean result = false;
+//		if (aField.getVocabularyTerm().equals("dwc:genus")) { result = true; } 		
+//		if (aField.getVocabularyTerm().equals("dwc:specificEpithet")) { result = true; } 		
+//		if (aField.getVocabularyTerm().equals("dwc:infraspecificEpithet")) { result = true; } 		
+//		return result;
+//	}
 
 	private BitMatrix getQRCodeMatrix() throws WriterException { 
 		BitMatrix result = null;
@@ -108,8 +108,7 @@ public class LabelEncoder {
 			byte[] dataBytes = label.toJSON().getBytes("UTF-8");
 			data = new String(dataBytes,"ISO-8859-1");
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();  // set ErrorCorrectionLevel here
 		String correctionLevel = PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_QRCODEECLEVEL, "H");

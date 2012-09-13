@@ -21,6 +21,8 @@ package edu.harvard.mcz.precapture;
 
 import java.awt.Cursor;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -28,9 +30,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.InputMap;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.text.DefaultEditorKit;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -64,7 +69,7 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "0.12.4";
+	public static final String VERSION = "0.12.5";
 	public static final String SVN_ID = "$Id$";
 	public static final String AUTHORS = "Paul J. Morris";
 	public static final String COPYRIGHT = "Copyright © 2012 President and Fellows of Harvard College";
@@ -212,9 +217,42 @@ public class PreCaptureApp {
 					public void run() {
 						try {
 							PreCaptureSingleton.getInstance().getSplashScreen().setProgress(SplashScreen.END_PROGRESS);
-							PreCaptureSingleton.getInstance().getSplashScreen().setVisible(false);
 							
-							UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+							
+							if (PreCaptureSingleton.useNapkin()) { 
+								try {
+									// Use the Napkin look and feel
+									UIManager.setLookAndFeel("net.sourceforge.napkinlaf.NapkinLookAndFeel");
+								} catch (Exception e) {
+									// Expected if Napkin look and feel isn't on build path.
+							        UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+								}		
+							} else { 
+							    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+							}
+							
+							// Support Command C/P/X for copy/paste/cut on OSX as well as Control C/P/X on other systems.
+							InputMap inputMap = (InputMap)UIManager.get("TextField.focusInputMap");
+							inputMap.put(
+									KeyStroke.getKeyStroke(
+									    KeyEvent.VK_C, 
+									    PreCaptureSingleton.getInstance().getSplashScreen().getToolkit().getMenuShortcutKeyMask()
+									    ),
+									DefaultEditorKit.copyAction);
+							inputMap.put(
+									KeyStroke.getKeyStroke(
+									    KeyEvent.VK_V, 
+									    PreCaptureSingleton.getInstance().getSplashScreen().getToolkit().getMenuShortcutKeyMask()
+									    ),
+									DefaultEditorKit.pasteAction);
+							inputMap.put(
+									KeyStroke.getKeyStroke(
+									    KeyEvent.VK_X, 
+									    PreCaptureSingleton.getInstance().getSplashScreen().getToolkit().getMenuShortcutKeyMask()
+									    ),
+									DefaultEditorKit.cutAction);
+							
+							PreCaptureSingleton.getInstance().getSplashScreen().setVisible(false);
 							
 							// Launch user interface
 							if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MAINFRAME).equals("MainFrame")) {

@@ -176,56 +176,7 @@ public class ContainerEntryPanel extends JPanel {
 				log.debug(e.getActionCommand());
 				comboBoxTaxonPicker.getSelectedIndex();
 				UnitTrayLabel utl = ((UnitTrayLabelComboBoxModel)comboBoxTaxonPicker.getModel()).getSelectedContainerLabel();
-				// TODO: refactor out into a method.
-				if (utl!=null) { 
-					log.debug(utl.getSpecificEpithet());
-					Iterator<FieldPlusText> i = textFields.iterator();
-					while (i.hasNext()) { 
-						FieldPlusText field = i.next();
-						log.debug(field.getField().getVocabularyTerm());
-						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:genus")) { 
-							field.getTextField().setText(utl.getGenus());
-						}
-						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:specificEpithet")) { 
-							field.getTextField().setText(utl.getSpecificEpithet());
-						}
-						if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_USEQUADRANOMIALS).equals("true")) { 
-							if (field.getField().getVocabularyTerm().equalsIgnoreCase("abcd:SubspeciesEpithet")) { 
-								field.getTextField().setText(utl.getSubspecificEpithet());
-							}
-							if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
-								field.getTextField().setText(utl.getInfraspecificRank());
-							}
-							if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
-								field.getTextField().setText(utl.getInfraspecificEpithet());
-							}
-						} else { 
-							String rank = utl.getInfraspecificRank();
-							String epithet = utl.getInfraspecificEpithet();
-							if (utl.getSubspecificEpithet()!=null && utl.getSubspecificEpithet().length()>0 && (utl.getInfraspecificEpithet()==null || utl.getInfraspecificEpithet().length()==0)) { 
-								rank = "subspecies";
-								epithet = utl.getSubspecificEpithet();
-							}
-							if (rank==null) { rank = ""; } 
-							if (epithet==null) { epithet = ""; }
-							if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
-								field.getTextField().setText(rank);
-							}
-							if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
-								field.getTextField().setText(epithet);
-							}
-							if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificRank")) { 
-								field.getTextField().setText(rank);
-							}
-						}
-						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:scientificNameAuthorship")) { 
-							field.getTextField().setText(utl.getAuthorship());
-						}
-						if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:scientificName")) {
-							// TODO: Handle putting hybrids into the scientific name field
-						}
-					}
-				}
+				extractData(utl);
 				if (textNumberToPrint.getText().isEmpty()) { 
 					textNumberToPrint.setText("1");
 				}
@@ -257,6 +208,12 @@ public class ContainerEntryPanel extends JPanel {
 		    
 		    // TODO: Look to see if the field has a list of default values, if so use
 		    // a combo box instead of a text field.  
+		    if (textFields.get(i).getField().getDefaultValue().size()>1) { 
+		    	// Combo box would go here.  
+		    	// also would need handling in the bit that is extracting data from the field list
+		    	// Probably means that FieldsPlusText needs to include a combobox as well as a textfield.
+	        } 
+		    
 		    
 		    textFields.get(i).getTextField().setColumns(10);
 		    panel_3.add(label, "2, " + Integer.toString(col) + ", right, default");
@@ -335,5 +292,98 @@ public class ContainerEntryPanel extends JPanel {
 	    	}
 	    }
 		
+	}
+	
+	/**
+	 * Extract the data from a selected picklist item (a UnitTrayLabel instance) 
+	 * into the form fields by vocabulary term.
+	 * 
+	 * Contains the hardcoded mapping between supported vocabulary terms and the
+	 * fields in the taxon authority file (UnitTrayLabel).
+	 * 
+	 * @param utl
+	 */
+	private void extractData(UnitTrayLabel utl) { 
+		boolean useQuadranomials = false;
+		if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_USEQUADRANOMIALS).equals("true")) { 
+			useQuadranomials = true;
+		}
+		if (utl!=null) { 
+			Iterator<FieldPlusText> i = textFields.iterator();
+			while (i.hasNext()) { 
+				FieldPlusText field = i.next();
+				log.debug(field.getField().getVocabularyTerm());
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:genus")) { 
+					field.getTextField().setText(utl.getGenus());
+				}
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:specificEpithet")) { 
+					field.getTextField().setText(utl.getSpecificEpithet());
+				}
+				if (useQuadranomials) { 
+					// put subspecies into subspecies concept, put infraspecific name and rank into infra fields.
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("abcd:SubspeciesEpithet")) { 
+						field.getTextField().setText(utl.getSubspecificEpithet());
+					}
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
+						field.getTextField().setText(utl.getInfraspecificRank());
+					}
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
+						field.getTextField().setText(utl.getInfraspecificEpithet());
+					}
+				} else { 
+					// Assemble a trinomial.
+					// if there is an infraspecific name, don't include the subspecies.
+					// if there isnt't an infraspecific name, put subspecies into the infra fields.
+					String rank = utl.getInfraspecificRank();
+					String epithet = utl.getInfraspecificEpithet();
+					if (utl.getSubspecificEpithet()!=null && utl.getSubspecificEpithet().length()>0 && (utl.getInfraspecificEpithet()==null || utl.getInfraspecificEpithet().length()==0)) { 
+						rank = "subspecies";
+						epithet = utl.getSubspecificEpithet();
+					}
+					if (rank==null) { rank = ""; } 
+					if (epithet==null) { epithet = ""; }
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
+						field.getTextField().setText(rank);
+					}
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
+						field.getTextField().setText(epithet);
+					}
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificRank")) { 
+						field.getTextField().setText(rank);
+					}
+				}
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:scientificNameAuthorship")) { 
+					field.getTextField().setText(utl.getAuthorship());
+				}
+				
+				// PJM: 2012Sept12: preventing this block from running for now.
+				if (0==1 && field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:scientificName")) {
+					// PJM 2012 Sept 12
+					// Was a todo item: Handle putting hybrids into the scientific name field
+					// Discussion with Patrick suggests that the NEVP data set will only contain 
+					// nothotaxa (named hybrids), and it will be up to individual institutions 
+					// to capture hybrids between taxa.
+                    // Hybrids need more refinement downstream as well in Symbiota, so posponing work
+					// on them for now.
+					
+					// TODO: Add logic to include either atomic concepts or full scientific name, 
+					// but not both.
+					
+					// Support for assembly of full name into dwc:scientificName, if used.
+					StringBuffer assembledName = new StringBuffer();
+					assembledName.append(utl.getGenus()).append(" "); 
+					assembledName.append(utl.getSpecificEpithet()).append(" "); 
+				    if (utl.getInfraspecificEpithet().isEmpty() || PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_USEQUADRANOMIALS).equals("true")) { 
+					    assembledName.append(utl.getSubspecificEpithet()).append(" "); 
+				    }
+					assembledName.append(utl.getInfraspecificRank()).append(" "); 
+					assembledName.append(utl.getInfraspecificEpithet()).append(" "); 
+					String aName = assembledName.toString().trim();
+					// TODO: This regex isn't removing duplicated spaces.
+					aName = aName.replaceAll("/ +/", " ");
+					field.getTextField().setText(aName);
+				}
+			}
+		}
 	}
 }
