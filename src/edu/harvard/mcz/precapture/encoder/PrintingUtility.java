@@ -60,6 +60,14 @@ public class PrintingUtility {
 
 	}
 	
+	/**
+	 * Send the generated PDF file to a printer.  (file to print is from LabelEncoder.getPrintFile().
+	 * 
+	 * @param printDefinition Used to find paper size
+	 * @param paperWidthPoints
+	 * @param paperHeightPoints
+	 * @throws PrintFailedException if printing fails for any reason.
+	 */
 	public static void sendPDFToPrinter(LabelDefinitionType printDefinition, int paperWidthPoints, int paperHeightPoints) throws PrintFailedException { 
 		try { 
 			
@@ -69,12 +77,13 @@ public class PrintingUtility {
 
 			DocFlavor psInFormat = DocFlavor.INPUT_STREAM.PDF;
 			
-			// No printers listed... Try autosense instead of PDF
+			// No printers listed... Don't Try autosense instead of PDF
 		    // DocFlavor psInFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
-			// Ends up listing printers that can't take the PDF, failing over to using 
-			// a pdf printing library instead and having it pull up the printer dialog.
+			// Ends up listing printers that can't take the PDF,
+			// Need instead to fail over to using a pdf printing library 
+			// and having the pdf printing library pull up the printer dialog.
 			
-			Doc myDoc = new SimpleDoc(pdfInputStream, DocFlavor.INPUT_STREAM.PDF, null); 
+			Doc myDoc = new SimpleDoc(pdfInputStream, psInFormat, null); 
 			PrintRequestAttributeSet atset = new HashPrintRequestAttributeSet();
 			atset.add(new Copies(1));
 			// Set paper size
@@ -107,21 +116,6 @@ public class PrintingUtility {
 			atset.add(Sides.ONE_SIDED);
 			PrintService[] services = PrintServiceLookup.lookupPrintServices(psInFormat, atset);
 			log.debug("Number of matching printing services =  " + services.length);
-//			if (services.length == 0) {
-//				log.debug("Relaxing print lookup criteria");
-//				// relax the criteria
-//			    atset = new HashPrintRequestAttributeSet();
-//			    services = PrintServiceLookup.lookupPrintServices(psInFormat, atset);
-//			    log.debug("Number of matching printing services =  " + services.length);
-//			}
-//			if (services.length == 0) {
-//				// Try a specific printer
-//				String targetPrinterName = "HP Color LaserJet";
-//			    log.debug("Trying printer by name: " + targetPrinterName);
-//				HashPrintServiceAttributeSet pnameAttrSet = new HashPrintServiceAttributeSet(new PrinterName(targetPrinterName, null));
-//				services = PrintServiceLookup.lookupPrintServices(null, pnameAttrSet); 
-//			    log.debug("Number of matching printing services =  " + services.length);
-//			}
 			boolean printed = false;
 			if (services.length ==0 ) {
 				log.debug("No PDF printing services found.");
@@ -166,50 +160,13 @@ public class PrintingUtility {
 								
 								pdfInputStream = new FileInputStream(LabelEncoder.getPrintFile());
 								
-								// trying pdfbox instead of pdf-renderer
+								// Send PDF to printer using PDFBox PDF printing support.
 								PDDocument pdfDocument = PDDocument.load(pdfInputStream);
 								pdfDocument.print();
 								pdfDocument.close();
 								printed = true;
+								// Note, can't get pdf-renderer to print without re-scaling and shrinking the document.
 								
-								// Can't get pdf-renderer to print without scaling the document down.
-//								FileChannel fc = pdfInputStream.getChannel();
-//								ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-//
-//								PDFFile curFile=null;
-//								PDFPrintPage pages=null;
-//								curFile = new PDFFile(bb); 
-//								pages = new PDFPrintPage(curFile);
-//								PrinterJob printJob = PrinterJob.getPrinterJob();
-//
-//								printJob.setPrintService((PrintService)selectedService);
-//								
-//								printJob.setJobName("PreCaptureApp Labels");
-//								Book book = new Book();
-//								PageFormat pformat = PrinterJob.getPrinterJob().defaultPage();
-//								log.debug(pformat.getHeight()); 
-//								log.debug(pformat.getWidth()); 
-//								log.debug(pformat.getImageableHeight()); 
-//								log.debug(pformat.getImageableWidth());
-//								log.debug(pformat.getOrientation());
-//								
-//								pformat.setOrientation(PageFormat.PORTRAIT);
-//								Paper pPaper = pformat.getPaper();
-//								pPaper.setImageableArea(1.0, 1.0, pPaper.getWidth() - 2.0, pPaper.getHeight() - 2.0);
-//								pformat.setPaper(pPaper);
-//								
-//								log.debug(pformat.getHeight()); 
-//								log.debug(pformat.getWidth()); 
-//								log.debug(pformat.getImageableHeight()); 
-//								log.debug(pformat.getImageableWidth());
-//								log.debug(pformat.getOrientation());								
-//								
-//								book.append(pages, pformat, curFile.getNumPages());
-//								printJob.setPageable(book);
-//
-//								//PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
-//								printJob.printDialog(atset);
-//								printJob.print(atset);
 							} catch (Exception e) { 
 			                    log.error(e.getMessage(), e);
 							}
@@ -219,8 +176,8 @@ public class PrintingUtility {
 				pdfInputStream.close();
 			} 
 			if (!printed) { 
-				JOptionPane.showMessageDialog(null, "Unable to locate or use a printer, print the file 'labels.pdf'");
 				log.error("No available printing services");
+				throw new PrintFailedException("Unable to locate or use a printer, print the file '" + LabelEncoder.getPrintFile() +"'");
 			}
 		} catch (FileNotFoundException e) {
 			log.error(e.getMessage());

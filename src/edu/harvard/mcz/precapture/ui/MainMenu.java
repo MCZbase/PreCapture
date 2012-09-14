@@ -174,9 +174,5 @@ public class MainMenu extends JMenuBar {
 		mntmVersion.setEnabled(PreCaptureSingleton.useNapkin());
 		mnHelp.add(mntmVersion);
 		
-		JMenuItem mntmID = new JMenuItem("$Id: MainFrame.java 34 2012-07-31 23:30:57Z chicoreus $" );
-		// needs to be enabled to be readable in napkin look and feel
-		mntmID.setEnabled(PreCaptureSingleton.useNapkin());
-		mnHelp.add(mntmID);		
 	}
 }
