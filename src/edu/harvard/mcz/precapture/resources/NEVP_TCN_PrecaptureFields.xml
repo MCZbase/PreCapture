@@ -3,8 +3,7 @@
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
      xsi:schemaLocation="http://mcz.harvard.edu/PreCaptureFieldSchema PreCaptureFieldSchema.xsd ">
   <tns:SupportedProject>NEVP TCN</tns:SupportedProject>
-  <tns:Version>1.0</tns:Version>
-  <tns:FieldInList>
+  <tns:Version>1.1</tns:Version>
   <tns:FieldInList>
     <tns:Label>Identification Qualifier</tns:Label>
     <tns:Code>iq</tns:Code>
@@ -16,6 +15,7 @@
     <tns:FontSize>12</tns:FontSize>
     <tns:DefaultValue></tns:DefaultValue>
   </tns:FieldInList>      
+  <tns:FieldInList>
     <tns:Label>Genus</tns:Label>
     <tns:Code>g</tns:Code>
     <tns:Type>String</tns:Type>
