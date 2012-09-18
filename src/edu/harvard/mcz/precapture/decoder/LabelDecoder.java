@@ -21,8 +21,16 @@ package edu.harvard.mcz.precapture.decoder;
 
 import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+import net.sf.json.util.JSONTokener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,8 +46,12 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
+import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.exceptions.BarcodeReadException;
 import edu.harvard.mcz.precapture.ui.ContainerLabel;
+import edu.harvard.mcz.precapture.ui.FieldPlusText;
+import edu.harvard.mcz.precapture.xml.Field;
+import edu.harvard.mcz.precapture.xml.MappingList;
 
 /**
  * @author mole
@@ -72,7 +84,104 @@ public class LabelDecoder {
 		// TODO: Implement or remove.
 		this.label = containerLabel;
 	}
+
+	public static Map<String,String> getVocabularyValueMap(String jsonString) {
+		HashMap<String,String> result = new HashMap<String,String>();
+	     JSONObject json = (JSONObject)JSONSerializer.toJSON(jsonString);
+	     String project = (String) json.get("m1p");
+	     String version = (String) json.get("m2v");
+	     
+	     boolean foundMapping = false;
+	     // Check if current mapping list is the one used in this json
+	     MappingList mapping =  PreCaptureSingleton.getInstance().getMappingList();
+	     List<String> projects = mapping.getSupportedProject();
+	     Iterator<String> i = projects.iterator();
+	     while (!foundMapping && i.hasNext()) { 
+	         if (i.next().equals(project) && mapping.getVersion().equals(version)) { 
+	        	 foundMapping = true;
+	         }
+	     }
+	     //TODO Find other mappings
+	     
+	     if (foundMapping) { 
+	    	 Iterator keys = json.keys();
+	    	 while (keys.hasNext()) { 
+	    		 String key = (String)keys.next();
+	    		 String term = getTermForKey(mapping,key);
+	    		 String value = (String)json.get(key);
+	    		 log.debug(key + ":" + term + ":" + value );
+	    		 result.put(term, value);
+	    	 }
+	     }
+	     return result;
+	}
 	
+	/**
+	 * Given a string containing JSON, construct a ContanierLabel object
+	 * 
+	 * @param jsonString
+	 * @return
+	 */
+	public static ContainerLabel createLabelFromJson(String jsonString) { 
+	     ContainerLabel result = null;
+	     JSONObject json = (JSONObject)JSONSerializer.toJSON(jsonString);
+	     String project = (String) json.get("m1p");
+	     String version = (String) json.get("m2v");
+	     
+	     boolean foundMapping = false;
+	     // Check if current mapping list is the one used in this json
+	     MappingList mapping =  PreCaptureSingleton.getInstance().getMappingList();
+	     List<String> projects = mapping.getSupportedProject();
+	     Iterator<String> i = projects.iterator();
+	     while (!foundMapping && i.hasNext()) { 
+	         if (i.next().equals(project) && mapping.getVersion().equals(version)) { 
+	        	 foundMapping = true;
+	         }
+	     }
+	     //TODO Find other mappings
+	     
+	     if (foundMapping) { 
+	    	 Iterator keys = json.keys();
+	    	 while (keys.hasNext()) { 
+	    		 String key = (String)keys.next();
+	    		 String term = getTermForKey(mapping,key);
+	    		 String value = (String)json.get(key);
+
+	    		 ArrayList<FieldPlusText> fields = result.getFields();
+	    		 Iterator<FieldPlusText> f = fields.iterator();
+	    		 while (f.hasNext()) { 
+	    			 FieldPlusText field = f.next();
+	    			 if (field.getField().getVocabularyTerm().equals(term)) { 
+	    				 field.getTextField().setText(value);
+	    			 }
+	    		 }
+	    		 log.debug(key + ":" + value );
+	    	 }
+	     }
+	     
+	     return result;
+	}
+	
+	/**
+	 * Given a mapping list and a key, return the vocabulary term for that key
+	 * 
+	 * @param mappings the mapping definition to check for the code and vocabulary term.
+	 * @param key the short code used in the JSON as a key for a field concept.
+	 * @return string value of the vocabulary term that the code translates to.
+	 */
+	public static String getTermForKey(MappingList mappings, String key) {
+		String result = null;
+		List<Field> fields = mappings.getFieldInList();
+		Iterator<Field> i = fields.iterator();
+		while (i.hasNext()) { 
+			Field field = i.next();
+			if (field.getCode().equals(key)) { 
+				result = field.getVocabularyTerm();
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * Given an image, returns the decoded text of a QRCode within that image.
 	 * 

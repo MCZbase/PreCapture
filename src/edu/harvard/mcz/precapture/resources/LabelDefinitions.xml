@@ -25,6 +25,17 @@
     <tns:TextOrentation>Vertical</tns:TextOrentation>
   </tns:LabelDefinition>
   <tns:LabelDefinition>
+    <tns:Title>Half Sheet 4.25x11 Custom</tns:Title>
+    <tns:Units>Inches</tns:Units>
+    <tns:PaperHeight>11</tns:PaperHeight>
+    <tns:PaperWidth>4.25</tns:PaperWidth>
+    <tns:Margins>.5</tns:Margins>
+    <tns:Columns>1</tns:Columns>
+    <tns:LabelWidth>3.25</tns:LabelWidth>
+    <tns:LabelHeight>10</tns:LabelHeight>
+    <tns:TextOrentation>Vertical</tns:TextOrentation>
+  </tns:LabelDefinition>  
+  <tns:LabelDefinition>
     <tns:Title>Multiple 2.5x4 slips on 8.5x11</tns:Title>
     <tns:Units>Inches</tns:Units>
     <tns:PaperHeight>11</tns:PaperHeight>
