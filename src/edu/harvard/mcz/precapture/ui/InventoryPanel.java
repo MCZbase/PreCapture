@@ -95,6 +95,20 @@ public class InventoryPanel extends JPanel {
 		
 		popupMenu = new JPopupMenu();
 		
+		JMenuItem mntmAddRow = new JMenuItem("Add Row");
+		mntmAddRow.setMnemonic(KeyEvent.VK_A);
+		mntmAddRow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) { 
+				try { 
+				    ((InventoryTableModel)tableInventory.getModel()).addRow();
+				} catch (Exception ex) { 
+					log.error(ex.getMessage());
+					JOptionPane.showMessageDialog(frame, "Failed to add an Inventory row. " + ex.getMessage());
+				}
+			}
+		});	
+		popupMenu.add(mntmAddRow);		
+		
 		JMenuItem mntmCloneRow = new JMenuItem("Clone Row");
 		mntmCloneRow.setMnemonic(KeyEvent.VK_C);
 		mntmCloneRow.addActionListener(new ActionListener() {
@@ -114,7 +128,7 @@ public class InventoryPanel extends JPanel {
 		popupMenu.add(mntmCloneRow);
 		
 		JMenuItem mntmDeleteRow = new JMenuItem("Delete Row");
-		mntmDeleteRow.setMnemonic(KeyEvent.VK_C);
+		mntmDeleteRow.setMnemonic(KeyEvent.VK_D);
 		mntmDeleteRow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) { 
 				try { 
@@ -127,20 +141,8 @@ public class InventoryPanel extends JPanel {
 				}
 			}
 		});	
+		popupMenu.addSeparator();		
 		popupMenu.add(mntmDeleteRow);		
-		
-		JMenuItem mntmAddRow = new JMenuItem("Add Row");
-		mntmAddRow.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) { 
-				try { 
-				    ((InventoryTableModel)tableInventory.getModel()).addRow();
-				} catch (Exception ex) { 
-					log.error(ex.getMessage());
-					JOptionPane.showMessageDialog(frame, "Failed to add an Inventory row. " + ex.getMessage());
-				}
-			}
-		});	
-		popupMenu.add(mntmAddRow);
 		
 		JPanel panel_8 = new JPanel();
 		FlowLayout flowLayout_8 = (FlowLayout) panel_8.getLayout();
