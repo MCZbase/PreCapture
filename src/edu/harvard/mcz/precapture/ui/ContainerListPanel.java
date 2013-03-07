@@ -108,7 +108,18 @@ public class ContainerListPanel extends JPanel {
 		JButton btnClear = new JButton("Clear");
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) { 
-				PreCaptureSingleton.getInstance().getCurrentLabelList().clearList();
+				Object[] options = {"Yes, clear list.", "Cancel."};
+				int n = JOptionPane.showOptionDialog(parent,
+					    "Are you sure you want to clear the print list?",
+					    "Confirm clear",
+					    JOptionPane.YES_NO_OPTION,
+					    JOptionPane.QUESTION_MESSAGE,
+					    null,
+					    options,
+					    options[1]);
+				if (n==0) { 
+				    PreCaptureSingleton.getInstance().getCurrentLabelList().clearList();
+				}
 			}
 		});
 		panel_6.add(btnClear);

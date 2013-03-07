@@ -69,7 +69,7 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "1.0.1";
+	public static final String VERSION = "1.0.4";
 	public static final String SVN_ID = "$Id$";
 	public static final String AUTHORS = "Paul J. Morris";
 	public static final String COPYRIGHT = "Copyright © 2012 President and Fellows of Harvard College";

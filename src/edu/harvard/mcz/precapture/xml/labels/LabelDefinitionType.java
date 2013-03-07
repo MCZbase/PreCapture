@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="LabelWidth" type="{http://www.w3.org/2001/XMLSchema}float"/>
  *         &lt;element name="LabelHeight" type="{http://www.w3.org/2001/XMLSchema}float"/>
  *         &lt;element name="TextOrentation" type="{http://mcz.harvard.edu/LabelDefinitionSchema}TextOrentationType"/>
+ *         &lt;element name="FontDelta" type="{http://www.w3.org/2001/XMLSchema}float"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -51,7 +52,8 @@ import javax.xml.bind.annotation.XmlType;
     "columns",
     "labelWidth",
     "labelHeight",
-    "textOrentation"
+    "textOrentation",
+    "fontDelta"
 })
 public class LabelDefinitionType {
 
@@ -73,6 +75,8 @@ public class LabelDefinitionType {
     protected float labelHeight;
     @XmlElement(name = "TextOrentation", required = true)
     protected TextOrentationType textOrentation;
+    @XmlElement(name = "FontDelta")
+    protected float fontDelta = 0f;
 
     /**
      * Gets the value of the title property.
@@ -241,5 +245,19 @@ public class LabelDefinitionType {
     public void setTextOrentation(TextOrentationType value) {
         this.textOrentation = value;
     }
+
+	/**
+	 * @return the fontDelta
+	 */
+	public float getFontDelta() {
+		return fontDelta;
+	}
+
+	/**
+	 * @param fontDelta the fontDelta to set
+	 */
+	public void setFontDelta(float fontDelta) {
+		this.fontDelta = fontDelta;
+	}
 
 }

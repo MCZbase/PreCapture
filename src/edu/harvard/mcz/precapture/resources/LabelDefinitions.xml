@@ -45,17 +45,19 @@
     <tns:LabelWidth>3.25</tns:LabelWidth>
     <tns:LabelHeight>2.5</tns:LabelHeight>
     <tns:TextOrentation>Horizontal</tns:TextOrentation>
+    <tns:FontDelta>-2</tns:FontDelta>
   </tns:LabelDefinition>
   <tns:LabelDefinition>
     <tns:Title>2.3x4" Dymo LabelWriter</tns:Title>
     <tns:Units>Inches</tns:Units>
     <tns:PaperHeight>3.9</tns:PaperHeight>
     <tns:PaperWidth>2.3125</tns:PaperWidth>
-    <tns:Margins>.1</tns:Margins>
+    <tns:Margins>.17</tns:Margins>
     <tns:Columns>1</tns:Columns>
-    <tns:LabelWidth>2.1125</tns:LabelWidth>
-    <tns:LabelHeight>3.7</tns:LabelHeight>
+    <tns:LabelWidth>1.92</tns:LabelWidth>
+    <tns:LabelHeight>3.552</tns:LabelHeight>
     <tns:TextOrentation>Vertical</tns:TextOrentation>
+    <tns:FontDelta>-2</tns:FontDelta>
   </tns:LabelDefinition>    
   <tns:LabelDefinition>
     <tns:Title>4x2.3"Label</tns:Title>
@@ -67,5 +69,6 @@
     <tns:LabelWidth>3.8</tns:LabelWidth>
     <tns:LabelHeight>2.1125</tns:LabelHeight>
     <tns:TextOrentation>Horizontal</tns:TextOrentation>
+    <tns:FontDelta>-2</tns:FontDelta>
   </tns:LabelDefinition>  
 </tns:LabelDefinitions>

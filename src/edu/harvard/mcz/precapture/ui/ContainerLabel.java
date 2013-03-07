@@ -209,41 +209,58 @@ public class ContainerLabel {
 		cell.setVerticalAlignment(PdfPCell.ALIGN_TOP);
 		cell.disableBorderSide(PdfPCell.RIGHT);
 		cell.setPaddingLeft(3);
+		cell.setNoWrap(false);
 
-		Paragraph higher = new Paragraph();
+		int leading = (int) (fields.get(0).getField().getFontSize()  + printDefinition.getFontDelta()) -1;
+		Paragraph higher = new Paragraph(leading,"",new Font(Font.FontFamily.TIMES_ROMAN, 
+	    		   fields.get(0).getField().getFontSize()  + printDefinition.getFontDelta(), 
+	    		   Font.NORMAL));
+		higher.setSpacingBefore(0);
+		higher.setSpacingAfter(0);
 		boolean added = false;
 		boolean hasContent = false;
 		for (int i=0;i<fields.size();i++) { 
-		   if (fields.get(i).getField().isNewLine()) {
-			   if (hasContent) { 
+		   log.debug(i);
+		   if (fields.get(i).getField().isNewLine() || (i == fields.size()-1) ) {
+			   if (!higher.isEmpty()) { 
+				   log.debug(higher.getContent());
 				   cell.addElement(higher);
 			   }
-			   higher = new Paragraph();
+			   leading = (int) (fields.get(i).getField().getFontSize()  + printDefinition.getFontDelta()) -1;
+			   higher = new Paragraph(leading,"",new Font(Font.FontFamily.TIMES_ROMAN, 
+		    		   fields.get(i).getField().getFontSize()  + printDefinition.getFontDelta(), 
+		    		   Font.NORMAL));
+			   higher.setSpacingBefore(0);
+			   higher.setSpacingAfter(0);
 			   added = false;
 			   hasContent = false;
 		   }
 		   Chunk chunk = new Chunk(fields.get(i).getTextField().getText().trim()); 
 		   if (fields.get(i).getField().isUseItalic()) {
 		       chunk.setFont(new Font(Font.FontFamily.TIMES_ROMAN, 
-		    		   fields.get(i).getField().getFontSize(), 
+		    		   fields.get(i).getField().getFontSize() + printDefinition.getFontDelta(), 
 		    		   Font.ITALIC));
 		   } else { 
 		       chunk.setFont(new Font(Font.FontFamily.TIMES_ROMAN, 
-		    		   fields.get(i).getField().getFontSize(), 
+		    		   fields.get(i).getField().getFontSize()  + printDefinition.getFontDelta(), 
 		    		   Font.NORMAL));
 		   }
-		   hasContent = true;
-		   higher.add(chunk);
-		   if (fields.get(i).getTextField().getText().trim().length()>0) { 
-			   // add a trailing space as a separator if there was something to separate.
-			   higher.add(new Chunk(" "));
+		   if (!chunk.isEmpty()) {
+			   hasContent = true;
+			   higher.add(chunk);
+			   if (fields.get(i).getTextField().getText().trim().length()>0) { 
+				   // add a trailing space as a separator if there was something to separate.
+				   higher.add(new Chunk(" "));
+			   }
 		   }
 		} 
-		if (!added) { 
+		if (!added) {
+			log.debug(higher.getContent());
 			cell.addElement(higher);
 		}
 		String extraText = PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_EXTRAHUMANTEXT);
 		if (extraText!=null && extraText.length()>0) { 
+			log.debug(extraText);
 		    cell.addElement(new Chunk(extraText));
 		}
 

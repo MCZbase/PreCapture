@@ -296,12 +296,15 @@ public class LabelEncoder {
 
 							PdfPCell cell = label.toPDFCell(printDefinition);
 							cell.setFixedHeight(labelHeightPoints);
+							// Colors to illustrate where the cells are on the layout
+							// cell.setBackgroundColor(new BaseColor(255,255,30));
 
 							PdfPCell cell_barcode = new PdfPCell();
 							cell_barcode.setBorderColor(BaseColor.LIGHT_GRAY);
 							cell_barcode.disableBorderSide(PdfPCell.LEFT);
 							cell_barcode.setVerticalAlignment(PdfPCell.ALIGN_TOP);
 							cell_barcode.setFixedHeight(labelHeightPoints);
+							// cell_barcode.setBackgroundColor(new BaseColor(255,30,255));
 
 							encoder = new LabelEncoder(label);
 							image = encoder.getImage();

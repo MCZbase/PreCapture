@@ -44,7 +44,6 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.zxing</groupId>
@@ -108,8 +107,17 @@
 			<artifactId>pdfbox</artifactId>
 			<version>1.7.0</version>
 		</dependency>
+        <dependency>
+            <groupId>org.eclipse.jdt.internal</groupId>
+            <artifactId>jarinjarloader</artifactId>
+            <version>1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/jar-in-jar-loader.zip</systemPath>
+        </dependency>		
 	</dependencies>
 	<build>
+		<sourceDirectory>${project.basedir}/src</sourceDirectory>
+		<testSourceDirectory>${project.basedir}/src</testSourceDirectory>
 		<plugins>
 		<plugin>
 			<artifactId>maven-compiler-plugin</artifactId>

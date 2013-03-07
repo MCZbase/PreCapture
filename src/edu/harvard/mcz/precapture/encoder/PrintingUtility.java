@@ -187,7 +187,6 @@ public class PrintingUtility {
 			if (e!=null && e.getCause()!=null) { 
 			    log.error(e.getCause().getMessage());
 			}
-			e.printStackTrace();
 			throw new PrintFailedException("No labels to print." + e.getMessage());
 		}
 	}

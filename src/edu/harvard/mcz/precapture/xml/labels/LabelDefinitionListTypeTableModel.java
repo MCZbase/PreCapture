@@ -56,7 +56,7 @@ public class LabelDefinitionListTypeTableModel extends AbstractTableModel {
 	}
 
 	public int getColumnCount() {
-		return 4;
+		return 5;
 	}
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
@@ -77,6 +77,9 @@ public class LabelDefinitionListTypeTableModel extends AbstractTableModel {
 			    case 3: 
 			    	result = definitionList.getLabelDefinition().get(rowIndex).getLabelWidth();
 			    	break;
+			    case 4: 
+			    	result = definitionList.getLabelDefinition().get(rowIndex).getFontDelta();
+			    	break;			    	
 			    }
 				} catch (Exception e) { 
 					// asked for something that isn't there
@@ -105,6 +108,9 @@ public class LabelDefinitionListTypeTableModel extends AbstractTableModel {
 	    case 3: 
 	    	result = "Label Width";
 	    	break;
+	    case 4: 
+	    	result = "Font size change";
+	    	break;	    	
 	    }		
 		return result;
 	}	

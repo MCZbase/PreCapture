@@ -90,7 +90,7 @@ public class TestLabelEncoder {
 		PreCaptureSingleton.getInstance().getProperties().getProperties().setProperty(PreCaptureProperties.KEY_MY_COLLECTION_CODE,"GH"); 
 		
 		// Load field mappings from XML 
-		String resource = "test/resources/ResourceTest_PrecaptureFields.xml";
+		String resource = "/edu/harvard/mcz/precapture/test/resources/ResourceTest_PrecaptureFields.xml";
 		InputStream stream = PreCaptureApp.class.getResourceAsStream(resource);
 		if (stream!=null) {
 			JAXBContext jc;
@@ -217,7 +217,7 @@ public class TestLabelEncoder {
 		encoder = new LabelEncoder(containerLabel);
 		try {
 			BufferedImage image = encoder.getBufferedImage();
-			decodedJson = LabelDecoder.decodeImage(this.resizeImage(image, image.getWidth()/2, image.getHeight()/2));
+			decodedJson = LabelDecoder.decodeImage(this.resizeImage(image, ((Double)Math.floor(image.getWidth()/1)).intValue(), ((Double)Math.floor(image.getHeight()/1)).intValue()));
 		} catch (Exception e) {
 			log.debug(e.getMessage());
 			fail(e.getMessage());
@@ -227,7 +227,7 @@ public class TestLabelEncoder {
 		
 		// Runs up to about 150 characters at 50% size reduction before failing.
 		// hits limit first if utf-8 is used.
-		for (int x=0; x<13; x++) { 
+		for (int x=0; x<12; x++) { 
 			
 			i = containerLabel.getFields().iterator();
 			counter = 0;
@@ -252,7 +252,7 @@ public class TestLabelEncoder {
 			encoder = new LabelEncoder(containerLabel);
 			try {
 				BufferedImage image = encoder.getBufferedImage();
-				decodedJson = LabelDecoder.decodeImage(this.resizeImage(image, image.getWidth()/2, image.getHeight()/2));
+				decodedJson = LabelDecoder.decodeImage(this.resizeImage(image, image.getWidth()/1, image.getHeight()/1));
 				log.debug("decoded bytes=" + decodedJson.length());
 			} catch (Exception e) {
 				log.debug(e.getMessage());
