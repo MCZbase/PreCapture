@@ -48,6 +48,18 @@
     <tns:FontDelta>-2</tns:FontDelta>
   </tns:LabelDefinition>
   <tns:LabelDefinition>
+    <tns:Title>Multiple 1.5x3 slips on 8.5x11</tns:Title>
+    <tns:Units>Inches</tns:Units>
+    <tns:PaperHeight>11</tns:PaperHeight>
+    <tns:PaperWidth>8.5</tns:PaperWidth>
+    <tns:Margins>.62</tns:Margins>
+    <tns:Columns>2</tns:Columns>
+    <tns:LabelWidth>3</tns:LabelWidth>
+    <tns:LabelHeight>1.5</tns:LabelHeight>
+    <tns:TextOrentation>Horizontal</tns:TextOrentation>
+    <tns:FontDelta>-4</tns:FontDelta>
+  </tns:LabelDefinition>  
+  <tns:LabelDefinition>
     <tns:Title>2.3x4" Dymo LabelWriter</tns:Title>
     <tns:Units>Inches</tns:Units>
     <tns:PaperHeight>3.9</tns:PaperHeight>
@@ -70,5 +82,5 @@
     <tns:LabelHeight>2.1125</tns:LabelHeight>
     <tns:TextOrentation>Horizontal</tns:TextOrentation>
     <tns:FontDelta>-2</tns:FontDelta>
-  </tns:LabelDefinition>  
+  </tns:LabelDefinition>    
 </tns:LabelDefinitions>
