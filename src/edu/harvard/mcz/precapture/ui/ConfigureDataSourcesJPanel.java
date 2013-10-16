@@ -125,8 +125,8 @@ public class ConfigureDataSourcesJPanel extends JPanel {
 						Thread worker = new Thread() {
 							public void run() {
 								try {
-									UnitTrayLabelLifeCycle.loadFromCSV(taxonfile.getCanonicalPath(),taxonProgressBar);
-									JOptionPane.showMessageDialog(frame, "Taxon Authority File load complete. ");
+									int count = UnitTrayLabelLifeCycle.loadFromCSV(taxonfile.getCanonicalPath(),taxonProgressBar);
+									JOptionPane.showMessageDialog(frame, "Taxon Authority File load complete (" + count + " specific names). \n Restart program to use.");
 
 									// TODO: After load, the picklists aren't immediately repopulated with 
 									// the loaded names.  Most evident on a new installation.

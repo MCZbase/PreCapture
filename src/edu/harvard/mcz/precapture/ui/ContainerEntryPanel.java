@@ -313,6 +313,15 @@ public class ContainerEntryPanel extends JPanel {
 			while (i.hasNext()) { 
 				FieldPlusText field = i.next();
 				log.debug(field.getField().getVocabularyTerm());
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:family")) { 
+					field.getTextField().setText(utl.getFamily());
+				}
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("hTaxon:subfamily")) { 
+					field.getTextField().setText(utl.getSubfamily());
+				}
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("hTaxon:tribe")) { 
+					field.getTextField().setText(utl.getTribe());
+				}
 				if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:genus")) { 
 					field.getTextField().setText(utl.getGenus());
 				}

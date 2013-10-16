@@ -45,7 +45,7 @@
     <tns:LabelWidth>3.25</tns:LabelWidth>
     <tns:LabelHeight>2.5</tns:LabelHeight>
     <tns:TextOrentation>Horizontal</tns:TextOrentation>
-    <tns:FontDelta>-2</tns:FontDelta>
+    <tns:FontDelta>-1</tns:FontDelta>
   </tns:LabelDefinition>
   <tns:LabelDefinition>
     <tns:Title>Multiple 1.5x3 slips on 8.5x11</tns:Title>

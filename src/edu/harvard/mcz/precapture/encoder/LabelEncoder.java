@@ -48,6 +48,7 @@ import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Rectangle;
@@ -303,13 +304,15 @@ public class LabelEncoder {
 							cell_barcode.setBorderColor(BaseColor.LIGHT_GRAY);
 							cell_barcode.disableBorderSide(PdfPCell.LEFT);
 							cell_barcode.setVerticalAlignment(PdfPCell.ALIGN_TOP);
+							cell_barcode.setHorizontalAlignment(Element.ALIGN_RIGHT);
 							cell_barcode.setFixedHeight(labelHeightPoints);
 							// cell_barcode.setBackgroundColor(new BaseColor(255,30,255));
 
 							encoder = new LabelEncoder(label);
 							image = encoder.getImage();
 							image.setAlignment(Image.ALIGN_TOP);
-							image.setAlignment(Image.ALIGN_LEFT);
+							//image.setAlignment(Image.ALIGN_LEFT);
+							image.setAlignment(Image.ALIGN_RIGHT);
 							image.scaleToFit(barcodeCellWidthPoints, labelHeightPoints);
 							cell_barcode.addElement(image);
 

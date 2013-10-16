@@ -32,6 +32,7 @@
     <tns:NewLine>false</tns:NewLine>
     <tns:FontSize>12</tns:FontSize>
     <tns:DefaultValue></tns:DefaultValue>
+    <tns:Suffix>:</tns:Suffix>
   </tns:FieldInList>
   <tns:FieldInList>      
     <tns:Label>Subfamily</tns:Label>
@@ -43,6 +44,7 @@
     <tns:NewLine>false</tns:NewLine>
     <tns:FontSize>12</tns:FontSize>
     <tns:DefaultValue></tns:DefaultValue>
+    <tns:Suffix>:</tns:Suffix>
   </tns:FieldInList>
   <tns:FieldInList>      
     <tns:Label>Tribe</tns:Label>
@@ -51,7 +53,7 @@
     <tns:VocabularyTerm>hTaxon:tribe</tns:VocabularyTerm>
     <tns:Optional>false</tns:Optional>
     <tns:UseItalic>false</tns:UseItalic>
-    <tns:NewLine>true</tns:NewLine>
+    <tns:NewLine>false</tns:NewLine>
     <tns:FontSize>12</tns:FontSize>
     <tns:DefaultValue></tns:DefaultValue>
   </tns:FieldInList>  
@@ -62,7 +64,7 @@
     <tns:VocabularyTerm>dwc:genus</tns:VocabularyTerm>
     <tns:Optional>false</tns:Optional>
     <tns:UseItalic>true</tns:UseItalic>
-    <tns:NewLine>false</tns:NewLine>
+    <tns:NewLine>true</tns:NewLine>
     <tns:FontSize>12</tns:FontSize>
     <tns:DefaultValue></tns:DefaultValue>
   </tns:FieldInList>

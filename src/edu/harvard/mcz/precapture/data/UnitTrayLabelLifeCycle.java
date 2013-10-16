@@ -93,6 +93,8 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     /**
     * @param canonicalPath
     * @param taxonProgressBar
+    * 
+    * @returns count of the number of specific epithets found in load.
     */
     public static int loadFromCSV(String filename, JProgressBar taxonProgressBar) throws IOException {
     	int numberLoaded = 0;
@@ -112,13 +114,31 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     		});
     	}
     	CsvReader reader = new CsvReader(filename,',',Charset.forName("utf-8"));
+    	log.debug("Reading: " + filename);
     	reader.readHeaders();
+    	boolean hasTribe = false;
+    	boolean hasSubfamily = false;
+    	String[] headers = reader.getHeaders();
+    	log.debug("ExpectedHeaders: Family, Genus, SpecificEpithet, SubspecificEpithet, InfraspecificEpithet, InfraspecificRank, Authorship");
+    	log.debug("OptionalHeaders: Subfamily, Tribe");
+    	for (int i=0; i<headers.length; i++) { 
+    		log.debug("Contains Header: "+ headers[i]);
+    		if (headers[i].equals("Tribe")) { hasTribe = true; } 
+    		if (headers[i].equals("Subfamily")) { hasSubfamily = true; } 
+    	}
     	UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
     	uls.deleteAll();
     	while (reader.readRecord()) { 
-    		//  TODO: If scientificName is added, it will need to be added here as well.
     		UnitTrayLabel unitTrayLabel = new UnitTrayLabel();
+    		// TODO: If scientific name is added to data structure 
+    		// it will need to be added here as well.
     		unitTrayLabel.setFamily(reader.get("Family"));
+    	    if (hasSubfamily) {
+    		    unitTrayLabel.setSubfamily(reader.get("Subfamily"));
+    		}
+    	    if (hasTribe) {
+    		    unitTrayLabel.setTribe(reader.get("Tribe"));
+    		}
     		unitTrayLabel.setGenus(reader.get("Genus"));
     		unitTrayLabel.setSpecificEpithet(reader.get("SpecificEpithet"));
     		unitTrayLabel.setSubspecificEpithet(reader.get("SubspecificEpithet"));
@@ -127,7 +147,9 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     		unitTrayLabel.setAuthorship(reader.get("Authorship"));
     		try {
 				uls.persist(unitTrayLabel);
-				numberLoaded++;
+				if (unitTrayLabel.getSpecificEpithet()!=null) { 
+				    numberLoaded++;
+				}
 			} catch (SaveFailedException e) {
 				log.error(e.getMessage());
 			}

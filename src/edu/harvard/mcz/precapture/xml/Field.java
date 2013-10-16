@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="NewLine" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *         &lt;element name="FontSize" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="DefaultValue" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/>
+ *         &lt;element name="Suffix" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -53,7 +54,8 @@ import javax.xml.bind.annotation.XmlType;
     "useItalic",
     "newLine",
     "fontSize",
-    "defaultValue"
+    "defaultValue",
+    "suffix"
 })
 public class Field {
 
@@ -75,6 +77,8 @@ public class Field {
     protected int fontSize;
     @XmlElement(name = "DefaultValue", required = true)
     protected List<String> defaultValue;
+    @XmlElement(name = "Suffix")
+    protected String suffix;
 
     /**
      * Gets the value of the label property.
@@ -264,5 +268,19 @@ public class Field {
         }
         return this.defaultValue;
     }
+
+	/**
+	 * @return the suffix
+	 */
+	public String getSuffix() {
+		return suffix;
+	}
+
+	/**
+	 * @param suffix the suffix to set
+	 */
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+	}
 
 }

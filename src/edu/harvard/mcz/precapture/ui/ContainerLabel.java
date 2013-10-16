@@ -235,6 +235,7 @@ public class ContainerLabel {
 			   added = false;
 			   hasContent = false;
 		   }
+		   log.debug(fields.get(i).getTextField().getText().trim());
 		   Chunk chunk = new Chunk(fields.get(i).getTextField().getText().trim()); 
 		   if (fields.get(i).getField().isUseItalic()) {
 		       chunk.setFont(new Font(Font.FontFamily.TIMES_ROMAN, 
@@ -248,6 +249,10 @@ public class ContainerLabel {
 		   if (!chunk.isEmpty()) {
 			   hasContent = true;
 			   higher.add(chunk);
+               log.debug(fields.get(i).getField().getSuffix());
+			   if (fields.get(i).getField().getSuffix()!=null && fields.get(i).getField().getSuffix().length()>0) { 
+				   higher.add(new Chunk(fields.get(i).getField().getSuffix()));
+			   }
 			   if (fields.get(i).getTextField().getText().trim().length()>0) { 
 				   // add a trailing space as a separator if there was something to separate.
 				   higher.add(new Chunk(" "));
