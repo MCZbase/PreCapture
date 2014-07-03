@@ -162,6 +162,17 @@ public class LabelEncoder {
 		return image;
 	}
 
+	/**
+	 * 
+	 * @param containers
+	 * @return
+	 * @throws PrintFailedException
+	 */
+	public static boolean printAnnotationLabels(ArrayList<ContainerLabel> containers) throws PrintFailedException { 
+		// TODO Refactor code from BarcodeParserPanel print action into here.
+		return false;
+	}
+	
 	@SuppressWarnings("hiding")
 	public static boolean printList(ArrayList<ContainerLabel> containers) throws PrintFailedException { 
 		log.debug("Invoked printList ");
@@ -390,7 +401,7 @@ public class LabelEncoder {
 	public static final int REL_WIDTH_TEXT_CELL = 2;
 	public static final int REL_WIDTH_BARCODE_CELL = 3;
 
-	private static PdfPTable setupTable(int paperWidthPoints, int marginsPoints, int labelWidthPoints, int columns, int subCellColumnCount) throws DocumentException { 
+	public static PdfPTable setupTable(int paperWidthPoints, int marginsPoints, int labelWidthPoints, int columns, int subCellColumnCount) throws DocumentException { 
 		PdfPTable table = new PdfPTable(subCellColumnCount);
 		table.setLockedWidth(true);   // force use of totalWidth in points, rather than percentWidth.
 		float percentWidth = ((((float)paperWidthPoints)-(2f*((float)marginsPoints)))/((float)paperWidthPoints))*100f;
@@ -402,8 +413,10 @@ public class LabelEncoder {
 		for (int c=0;c<columns;c++) { 
 			cellWidthsRatio[cellNumber] = REL_WIDTH_TEXT_CELL; // width of text cell
 			cellNumber++;
-			cellWidthsRatio[cellNumber] = REL_WIDTH_BARCODE_CELL; // width of barcode cell
-			cellNumber++;
+			if (columns>1) { 
+			   cellWidthsRatio[cellNumber] = REL_WIDTH_BARCODE_CELL; // width of barcode cell
+			   cellNumber++;
+			}
 		}
 		table.setTotalWidth(paperWidthPoints - 2* marginsPoints);
 		// must set total width before setting relative cell widths.

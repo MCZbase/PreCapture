@@ -42,6 +42,8 @@ import org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader;
 import edu.harvard.mcz.precapture.PreCaptureApp;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.resources.help.HelpLoaderClass;
+import javax.swing.KeyStroke;
+import java.awt.event.InputEvent;
 
 /**
  * @author mole
@@ -66,6 +68,7 @@ public class MainMenu extends JMenuBar {
 		add(mnFile);
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
 		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				PreCaptureApp.exit(frame);
@@ -92,6 +95,17 @@ public class MainMenu extends JMenuBar {
 		});
 		mntmRunTests.setMnemonic(KeyEvent.VK_T);
 		mnFile.add(mntmRunTests);
+		
+		JMenuItem mntmMakeAnnotationLabels = new JMenuItem("Make Annotation Labels");
+		mntmMakeAnnotationLabels.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				BarcodeToAnnotationLabelDialog aDialog = new BarcodeToAnnotationLabelDialog();
+				aDialog.setVisible(true);
+			}
+		});
+		mntmMakeAnnotationLabels.setMnemonic('A');
+		mntmMakeAnnotationLabels.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
+		mnFile.add(mntmMakeAnnotationLabels);
 		
 		//mnFile.add(mntmLoadTaxa);
 		mntmExit.setMnemonic(KeyEvent.VK_X);
@@ -123,6 +137,7 @@ public class MainMenu extends JMenuBar {
 		add(mnHelp);
 		
 		JMenuItem mntmApplicationHelp = new JMenuItem("Using " + PreCaptureApp.NAME);
+		mntmApplicationHelp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
 		mntmApplicationHelp.setMnemonic(KeyEvent.VK_U);
 		try {
 			//URL hsURL = PreCaptureApp.class.getResource("resources/help/helpset.hs");

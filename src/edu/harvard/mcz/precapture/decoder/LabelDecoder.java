@@ -27,6 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JTextField;
+
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -127,20 +129,32 @@ public class LabelDecoder {
 	     JSONObject json = (JSONObject)JSONSerializer.toJSON(jsonString);
 	     String project = (String) json.get("m1p");
 	     String version = (String) json.get("m2v");
+	     log.debug("Project: " + project);
+	     log.debug("Version: " + version);
 	     
 	     boolean foundMapping = false;
 	     // Check if current mapping list is the one used in this json
 	     MappingList mapping =  PreCaptureSingleton.getInstance().getMappingList();
 	     List<String> projects = mapping.getSupportedProject();
 	     Iterator<String> i = projects.iterator();
-	     while (!foundMapping && i.hasNext()) { 
-	         if (i.next().equals(project) && mapping.getVersion().equals(version)) { 
+	     while (!foundMapping && i.hasNext()) {
+	    	 String projectInMapping = i.next();
+	         if (
+	        		 (projectInMapping.equals(project) || project.equals("["+projectInMapping+"]") )
+	        		 && mapping.getVersion().equals(version)
+	            ) { 
 	        	 foundMapping = true;
 	         }
 	     }
 	     //TODO Find other mappings
 	     
 	     if (foundMapping) { 
+	 		 ArrayList<FieldPlusText> textFields = new ArrayList<FieldPlusText>(); 
+	         int fieldCount = PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size();
+		     for (int j=0; j<fieldCount; j++) { 
+		     	textFields.add(new FieldPlusText(PreCaptureSingleton.getInstance().getMappingList().getFieldInList().get(j), new JTextField()));
+		     } 	    	 
+	    	 result = new ContainerLabel(textFields);
 	    	 Iterator keys = json.keys();
 	    	 while (keys.hasNext()) { 
 	    		 String key = (String)keys.next();
@@ -157,6 +171,14 @@ public class LabelDecoder {
 	    		 }
 	    		 log.debug(key + ":" + value );
 	    	 }
+	     } else { 
+	    	 log.error("Failed to find a configured mapping in JSON, check project ("+ project +") and version ("+ version +").");
+	    	 log.debug("Supported Version: " + mapping.getVersion());
+	         log.debug("Supported Projects:");
+	         i = projects.iterator();
+	         while (i.hasNext()) { 
+	        	 log.debug(i.next());
+	         }
 	     }
 	     
 	     return result;
