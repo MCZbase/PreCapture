@@ -124,8 +124,6 @@ public class ContainerListPanel extends JPanel {
 		});
 		panel_6.add(btnClear);
 		
-		//TODO: Add popup menu to clone/delete rows.
-		
 		popupMenu = new JPopupMenu();
 		
 		JMenuItem mntmCloneRow = new JMenuItem("Clone Row");
@@ -147,7 +145,7 @@ public class ContainerListPanel extends JPanel {
 		popupMenu.add(mntmCloneRow);
 		
 		JMenuItem mntmDeleteRow = new JMenuItem("Delete Row");
-		mntmDeleteRow.setMnemonic(KeyEvent.VK_C);
+		mntmDeleteRow.setMnemonic(KeyEvent.VK_D);
 		mntmDeleteRow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) { 
 				try { 
@@ -163,6 +161,7 @@ public class ContainerListPanel extends JPanel {
 		popupMenu.add(mntmDeleteRow);		
 		
 		JMenuItem mntmAddRow = new JMenuItem("Add Row");
+		mntmDeleteRow.setMnemonic(KeyEvent.VK_A);
 		mntmAddRow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) { 
 				try { 
