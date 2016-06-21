@@ -45,6 +45,8 @@ public class PreCaptureProperties extends AbstractTableModel {
 	public static final String KEY_PAPERSIZE = "print.papersize";
 	/** Key for properties file for location of field mapping xml file. */
 	public static final String KEY_FIELDMAPPING = "config.fieldmap";
+	/** Key for properties file for whether authority file is shown. */
+	public static final String KEY_DISPLAY_AUTHORITY_FILE =  "config.displayauthorityfile";	
 	/** Key for properties file for whether authority file is editable. */
 	public static final String KEY_EDITABLE_AUTHORITY_FILE =  "config.editableauthorityfile";
 	/** Key for properties file for whether the inventory tab should be shown in the UI. */
@@ -180,10 +182,14 @@ public class PreCaptureProperties extends AbstractTableModel {
 			// xml file containing field mappings
 			properties.setProperty(KEY_FIELDMAPPING, "resources/NEVP_TCN_PrecaptureFields.xml");
 		}
+		if (!properties.containsKey(KEY_DISPLAY_AUTHORITY_FILE)) {
+			// is the taxon name authority file shown? 
+			properties.setProperty(KEY_DISPLAY_AUTHORITY_FILE, "false");
+		}
 		if (!properties.containsKey(KEY_EDITABLE_AUTHORITY_FILE)) {
 			// is the taxon name authority file editable? 
 			properties.setProperty(KEY_EDITABLE_AUTHORITY_FILE, "false");
-		}
+		}		
 		if (!properties.containsKey(KEY_SHOW_INVENTORY)) {
 			// is the taxon name authority file editable? 
 			properties.setProperty(KEY_SHOW_INVENTORY, "true");

@@ -115,7 +115,11 @@ protocols for how to use this inventory if your project includes an inventory es
 
 <h3>Editing the Taxon Authority File</h3>
 
-<p>This functionality is not yet available inside the PreCapture application, see Loading a Taxon Authority File</p>
+<p>Added in version 1.0.7.  If the configuration property config.displayauthorityfile is set to true, a tab <strong>Taxon Authority File</strong> will be displayed containing the currently loaded taxon authority file, see Loading a Taxon Authority File</p>
+<p>If the configuration property config.editableauthorityfile is set to true, the <strong>Taxon Authority File</strong> tab will be visible and editable.</p>
+<p>When the Taxon Authority File is editable, it is also possible to use an alternative workflow of setting the value of the "Number to Print" column for rows that you wish to print
+and then pressing the <strong>Add to Print List</strong> button, which will copy all rows with a to print number larger than zero into the <strong>Print List</strong> from where they can 
+be edited and printed.</p>
 
 <h3>Exiting the application</h3>
 
@@ -179,7 +183,8 @@ change the property config.mainuiframe from "MainFrame" to "MainFrameAlternative
 <ul>
 <li>print.papersize Not currently in use.</li>
 <li>config.fieldmap The location of the XML configuration file for fields to print on container labels.  A relative path is inside the jar, an absolute path on the local filesystem.</li>
-<li>config.editableauthorityfile Not currently in use.</li>
+<li>config.displayauthorityfile true to display the authority file in a separate tab.</li>
+<li>config.editableauthorityfile true to display the authority file in editable form in a separate tab, also may allow copying of fields from the authority file to the print list.</li>
 <li>config.showinventorytab true to include the Inventory tab in the application, false to hide it.</li>
 <li>config.printdefinitions The location of the XML configuration file for print format definitions.  A relative path is inside the jar, an absolute path on the local filesystem.</li>
 <li>config.selectedprintdefinition The print definition to use by default from the print format definition file.</li>
@@ -187,6 +192,7 @@ change the property config.mainuiframe from "MainFrame" to "MainFrameAlternative
 <li>config.mycollectioncode  The collection code/Herbarium Acronym for the collection. The default value to use for a field that is mapped to the concept dwc:collectionCode.</li>
 <li>config.filterlengththreshold The number of characters to type into the taxon picker box before it starts filtering.  3 is probably a good choice.</li>
 <li>config.qr_errorcorrection The QRCode redundancy level to use.  One of L, M, Q, H.  H is recommended.  L allows about a 7% loss, H about a 30% loss.  H makes for more reliable reading, but more bits in the barcode.</li>
+<li>config.ediableunittraylabeldb Not currently in use.</li>
 </ul>
 
 <h2>Editing XML Configurations</h2>

@@ -154,7 +154,9 @@ public class MainFrameAlternative implements WindowListener {
 			tabbedPane.setMnemonicAt(1, KeyEvent.VK_I);
 		} 
 		
-		if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_EDITVIEWUTL).equals("true"))  {
+		if ( PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_DISPLAY_AUTHORITY_FILE).equals("true") ||
+			 PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_EDITABLE_AUTHORITY_FILE).equals("true")
+		   )  {
 			tabbedPane.addTab("Taxon Authority File", null, new UnitTrayLabelEditPanel(frame), null);
 			tabbedPane.setMnemonicAt(1, KeyEvent.VK_T);
 		} 

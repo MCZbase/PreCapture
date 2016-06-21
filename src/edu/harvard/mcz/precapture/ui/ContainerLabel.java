@@ -72,6 +72,22 @@ public class ContainerLabel {
 			}
 		}
 	}
+	
+	public ContainerLabel(ArrayList<FieldPlusText> fields, boolean setDefaults) {
+		numberToPrint = 1;
+        this.fields = fields;
+        if (setDefaults) { 
+		  for (int i = 0; i<fields.size(); i++) { 
+			if (fields.get(i).getField().getDefaultValue().size()==1) { 
+			    fields.get(i).getTextField().setText(fields.get(i).getField().getDefaultValue().get(0));
+			}
+			if (fields.get(i).getField().getVocabularyTerm().equals("dwc:collectionCode") && 
+					PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MY_COLLECTION_CODE).length()>0) { 
+			    fields.get(i).getTextField().setText(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_MY_COLLECTION_CODE));
+			}
+		  }
+        }
+	}	
 
 
 	/**

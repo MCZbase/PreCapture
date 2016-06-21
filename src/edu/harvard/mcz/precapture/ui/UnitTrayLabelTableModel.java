@@ -21,15 +21,20 @@ package edu.harvard.mcz.precapture.ui;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.harvard.mcz.precapture.PreCaptureProperties;
+import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.data.UnitTrayLabel;
 import edu.harvard.mcz.precapture.data.UnitTrayLabelLifeCycle;
+import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
 /**
  * @author mole
@@ -76,7 +81,6 @@ public class UnitTrayLabelTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
 		switch (columnIndex) {  
 			case 0:
 				return labelList.get(rowIndex).getId();
@@ -116,6 +120,92 @@ public class UnitTrayLabelTableModel extends AbstractTableModel {
 				return labelList.get(rowIndex).getOrdinal();
 		}
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.swing.table.AbstractTableModel#isCellEditable(int, int)
+	 */
+	@Override
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_EDITABLE_AUTHORITY_FILE).equals("true")) {
+			if (columnIndex==12 || columnIndex==14 || columnIndex ==15) { 
+				return false;
+			}
+			return true;
+		} else { 
+			return false;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object, int, int)
+	 */
+	@Override
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+		try { 
+			switch (columnIndex) {  
+			case 0:
+				labelList.get(rowIndex).setId(Long.valueOf(aValue.toString()));
+				break;
+			case 1:
+				labelList.get(rowIndex).setDrawerNumber(aValue.toString());
+				break;
+			case 2:
+				labelList.get(rowIndex).setFamily(aValue.toString());
+				break;
+			case 3:
+				labelList.get(rowIndex).setSubfamily(aValue.toString());
+				break;
+			case 4:
+				labelList.get(rowIndex).setTribe(aValue.toString());
+				break;
+			case 5:
+				labelList.get(rowIndex).setGenus(aValue.toString());
+				break;
+			case 6:
+				labelList.get(rowIndex).setSpecificEpithet(aValue.toString());
+				break;
+			case 7:
+				labelList.get(rowIndex).setSubspecificEpithet(aValue.toString());
+				break;
+			case 8:
+				labelList.get(rowIndex).setInfraspecificEpithet(aValue.toString());
+				break;
+			case 9:
+				labelList.get(rowIndex).setInfraspecificRank(aValue.toString());
+				break;
+			case 10:
+				labelList.get(rowIndex).setAuthorship(aValue.toString());
+				break;
+			case 11:
+				labelList.get(rowIndex).setUnNamedForm(aValue.toString());
+				break;
+			case 12:
+				labelList.get(rowIndex).setPrinted(Integer.parseInt(aValue.toString()));
+				break;
+			case 13:
+				labelList.get(rowIndex).setNumberToPrint(Integer.parseInt(aValue.toString()));
+				break;
+			case 14:
+				//labelList.get(rowIndex).setDateCreated(aValue.toString());
+				break;
+			case 15:
+				//labelList.get(rowIndex).setDateLastUpdated(aValue.toString());
+				break;
+			case 16:
+				labelList.get(rowIndex).setCollection(aValue.toString());
+				break;
+			case 17:
+				labelList.get(rowIndex).setOrdinal(Integer.parseInt(aValue.toString()));
+				break;
+			}
+			UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
+			uls.merge(labelList.get(rowIndex));
+		} catch (java.lang.NumberFormatException e) { 
+			log.error(e.getMessage());
+		} catch (SaveFailedException e) {
+			log.error(e.getMessage(),e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -230,6 +320,71 @@ public class UnitTrayLabelTableModel extends AbstractTableModel {
 		return Object.class;
 	}
 	
+	/**
+	 * Set the value of the print flag/to be printed counter for all rows 
+	 * in the taxon authority table (unit tray label list) to a specified value.
+	 * 
+	 * @param value value to set the print flag to, 0 means none.
+	 */
+	public void setAllPrintFlagsTo(int value) {
+		UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
+		Iterator<UnitTrayLabel> i = labelList.iterator();
+		while (i.hasNext()) { 
+			UnitTrayLabel label = i.next();
+			if (label.getNumberToPrint() != value) { 
+			   label.setNumberToPrint(value);
+			   try {
+				   uls.merge(label);
+			   } catch (SaveFailedException e) {
+				   log.error(e.getMessage());
+			   }
+			}
+		}
+		this.fireTableDataChanged();
+	}
 	
+	/**
+	 * Add a row to the taxon authority table (unit tray label list).
+	 */
+	public void addRow() { 
+		UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
+		UnitTrayLabel label = new UnitTrayLabel();
+		label.setDateCreated(new Date());
+		try {
+			uls.persist(label);
+		    labelList.add(label);
+		    this.fireTableDataChanged();
+		} catch (SaveFailedException e) {
+			log.error(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Add all taxon authority table (unit tray label) records that have a print flag set to 
+	 * 1 or higher to the list of containers for printing.  This copies records from the taxon
+	 * authority table to the current print list.
+	 */
+	public void addPrintFlaggedToContainerList() { 
+		UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
+		Iterator<UnitTrayLabel> i = labelList.iterator();
+		while (i.hasNext()) { 
+			UnitTrayLabel utl = i.next();
+			if (utl.getNumberToPrint()>0) { 
+				ArrayList<FieldPlusText> textFields = ContainerEntryPanel.extractDataToList(utl);
+				ContainerLabel newLabel = new ContainerLabel(textFields, false);
+				log.debug(newLabel.toJSON());
+				newLabel.setNumberToPrint(utl.getNumberToPrint());
+				PreCaptureSingleton.getInstance().getCurrentLabelList().addLabelToList(newLabel);
+				utl.setPrinted(utl.getPrinted() + utl.getNumberToPrint());;
+				utl.setNumberToPrint(0);
+		        try {
+					uls.merge(utl);
+				} catch (SaveFailedException e) {
+					log.error(e.getMessage());
+				}
+			}
+		}
+		this.fireTableDataChanged();
+	}
 	
 }

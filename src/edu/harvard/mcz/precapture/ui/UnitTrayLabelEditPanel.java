@@ -23,7 +23,15 @@ import javax.swing.JPanel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.harvard.mcz.precapture.PreCaptureProperties;
+import edu.harvard.mcz.precapture.PreCaptureSingleton;
+
 import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
@@ -60,17 +68,43 @@ public class UnitTrayLabelEditPanel extends JPanel {
 		
 		JPanel panel = new JPanel();
 		add(panel, BorderLayout.SOUTH);
-		
-		JButton btnAddRow = new JButton("Add Row");
-		btnAddRow.setHorizontalAlignment(SwingConstants.RIGHT);
-		panel.add(btnAddRow);
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		add(scrollPane, BorderLayout.CENTER);
 		
 		table = new JTable();
 		table.setModel(new UnitTrayLabelTableModel());
-		scrollPane.setViewportView(table);
+		table.setAutoCreateRowSorter(true);
+		scrollPane.setViewportView(table);		
+		
+		if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_EDITABLE_AUTHORITY_FILE).equals("true")) { 
+			JButton btnAddRow = new JButton("Add Row");
+			btnAddRow.setHorizontalAlignment(SwingConstants.RIGHT);
+			btnAddRow.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					((UnitTrayLabelTableModel)table.getModel()).addRow();;
+				}
+			});
+			panel.add(btnAddRow);
+
+			JButton btnZeroPrint = new JButton("To Print to Zero");
+			btnZeroPrint.setHorizontalAlignment(SwingConstants.RIGHT);
+			btnZeroPrint.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					((UnitTrayLabelTableModel)table.getModel()).setAllPrintFlagsTo(0);
+				}
+			});
+			panel.add(btnZeroPrint);
+
+			JButton btnAddPrint = new JButton("Add to Print List");
+			btnAddPrint.setHorizontalAlignment(SwingConstants.RIGHT);
+			btnAddPrint.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					((UnitTrayLabelTableModel)table.getModel()).addPrintFlaggedToContainerList();
+				}
+			});
+			panel.add(btnAddPrint);		
+		}		
 
 	}
 

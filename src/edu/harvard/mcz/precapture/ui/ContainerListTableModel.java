@@ -183,12 +183,11 @@ public class ContainerListTableModel extends AbstractTableModel {
 	public void cloneRow(int clickedOnRow) {
 		ContainerLabel container =  labels.get(clickedOnRow);
 		ContainerLabel newContainerRecord = new ContainerLabel();
-		// TODO: iterate through fields to clone.
 		newContainerRecord.setNumberToPrint(container.getNumberToPrint());
 		Iterator<FieldPlusText> i = container.getFields().iterator();
 		while(i.hasNext()) {
 			FieldPlusText f = i.next();
-			newContainerRecord.getFields().add(f);
+			newContainerRecord.getFields().add(f.clone());
 		} 
 		labels.add(newContainerRecord);
 		fireTableDataChanged();

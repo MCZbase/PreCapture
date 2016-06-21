@@ -69,7 +69,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	
 	public UnitTrayLabel() {
 		this.printed = 0;
-		this.numberToPrint = 1;
+		this.numberToPrint = 0;
 		this.drawerNumber = "";
 		this.family = "";
 		this.subfamily = "";

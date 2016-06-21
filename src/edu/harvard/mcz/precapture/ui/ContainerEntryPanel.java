@@ -395,4 +395,107 @@ public class ContainerEntryPanel extends JPanel {
 			}
 		}
 	}
+	
+	/**
+	 * Given a UnitTrayLabel, populate a list of FieldPlusText with the data mapped over by vocabulary term.
+	 * 
+	 * @param utl UnitTrayLabel to obtain data from
+	 * @return an ArrayList of FieldPlusText containing data matched in UnitTrayLabel by vocabulary term.
+	 */
+	public static ArrayList<FieldPlusText> extractDataToList(UnitTrayLabel utl) {
+		ArrayList<FieldPlusText> textFieldsOut = new ArrayList<FieldPlusText>();
+		int fieldCount = PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size();
+		for (int j=0; j<fieldCount; j++) {
+			FieldPlusText f = new FieldPlusText(PreCaptureSingleton.getInstance().getMappingList().getFieldInList().get(j), new JTextField());
+			textFieldsOut.add(f);
+		}
+		boolean useQuadranomials = false;
+		if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_USEQUADRANOMIALS).equals("true")) { 
+			useQuadranomials = true;
+		}
+		if (utl!=null) { 
+			Iterator<FieldPlusText> i = textFieldsOut.iterator();
+			while (i.hasNext()) { 
+				FieldPlusText field = i.next();
+				log.debug(field.getField().getVocabularyTerm());
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:family")) { 
+					field.getTextField().setText(utl.getFamily());
+					log.debug(field.getField().getVocabularyTerm());
+					log.debug(utl.getFamily());
+				}
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("hTaxon:subfamily")) { 
+					field.getTextField().setText(utl.getSubfamily());
+				}
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("hTaxon:tribe")) { 
+					field.getTextField().setText(utl.getTribe());
+				}
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("abcd:PreviousUnit/Owner")) { 
+					field.getTextField().setText(utl.getCollection());
+				}
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("obo:OBI_0000967")) { 
+					field.getTextField().setText(utl.getDrawerNumber());
+				}				
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:genus")) { 
+					field.getTextField().setText(utl.getGenus());
+				}
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:specificEpithet")) { 
+					field.getTextField().setText(utl.getSpecificEpithet());
+				}
+				if (useQuadranomials) { 
+					// put subspecies into subspecies concept, put infraspecific name and rank into infra fields.
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("abcd:SubspeciesEpithet")) { 
+						field.getTextField().setText(utl.getSubspecificEpithet());
+					}
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
+						field.getTextField().setText(utl.getInfraspecificRank());
+					}
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
+						field.getTextField().setText(utl.getInfraspecificEpithet());
+					}
+				} else { 
+					// Assemble a trinomial.
+					// if there is an infraspecific name, don't include the subspecies.
+					// if there isnt't an infraspecific name, put subspecies into the infra fields.
+					String rank = utl.getInfraspecificRank();
+					String epithet = utl.getInfraspecificEpithet();
+					if (utl.getSubspecificEpithet()!=null && utl.getSubspecificEpithet().length()>0 && (utl.getInfraspecificEpithet()==null || utl.getInfraspecificEpithet().length()==0)) { 
+						rank = "subspecies";
+						epithet = utl.getSubspecificEpithet();
+					}
+					if (rank==null) { rank = ""; } 
+					if (epithet==null) { epithet = ""; }
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("hispid:isprk")) { 
+						field.getTextField().setText(rank);
+					}
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificEpithet")) { 
+						field.getTextField().setText(epithet);
+					}
+					if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:infraspecificRank")) { 
+						field.getTextField().setText(rank);
+					}
+				}
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:scientificNameAuthorship")) { 
+					field.getTextField().setText(utl.getAuthorship());
+				}
+				
+				if (field.getField().getVocabularyTerm().equalsIgnoreCase("dwc:scientificName")) {
+					// Support for assembly of full name into dwc:scientificName, if used.
+					StringBuffer assembledName = new StringBuffer();
+					assembledName.append(utl.getGenus()).append(" "); 
+					assembledName.append(utl.getSpecificEpithet()).append(" "); 
+				    if (utl.getInfraspecificEpithet().isEmpty() || PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_USEQUADRANOMIALS).equals("true")) { 
+					    assembledName.append(utl.getSubspecificEpithet()).append(" "); 
+				    }
+					assembledName.append(utl.getInfraspecificRank()).append(" "); 
+					assembledName.append(utl.getInfraspecificEpithet()).append(" "); 
+					String aName = assembledName.toString().trim();
+					// TODO: This regex isn't removing duplicated spaces.
+					aName = aName.replaceAll("/ +/", " ");
+					field.getTextField().setText(aName);
+				}
+			}
+		}
+		return textFieldsOut;
+	}
+	
 }
