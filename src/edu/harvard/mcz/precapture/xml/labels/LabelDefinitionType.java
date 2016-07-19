@@ -53,7 +53,9 @@ import javax.xml.bind.annotation.XmlType;
     "labelWidth",
     "labelHeight",
     "textOrentation",
-    "fontDelta"
+    "fontDelta",
+    "relWidthTextCell",
+    "relWidthBarcodeCell"
 })
 public class LabelDefinitionType {
 
@@ -77,7 +79,12 @@ public class LabelDefinitionType {
     protected TextOrentationType textOrentation;
     @XmlElement(name = "FontDelta")
     protected float fontDelta = 0f;
-
+    @XmlElement(name = "RelWidthTextCell")
+    protected float relWidthTextCell = 3f;
+    @XmlElement(name = "RelWidthBarcodeCell")
+    protected float relWidthBarcodeCell = 2f;
+    
+    
     /**
      * Gets the value of the title property.
      * 
@@ -258,6 +265,34 @@ public class LabelDefinitionType {
 	 */
 	public void setFontDelta(float fontDelta) {
 		this.fontDelta = fontDelta;
+	}
+
+	/**
+	 * @return the relWidthTextCell
+	 */
+	public float getRelWidthTextCell() {
+		return relWidthTextCell;
+	}
+
+	/**
+	 * @param relWidthTextCell the relWidthTextCell to set
+	 */
+	public void setRelWidthTextCell(float relWidthTextCell) {
+		this.relWidthTextCell = relWidthTextCell;
+	}
+
+	/**
+	 * @return the relWidthBarcodeCell
+	 */
+	public float getRelWidthBarcodeCell() {
+		return relWidthBarcodeCell;
+	}
+
+	/**
+	 * @param relWidthBarcodeCell the relWidthBarcodeCell to set
+	 */
+	public void setRelWidthBarcodeCell(float relWidthBarcodeCell) {
+		this.relWidthBarcodeCell = relWidthBarcodeCell;
 	}
 
 }

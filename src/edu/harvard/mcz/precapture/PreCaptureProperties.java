@@ -72,7 +72,10 @@ public class PreCaptureProperties extends AbstractTableModel {
 	public static final String KEY_USEQUADRANOMIALS = "config.usequadranomials";
 	/** Key for properties file for extra human readable text to put on all slips/labels by default */
 	public static final String KEY_EXTRAHUMANTEXT = "config.extrahumantext";
-	
+	/** Key for properties file for file to print labels out to. */
+	public static final String KEY_LABELPRINTFILE = "print.outputfile";
+	/** Key for properties file for turning on debugging of label layout by adding colors */
+	public static final String KEY_DEBUGLABEL = "debug.labellayout";
 	
 
 	private Properties properties = null;
@@ -231,6 +234,14 @@ public class PreCaptureProperties extends AbstractTableModel {
 			// by default print "don't remove slip" in human readable form
 			properties.setProperty(KEY_EXTRAHUMANTEXT, "Do not remove this slip from this folder.");
 		}		
+		if (!properties.containsKey(KEY_LABELPRINTFILE)) {
+			// by default print to labels.pdf in the current directory.
+			properties.setProperty(KEY_LABELPRINTFILE, "labels.pdf");
+		}		
+		if (!properties.containsKey(KEY_DEBUGLABEL)) {
+			// by default print to labels.pdf in the current directory.
+			properties.setProperty(KEY_DEBUGLABEL, "false");
+		}			
 	}
 
 	/**

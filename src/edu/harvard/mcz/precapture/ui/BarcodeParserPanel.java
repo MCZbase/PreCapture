@@ -153,7 +153,7 @@ public class BarcodeParserPanel extends JPanel {
 					// TODO: Refactor units code, simply copying and pasting here, generalize a method inside LabelEncoder
 					
 					try {
-						PdfWriter.getInstance(document, new FileOutputStream(LabelEncoder.getPrintFile()));
+						PdfWriter.getInstance(document, new FileOutputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE)));
 					} catch (FileNotFoundException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -207,7 +207,7 @@ public class BarcodeParserPanel extends JPanel {
 						
 						// TODO: May not work as expected yet, as only one cell is added, not the barcode cell as well...
 				
-						PdfPTable table = LabelEncoder.setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, 1, 1);
+						PdfPTable table = LabelEncoder.setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, 1, 1, 3f,2f);
 				        table.addCell(parsedBarcodeDataForLabel.toPDFCell(printDefinition));
 				        document.add(table);
 				        

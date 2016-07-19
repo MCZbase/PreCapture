@@ -12,6 +12,8 @@
     <tns:LabelWidth>7.5</tns:LabelWidth>
     <tns:LabelHeight>10</tns:LabelHeight>
     <tns:TextOrentation>Horizontal</tns:TextOrentation>
+    <tns:RelWidthTextCell>2.95</tns:RelWidthTextCell>
+    <tns:RelWidthBarcodeCell>2</tns:RelWidthBarcodeCell>    
   </tns:LabelDefinition>
   <tns:LabelDefinition>
     <tns:Title>Two Half Sheets on 8.5x11</tns:Title>
@@ -58,7 +60,23 @@
     <tns:LabelHeight>1.5</tns:LabelHeight>
     <tns:TextOrentation>Horizontal</tns:TextOrentation>
     <tns:FontDelta>-4</tns:FontDelta>
+    <tns:RelWidthTextCell>2.8</tns:RelWidthTextCell>
+    <tns:RelWidthBarcodeCell>2</tns:RelWidthBarcodeCell>    
   </tns:LabelDefinition>  
+  <tns:LabelDefinition>
+    <tns:Title>Multiple 1.5x3 slips on 8.5x11 Larger</tns:Title>
+    <tns:Units>Inches</tns:Units>
+    <tns:PaperHeight>11</tns:PaperHeight>
+    <tns:PaperWidth>8.5</tns:PaperWidth>
+    <tns:Margins>.62</tns:Margins>
+    <tns:Columns>2</tns:Columns>
+    <tns:LabelWidth>3</tns:LabelWidth>
+    <tns:LabelHeight>1.5</tns:LabelHeight>
+    <tns:TextOrentation>Horizontal</tns:TextOrentation>
+    <tns:FontDelta>-1</tns:FontDelta>
+    <tns:RelWidthTextCell>2.96</tns:RelWidthTextCell>
+    <tns:RelWidthBarcodeCell>2</tns:RelWidthBarcodeCell>
+  </tns:LabelDefinition>
   <tns:LabelDefinition>
     <tns:Title>2.3x4" Dymo LabelWriter</tns:Title>
     <tns:Units>Inches</tns:Units>

@@ -240,7 +240,7 @@ public class BarcodeTestingFrame extends JFrame {
 		    labelWidthPoints = (int)Math.floor(printDefinition.getLabelWidth()*1f);
 		    labelHeightPoints = (int)Math.floor(printDefinition.getLabelHeight()*1f);
 		}		
-		float ratio = ((float)LabelEncoder.REL_WIDTH_BARCODE_CELL)/(((float)LabelEncoder.REL_WIDTH_BARCODE_CELL)+((float)LabelEncoder.REL_WIDTH_TEXT_CELL));
+		float ratio = (2f)/((2f)+(3f));
         float barcodeCellWidthPoints = (float) Math.floor(labelWidthPoints * ratio);
         log.debug("Width of label in points: " + labelWidthPoints);
         log.debug("Width of barcode cell in points: " + barcodeCellWidthPoints);

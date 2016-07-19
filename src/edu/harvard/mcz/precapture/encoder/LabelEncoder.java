@@ -76,13 +76,6 @@ public class LabelEncoder {
 
 	private ContainerLabel label;
 
-	// TODO: Move to a property.
-	private static final String PRINTFILE = "labels.pdf";
-	
-	public static String getPrintFile() {
-		return PRINTFILE;
-	}
-
 	public LabelEncoder (ContainerLabel containerLabel)  {
 		label = containerLabel;
 	}
@@ -204,7 +197,7 @@ public class LabelEncoder {
 				try {
 					Image image = encoder.getImage();
 					Document document = new Document();
-					PdfWriter.getInstance(document, new FileOutputStream(LabelEncoder.getPrintFile()));
+					PdfWriter.getInstance(document, new FileOutputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE)));
 					// Convert units in print definition to points (72 points/inch, 28.346456 points/cm)
 
 					int paperWidthPoints = 612;  // 8.5"
@@ -215,6 +208,10 @@ public class LabelEncoder {
 					int numColumns = 1;   // goes with above
 
 					numColumns = printDefinition.getColumns();
+					float relWidthTextCell = printDefinition.getRelWidthTextCell();
+					float relWidthBarcodeCell = printDefinition.getRelWidthBarcodeCell();
+				    log.debug("relWidthTextCell = " + relWidthTextCell);
+				    log.debug("relWidthBarcodeCell = " + relWidthBarcodeCell);
 
 					if (printDefinition.getUnits().toString().toLowerCase().equals("inches")) { 
 						paperWidthPoints = (int)Math.floor(printDefinition.getPaperWidth()*72f);
@@ -273,9 +270,9 @@ public class LabelEncoder {
 					int subCellColumnCount = columns * 2;
 
 					// set the table, with an absolute width and relative widths of the cells in the table;
-					PdfPTable table = setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, columns, subCellColumnCount);
+					PdfPTable table = setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, columns, subCellColumnCount, relWidthTextCell, relWidthBarcodeCell);
 					// figure out the width of the cells containing the barcodes.
-					float ratio = ((float)REL_WIDTH_BARCODE_CELL)/(((float)REL_WIDTH_BARCODE_CELL)+((float)REL_WIDTH_TEXT_CELL));
+					float ratio = ((float)relWidthBarcodeCell)/(((float)relWidthBarcodeCell)+((float)relWidthTextCell));
 					float barcodeCellWidthPoints = (float) Math.floor(labelWidthPoints * ratio);
 					log.debug("Width of barcode cell in points: " + barcodeCellWidthPoints);
 
@@ -309,7 +306,9 @@ public class LabelEncoder {
 							PdfPCell cell = label.toPDFCell(printDefinition);
 							cell.setFixedHeight(labelHeightPoints);
 							// Colors to illustrate where the cells are on the layout
-							// cell.setBackgroundColor(new BaseColor(255,255,30));
+							if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_DEBUGLABEL).equals("true")) { 
+							    cell.setBackgroundColor(new BaseColor(255,255,30));
+							}
 
 							PdfPCell cell_barcode = new PdfPCell();
 							cell_barcode.setBorderColor(BaseColor.LIGHT_GRAY);
@@ -317,7 +316,9 @@ public class LabelEncoder {
 							cell_barcode.setVerticalAlignment(PdfPCell.ALIGN_TOP);
 							cell_barcode.setHorizontalAlignment(Element.ALIGN_RIGHT);
 							cell_barcode.setFixedHeight(labelHeightPoints);
-							// cell_barcode.setBackgroundColor(new BaseColor(255,30,255));
+							if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_DEBUGLABEL).equals("true")) { 
+							   cell_barcode.setBackgroundColor(new BaseColor(255,30,255));
+							}
 
 							encoder = new LabelEncoder(label);
 							image = encoder.getImage();
@@ -344,7 +345,7 @@ public class LabelEncoder {
 								document.add(table);
 								log.debug("Adding new page");
 								document.newPage();
-								table = setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, columns, subCellColumnCount);
+								table = setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, columns, subCellColumnCount, relWidthTextCell, relWidthBarcodeCell);
 								log.debug("Setup new table");
 							}
 						} // end loop through toPrint (for a taxon/precapture label data row)
@@ -398,10 +399,13 @@ public class LabelEncoder {
 	}
 
 	// TODO: Move to print definition configuration;
-	public static final int REL_WIDTH_TEXT_CELL = 2;
-	public static final int REL_WIDTH_BARCODE_CELL = 3;
+//	public static final int REL_WIDTH_TEXT_CELL = 2;
+//	public static final int REL_WIDTH_BARCODE_CELL = 3;
 
-	public static PdfPTable setupTable(int paperWidthPoints, int marginsPoints, int labelWidthPoints, int columns, int subCellColumnCount) throws DocumentException { 
+	public static PdfPTable setupTable(int paperWidthPoints, int marginsPoints, 
+			int labelWidthPoints, int columns, int subCellColumnCount,
+			float relWidthTextCell, float relWidthBarcodeCell
+			) throws DocumentException { 
 		PdfPTable table = new PdfPTable(subCellColumnCount);
 		table.setLockedWidth(true);   // force use of totalWidth in points, rather than percentWidth.
 		float percentWidth = ((((float)paperWidthPoints)-(2f*((float)marginsPoints)))/((float)paperWidthPoints))*100f;
@@ -411,10 +415,10 @@ public class LabelEncoder {
 		float[] cellWidthsRatio = new float[subCellColumnCount];
 		int cellNumber = 0;
 		for (int c=0;c<columns;c++) { 
-			cellWidthsRatio[cellNumber] = REL_WIDTH_TEXT_CELL; // width of text cell
+			cellWidthsRatio[cellNumber] = relWidthTextCell; // width of text cell
 			cellNumber++;
-			if (columns>1) { 
-			   cellWidthsRatio[cellNumber] = REL_WIDTH_BARCODE_CELL; // width of barcode cell
+			if (subCellColumnCount>1) { 
+			   cellWidthsRatio[cellNumber] = relWidthBarcodeCell; // width of barcode cell
 			   cellNumber++;
 			}
 		}

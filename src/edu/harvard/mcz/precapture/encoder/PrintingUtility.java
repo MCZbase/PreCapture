@@ -43,6 +43,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+import edu.harvard.mcz.precapture.PreCaptureProperties;
+import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.exceptions.PrintFailedException;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 
@@ -73,7 +75,7 @@ public class PrintingUtility {
 			
 		    // send generated PDF to printer.
 			
-			FileInputStream pdfInputStream = new FileInputStream(LabelEncoder.getPrintFile());
+			FileInputStream pdfInputStream = new FileInputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE));
 
 			DocFlavor psInFormat = DocFlavor.INPUT_STREAM.PDF;
 			
@@ -124,7 +126,7 @@ public class PrintingUtility {
 				try { 
 					pdfInputStream.close();
 					
-					pdfInputStream = new FileInputStream(LabelEncoder.getPrintFile());
+					pdfInputStream = new FileInputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE));
 					
 					// trying pdfbox instead of pdf-renderer
 					PDDocument pdfDocument = PDDocument.load(pdfInputStream);
@@ -158,7 +160,7 @@ public class PrintingUtility {
 							try { 
 								pdfInputStream.close();
 								
-								pdfInputStream = new FileInputStream(LabelEncoder.getPrintFile());
+								pdfInputStream = new FileInputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE));
 								
 								// Send PDF to printer using PDFBox PDF printing support.
 								PDDocument pdfDocument = PDDocument.load(pdfInputStream);
@@ -177,7 +179,7 @@ public class PrintingUtility {
 			} 
 			if (!printed) { 
 				log.error("No available printing services");
-				throw new PrintFailedException("Unable to locate or use a printer, print the file '" + LabelEncoder.getPrintFile() +"'");
+				throw new PrintFailedException("Unable to locate or use a printer, print the file '" + PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE) +"'");
 			}
 		} catch (FileNotFoundException e) {
 			log.error(e.getMessage());
