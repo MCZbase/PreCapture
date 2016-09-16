@@ -76,6 +76,8 @@ public class PreCaptureProperties extends AbstractTableModel {
 	public static final String KEY_LABELPRINTFILE = "print.outputfile";
 	/** Key for properties file for turning on debugging of label layout by adding colors */
 	public static final String KEY_DEBUGLABEL = "debug.labellayout";
+	/** Key for properties file for rank of subspecies in trinomials, 'subspecies' by default.  */
+	public static final String KEY_TRINOMIAL_SUBSP_RANK = "config.trinomialsubsprank";
 	
 
 	private Properties properties = null;
@@ -241,7 +243,11 @@ public class PreCaptureProperties extends AbstractTableModel {
 		if (!properties.containsKey(KEY_DEBUGLABEL)) {
 			// by default print to labels.pdf in the current directory.
 			properties.setProperty(KEY_DEBUGLABEL, "false");
-		}			
+		}	
+		if (!properties.containsKey(KEY_TRINOMIAL_SUBSP_RANK)) {
+			// by default print to labels.pdf in the current directory.
+			properties.setProperty(KEY_TRINOMIAL_SUBSP_RANK, "subspecies");
+		}		
 	}
 
 	/**

@@ -96,7 +96,7 @@ public class MainFrame  implements WindowListener {
 		frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		
 		JPanel panel = new JPanel();
-		tabbedPane.addTab("Folder", null, panel, null);
+		tabbedPane.addTab("Container", null, panel, null);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_O);
 		panel.setLayout(new BorderLayout(0, 0));
 		

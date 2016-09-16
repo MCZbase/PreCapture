@@ -104,7 +104,7 @@ public class MainFrameAlternative implements WindowListener {
 		frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		
 		JPanel panel = new JPanel();
-		tabbedPane.addTab("Folders", null, panel, null);
+		tabbedPane.addTab("Print List", null, panel, null);
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_O);
 		panel.setLayout(new BorderLayout(0, 0));
 		

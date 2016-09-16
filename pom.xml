@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>MCZDataShot</groupId>
 	<artifactId>PreCaptureApp</artifactId>
-	<version>1.0.8</version>
+	<version>1.0.9</version>
 	<name>datashot</name>
 	<description>MCZ DataShot Collection Precapture Label Application</description>
 	<packaging>jar</packaging>

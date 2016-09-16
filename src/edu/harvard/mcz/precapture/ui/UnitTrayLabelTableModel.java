@@ -25,7 +25,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JTextField;
+import javax.swing.RowSorter;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -363,13 +365,31 @@ public class UnitTrayLabelTableModel extends AbstractTableModel {
 	 * Add all taxon authority table (unit tray label) records that have a print flag set to 
 	 * 1 or higher to the list of containers for printing.  This copies records from the taxon
 	 * authority table to the current print list.
+	 * 
+	 * @param rowSorter 
 	 */
-	public void addPrintFlaggedToContainerList() { 
+	public int addPrintFlaggedToContainerList(RowSorter<? extends TableModel> rowSorter) { 
+		int added = 0;
 		UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
 		Iterator<UnitTrayLabel> i = labelList.iterator();
+		if (rowSorter!=null) {
+			ArrayList<UnitTrayLabel> toAdd = new ArrayList<UnitTrayLabel>(rowSorter.getViewRowCount());
+			while (toAdd.size()<rowSorter.getViewRowCount()) { toAdd.add(null); }
+			int index = 0;  // row number in model
+			while (i.hasNext()) { 
+				if (rowSorter.convertRowIndexToView(index)>=0) { 
+				   toAdd.add(rowSorter.convertRowIndexToView(index),i.next());
+				}
+				index++;
+			}
+			for (int j=0; j< toAdd.size(); j++) { 
+				if (toAdd.get(j)==null) { toAdd.remove(j); }
+			}			
+			i = toAdd.iterator();
+		}
 		while (i.hasNext()) { 
 			UnitTrayLabel utl = i.next();
-			if (utl.getNumberToPrint()>0) { 
+			if (utl!=null && utl.getNumberToPrint()>0) { 
 				ArrayList<FieldPlusText> textFields = ContainerEntryPanel.extractDataToList(utl);
 				ContainerLabel newLabel = new ContainerLabel(textFields, false);
 				log.debug(newLabel.toJSON());
@@ -379,12 +399,14 @@ public class UnitTrayLabelTableModel extends AbstractTableModel {
 				utl.setNumberToPrint(0);
 		        try {
 					uls.merge(utl);
+					added++;
 				} catch (SaveFailedException e) {
 					log.error(e.getMessage());
 				}
 			}
 		}
 		this.fireTableDataChanged();
+		return added;
 	}
 	
 }

@@ -346,7 +346,8 @@ public class ContainerEntryPanel extends JPanel {
 					String rank = utl.getInfraspecificRank();
 					String epithet = utl.getInfraspecificEpithet();
 					if (utl.getSubspecificEpithet()!=null && utl.getSubspecificEpithet().length()>0 && (utl.getInfraspecificEpithet()==null || utl.getInfraspecificEpithet().length()==0)) { 
-						rank = "subspecies";
+						rank = PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_TRINOMIAL_SUBSP_RANK);
+						// rank = "subspecies";
 						epithet = utl.getSubspecificEpithet();
 					}
 					if (rank==null) { rank = ""; } 
@@ -459,7 +460,8 @@ public class ContainerEntryPanel extends JPanel {
 					String rank = utl.getInfraspecificRank();
 					String epithet = utl.getInfraspecificEpithet();
 					if (utl.getSubspecificEpithet()!=null && utl.getSubspecificEpithet().length()>0 && (utl.getInfraspecificEpithet()==null || utl.getInfraspecificEpithet().length()==0)) { 
-						rank = "subspecies";
+						rank = PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_TRINOMIAL_SUBSP_RANK);
+						//rank = "subspecies";
 						epithet = utl.getSubspecificEpithet();
 					}
 					if (rank==null) { rank = ""; } 

@@ -296,60 +296,63 @@ public class LabelEncoder {
 					while (iterLabels.hasNext()) {
 						// Loop through all of the container labels found to print 
 						label = iterLabels.next();
-						log.debug("Label: " + counter + " " + label.toString());
-						for (int toPrint=0; toPrint<label.getNumberToPrint(); toPrint++) {
-							// For each container label, loop through the number of requested copies 
-							// Generate a text and a barcode cell for each, and add to array for page
-							int toPrintPlus = toPrint + 1;  // for pretty counter in log.
-							log.debug("Copy " + toPrintPlus + " of " + label.getNumberToPrint());
+						if (label!=null) {
+							log.debug(label);
+							log.debug("Label: " + counter + " " + label.toString());
+							for (int toPrint=0; toPrint<label.getNumberToPrint(); toPrint++) {
+								// For each container label, loop through the number of requested copies 
+								// Generate a text and a barcode cell for each, and add to array for page
+								int toPrintPlus = toPrint + 1;  // for pretty counter in log.
+								log.debug("Copy " + toPrintPlus + " of " + label.getNumberToPrint());
 
-							PdfPCell cell = label.toPDFCell(printDefinition);
-							cell.setFixedHeight(labelHeightPoints);
-							// Colors to illustrate where the cells are on the layout
-							if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_DEBUGLABEL).equals("true")) { 
-							    cell.setBackgroundColor(new BaseColor(255,255,30));
-							}
+								PdfPCell cell = label.toPDFCell(printDefinition);
+								cell.setFixedHeight(labelHeightPoints);
+								// Colors to illustrate where the cells are on the layout
+								if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_DEBUGLABEL).equals("true")) { 
+									cell.setBackgroundColor(new BaseColor(255,255,30));
+								}
 
-							PdfPCell cell_barcode = new PdfPCell();
-							cell_barcode.setBorderColor(BaseColor.LIGHT_GRAY);
-							cell_barcode.disableBorderSide(PdfPCell.LEFT);
-							cell_barcode.setVerticalAlignment(PdfPCell.ALIGN_TOP);
-							cell_barcode.setHorizontalAlignment(Element.ALIGN_RIGHT);
-							cell_barcode.setFixedHeight(labelHeightPoints);
-							if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_DEBUGLABEL).equals("true")) { 
-							   cell_barcode.setBackgroundColor(new BaseColor(255,30,255));
-							}
+								PdfPCell cell_barcode = new PdfPCell();
+								cell_barcode.setBorderColor(BaseColor.LIGHT_GRAY);
+								cell_barcode.disableBorderSide(PdfPCell.LEFT);
+								cell_barcode.setVerticalAlignment(PdfPCell.ALIGN_TOP);
+								cell_barcode.setHorizontalAlignment(Element.ALIGN_RIGHT);
+								cell_barcode.setFixedHeight(labelHeightPoints);
+								if (PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_DEBUGLABEL).equals("true")) { 
+									cell_barcode.setBackgroundColor(new BaseColor(255,30,255));
+								}
 
-							encoder = new LabelEncoder(label);
-							image = encoder.getImage();
-							image.setAlignment(Image.ALIGN_TOP);
-							//image.setAlignment(Image.ALIGN_LEFT);
-							image.setAlignment(Image.ALIGN_RIGHT);
-							image.scaleToFit(barcodeCellWidthPoints, labelHeightPoints);
-							cell_barcode.addElement(image);
+								encoder = new LabelEncoder(label);
+								image = encoder.getImage();
+								image.setAlignment(Image.ALIGN_TOP);
+								//image.setAlignment(Image.ALIGN_LEFT);
+								image.setAlignment(Image.ALIGN_RIGHT);
+								image.scaleToFit(barcodeCellWidthPoints, labelHeightPoints);
+								cell_barcode.addElement(image);
 
-							table.addCell(cell);
-							table.addCell(cell_barcode);
+								table.addCell(cell);
+								table.addCell(cell_barcode);
 
-							cellCounter = cellCounter + 2;  // we've added two cells to the page (two cells per label).
-							log.debug("Cells " + cellCounter + " of " + cellsPerPage + " cells per page.");
+								cellCounter = cellCounter + 2;  // we've added two cells to the page (two cells per label).
+								log.debug("Cells " + cellCounter + " of " + cellsPerPage + " cells per page.");
 
-							// If we have hit a full set of labels for the page, add them to the document
-							// in each column, filling left to right
-							if (cellCounter>=cellsPerPage-1) {
-								log.debug("Page is full");
-								log.debug("Table has " + table.getNumberOfColumns() + " columns and " + table.getRows().size() + " rows ");
-								// Reset to begin next page
-								cellCounter = 0;
-								table.setLockedWidth(true);
-								document.add(table);
-								log.debug("Adding new page");
-								document.newPage();
-								table = setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, columns, subCellColumnCount, relWidthTextCell, relWidthBarcodeCell);
-								log.debug("Setup new table");
-							}
-						} // end loop through toPrint (for a taxon/precapture label data row)
-						counter ++;  // Increment number of pre capture label data rows.
+								// If we have hit a full set of labels for the page, add them to the document
+								// in each column, filling left to right
+								if (cellCounter>=cellsPerPage-1) {
+									log.debug("Page is full");
+									log.debug("Table has " + table.getNumberOfColumns() + " columns and " + table.getRows().size() + " rows ");
+									// Reset to begin next page
+									cellCounter = 0;
+									table.setLockedWidth(true);
+									document.add(table);
+									log.debug("Adding new page");
+									document.newPage();
+									table = setupTable(paperWidthPoints, marginsPoints, labelWidthPoints, columns, subCellColumnCount, relWidthTextCell, relWidthBarcodeCell);
+									log.debug("Setup new table");
+								}
+							} // end loop through toPrint (for a taxon/precapture label data row)
+							counter ++;  // Increment number of pre capture label data rows.
+						} // end if not null label
 					} // end while results has next (for all taxa requested)
 					// get any remaining cells in pairs
 					if (cellCounter>0) { 
@@ -366,7 +369,7 @@ public class LabelEncoder {
 						document.add(table);
 					}
 					document.close();
-					
+
 					// send to printer
 					PrintingUtility.sendPDFToPrinter(printDefinition, paperWidthPoints, paperHeightPoints);
 

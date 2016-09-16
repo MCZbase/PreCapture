@@ -144,6 +144,9 @@ public class MainMenu extends JMenuBar {
 			URL hsURL = ClassLoader.getSystemResource("helpset.hs");
 			//hsURL = new URL("jar:rsrc:jar:precaptureHelp.jar!/helpset.hs");
 			if (hsURL==null) { 
+				hsURL =  HelpLoaderClass.class.getClassLoader().getResource("edu/harvard/mcz/precapture/resources/help/helpset.hs");
+			}
+			if (hsURL==null) { 
 				hsURL =  JarRsrcLoader.class.getClassLoader().getResource("helpset.hs");
 			}
 			if (hsURL==null) { 

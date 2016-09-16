@@ -68,6 +68,7 @@ public class ContainerListPanel extends JPanel {
 		
 		tablePrintList = new JTable();
 		tablePrintList.setModel(PreCaptureSingleton.getInstance().getCurrentLabelList());
+		tablePrintList.setAutoCreateRowSorter(true);
 		tablePrintList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -97,7 +98,7 @@ public class ContainerListPanel extends JPanel {
 		btnPrint_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) { 
 				try {
-					LabelEncoder.printList(PreCaptureSingleton.getInstance().getCurrentLabelList().getLabels());
+					LabelEncoder.printList(PreCaptureSingleton.getInstance().getCurrentLabelList().getSortedLabels(tablePrintList.getRowSorter()));
 				} catch (PrintFailedException e1) {
 					log.error(e1.getMessage());
 					JOptionPane.showMessageDialog(parent, "Failed to print. " + e1.getMessage());

@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JTextField;
+import javax.swing.RowSorter;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
 import edu.harvard.mcz.precapture.data.Inventory;
 import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
+import edu.harvard.mcz.precapture.data.UnitTrayLabel;
 import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
 /**
@@ -77,6 +80,33 @@ public class ContainerListTableModel extends AbstractTableModel {
 	 */
 	public ArrayList<ContainerLabel> getLabels() {
 		return labels;
+	}
+	
+	/**
+	 * Return a copy of the labels in a sorted, filtered order.
+	 * 
+	 * @param rowSorter row sorter by which to sort and filter the labels
+	 * @return
+	 */
+	public ArrayList<ContainerLabel> getSortedLabels(RowSorter<? extends TableModel> rowSorter) {
+		if (rowSorter==null) {
+			return labels;
+		}
+		ArrayList<ContainerLabel> sortLabels = new ArrayList<ContainerLabel>(rowSorter.getViewRowCount());
+		while (sortLabels.size()<rowSorter.getViewRowCount()) { sortLabels.add(null); }
+		Iterator<ContainerLabel> i = labels.iterator();
+		int index = 0;
+		while (i.hasNext()) { 
+			ContainerLabel label = i.next();
+			if (rowSorter.convertRowIndexToView(index)>=0) { 
+			   sortLabels.add(rowSorter.convertRowIndexToView(index),label);
+			}
+			index++;
+		}
+		for (int j=0; j< sortLabels.size(); j++) { 
+			if (sortLabels.get(j)==null) { sortLabels.remove(j); }
+		}
+		return sortLabels;
 	}
 
 	

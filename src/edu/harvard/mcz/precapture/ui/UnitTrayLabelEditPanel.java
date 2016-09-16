@@ -31,9 +31,12 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.SwingConstants;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -43,8 +46,10 @@ import javax.swing.JTable;
  *
  */
 public class UnitTrayLabelEditPanel extends JPanel {
-	private static final Log log = LogFactory
-			.getLog(UnitTrayLabelEditPanel.class);
+	private static final long serialVersionUID = -5306720974718111113L;
+
+	private static final Log log = LogFactory.getLog(UnitTrayLabelEditPanel.class);
+	
 	private JTable table;
 
 	/** 
@@ -100,7 +105,13 @@ public class UnitTrayLabelEditPanel extends JPanel {
 			btnAddPrint.setHorizontalAlignment(SwingConstants.RIGHT);
 			btnAddPrint.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					((UnitTrayLabelTableModel)table.getModel()).addPrintFlaggedToContainerList();
+					Cursor currentCursor = table.getCursor();
+					table.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					int rowsAdded = ((UnitTrayLabelTableModel)table.getModel()).addPrintFlaggedToContainerList(table.getRowSorter());
+					table.setCursor(currentCursor);
+					if (rowsAdded==0) { 
+					    JOptionPane.showMessageDialog(table.getParent(), "No rows added, enter the number to add in the 'NumberToPrint' column to add rows to the print list.");
+					}
 				}
 			});
 			panel.add(btnAddPrint);		
