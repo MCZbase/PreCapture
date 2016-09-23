@@ -68,16 +68,20 @@ public class PreCaptureProperties extends AbstractTableModel {
 	/** Key for properties file for wheter or not the edit panel should be shown for 
 	 * unit tray label (authority file records).  */
 	public static final String KEY_EDITVIEWUTL = "config.ediableunittraylabeldb";
-	/** Key for property to handle infraspecific names. */
-	public static final String KEY_USEQUADRANOMIALS = "config.usequadranomials";
+
 	/** Key for properties file for extra human readable text to put on all slips/labels by default */
 	public static final String KEY_EXTRAHUMANTEXT = "config.extrahumantext";
 	/** Key for properties file for file to print labels out to. */
 	public static final String KEY_LABELPRINTFILE = "print.outputfile";
 	/** Key for properties file for turning on debugging of label layout by adding colors */
 	public static final String KEY_DEBUGLABEL = "debug.labellayout";
+	
+	/** Key for property to handle infraspecific names. */
+	public static final String KEY_USEQUADRANOMIALS = "config.usequadranomials";
 	/** Key for properties file for rank of subspecies in trinomials, 'subspecies' by default.  */
 	public static final String KEY_TRINOMIAL_SUBSP_RANK = "config.trinomialsubsprank";
+	/** When not using quadranomials, put subspecies and subspecies rank in infraspecific name and rank. */
+	public static final String KEY_PUT_SUBSPECIES_IN_INFRA = "config.putsubspeciesininfra";	
 	
 
 	private Properties properties = null;
@@ -248,6 +252,10 @@ public class PreCaptureProperties extends AbstractTableModel {
 			// by default print to labels.pdf in the current directory.
 			properties.setProperty(KEY_TRINOMIAL_SUBSP_RANK, "subspecies");
 		}		
+		if (!properties.containsKey(KEY_PUT_SUBSPECIES_IN_INFRA)) {
+			// by default print to labels.pdf in the current directory.
+			properties.setProperty(KEY_PUT_SUBSPECIES_IN_INFRA, "true");
+		}			
 	}
 
 	/**

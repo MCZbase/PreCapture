@@ -56,20 +56,41 @@ change the property config.mainuiframe from "MainFrame" to "MainFrameAlternative
 <li>config.filterlengththreshold The number of characters to type into the taxon picker box before it starts filtering.  3 is probably a good choice.</li>
 </ul>
 
+<h3>Properties related to the handling of below species rank names</h3>
+<p>These properties control how trinomials and quadrinomials are transfered from the taxon authority file onto the print list.  
+There are three options (1) allowquadrinomials=true, both subspecific epithet and infraspecific epithet are copied over if present.  
+(2) allowquadrinomials=false, putsubspeciesininfra=true always construct a trinomial with the trivial epithet being placed in the infraspecificEpithet field.  If a subspecies epithet is being placed in infraspecificName, place the value from config.trinomialsubsprank in infraspecificRank.   
+(3)  allowquadrinomials=false, putsubspeciesininfra=false if subspecific epithet is populated but infraspecific epithet is not, copy the subspecific epithet to subspecific epithet and leave infraspecific epithet blank, otherwise for a quadrinomial, leave subspecific epithet blank and put the trivial epithet into infraspecificepithet with a corresponding infraspecific rank.</p>
+<li>config.usequadranomials true to allow both the subspecificEpithet and the infraspecificEpithet to be populated when copying data from the taxon authority file to the print list, false leaves out the subspecific epithet for a quadrinomial converting it to a trinomial with the placement of the trivial epithet governed by config.putsubspeciesininfra.
+<li>config.putsubspeciesininfra (=true), if true, and usequadrinomials=false, then when copying names from the taxon authority file into the print list, places subspecies in infraspecificRank, with a rank of config.trinomialsubsprank.</li>
+<li>config.trinomialsubsprank (=subspecies) the value is used for infraspecific rank when a subspecies is placed in infraspecificEpithet, and used to identify an infraspecific name that is of rank subspecies.</li>
+
 <h3>All Available properties</h3>
 
 <ul>
-<li>print.papersize Not currently in use.</li>
-<li>config.fieldmap The location of the XML configuration file for fields to print on container labels.  A relative path is inside the jar, an absolute path on the local filesystem.</li>
+<li>print.outputfile (=labels.pdf) The pdf file to which labels are written to before being sent to the printer.</li>
+<li>config.fieldmap The location of the XML configuration file for fields to print on container labels.  
+A relative path is inside the jar, an absolute path on the local filesystem.  
+Configurations included in the jar are: <strong>resources/MCZ_Lepidoptera_PrecaptureFields.xml</strong> 
+and <strong>resources/NEVP_TCN_PrecaptureFields.xml</strong></li>
 <li>config.displayauthorityfile true to display the authority file in a separate tab.</li>
 <li>config.editableauthorityfile true to display the authority file in editable form in a separate tab, also may allow copying of fields from the authority file to the print list.</li>
+<li>config.extrahumantext Additional human readable text that is added to the label (e.g. "Do not remove from folder")</li>
 <li>config.showinventorytab true to include the Inventory tab in the application, false to hide it.</li>
 <li>config.printdefinitions The location of the XML configuration file for print format definitions.  A relative path is inside the jar, an absolute path on the local filesystem.</li>
 <li>config.selectedprintdefinition The print definition to use by default from the print format definition file.</li>
-<li>config.mainuiframe The variant of the user interface to use.  MainFrame is the default with folder details and the print list in separate tabs, MainFrameAlternative includes the folder details and print lists in a split pane within a single tab.</li>
+<li>config.mainuiframe The variant of the user interface to use.  <strong>MainFrame</strong> is the default with folder details
+ and the print list in separate tabs, <strong>MainFrameAlternative</strong> includes the folder details and 
+ print lists in a split pane within a single tab.</li>
 <li>config.mycollectioncode  The collection code/Herbarium Acronym for the collection. The default value to use for a field that is mapped to the concept dwc:collectionCode.</li>
-<li>config.filterlengththreshold The number of characters to type into the taxon picker box before it starts filtering.  3 is probably a good choice.</li>
-<li>config.qr_errorcorrection The QRCode redundancy level to use.  One of L, M, Q, H.  H is recommended.  L allows about a 7% loss, H about a 30% loss.  H makes for more reliable reading, but more bits in the barcode.</li>
+<li>config.filterlengththreshold (=4) The number of characters to type into the taxon picker box before it starts filtering.  3 is probably a good choice.</li>
+<li>config.qr_errorcorrection The QRCode redundancy level to use.  One of L, M, Q, H.  H is recommended. 
+ L allows about a 7% loss, H about a 30% loss.  H makes for more reliable reading, but more bits in the barcode.</li>
+<li>config.usequadranomials true to allow both the subspecificEpithet and the infraspecificEpithet to be populated when copying data from the taxon authority file to the print list, false leaves out the subspecific epithet for a quadrinomial converting it to a trinomial with the placement of the trivial epithet governed by config.putsubspeciesininfra.</li>
+<li>config.trinomialsubsprank=subspecies the value is used for infraspecific rank when a subspecies is placed in infraspecificEpithet.</li>
+<li>config.putsubspeciesininfra (=true), if true, and usequadrinomials=false, then when copying names from the taxon authority file into the print list, places subspecies in infraspecificRank, with a rank of config.trinomialsubsprank.</li>
+<li>debug.labellayout (=false), if true, prints labels with layout lines for debuging label layout designs</li>
+<li>print.papersize Not currently in use.</li>
 <li>config.ediableunittraylabeldb Not currently in use.</li>
 </ul>
 
