@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>MCZDataShot</groupId>
 	<artifactId>PreCaptureApp</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<name>datashot</name>
 	<description>MCZ DataShot Collection Precapture Label Application</description>
 	<packaging>jar</packaging>
@@ -140,7 +140,19 @@
        <include>**/*.xml</include>
        <include>**/*.properties</include>
      </includes>
+     <excludes>
+         <exclude>log4j.properties</exclude>
+     </excludes>
    </resource>
+   <resource>
+     <directory>${project.basedir}/supporting/</directory>
+     <targetPath>./</targetPath>
+     <includes>
+         <include>log4j.properties</include>
+     </includes>
+     <excludes>
+     </excludes>
+   </resource>   
 </resources> 
 		<plugins>
 		<plugin>

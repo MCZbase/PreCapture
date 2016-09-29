@@ -378,10 +378,13 @@ public class UnitTrayLabelTableModel extends AbstractTableModel {
 			int index = 0;  // row number in model
 			while (i.hasNext()) { 
 				if (rowSorter.convertRowIndexToView(index)>=0) { 
+				   toAdd.remove(rowSorter.convertRowIndexToView(index));
 				   toAdd.add(rowSorter.convertRowIndexToView(index),i.next());
+				   log.debug(toAdd.get(rowSorter.convertRowIndexToView(index)).getGenus());
 				}
 				index++;
 			}
+			i = null;
 			for (int j=0; j< toAdd.size(); j++) { 
 				if (toAdd.get(j)==null) { toAdd.remove(j); }
 			}			
