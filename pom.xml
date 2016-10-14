@@ -145,6 +145,14 @@
      </excludes>
    </resource>
    <resource>
+     <directory>${project.basedir}</directory>
+     <includes>
+       <include>pom.xml</include>
+       <include>README.txt</include>
+       <include>LICENCE.txt</include>
+     </includes>
+   </resource>   
+   <resource>
      <directory>${project.basedir}/supporting/</directory>
      <targetPath>./</targetPath>
      <includes>
@@ -163,25 +171,6 @@
 				<target>1.7</target>
 			</configuration>
 		</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<configuration>
-							<target>
-								<ant antfile="buildAppJar.xml" target="create_run_jar" />
-							</target>
-							<failonError>false</failonError>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -214,8 +203,13 @@
 						<id>attach-sources</id>
 						<phase>package</phase>
 						<goals>
-							<goal>jar</goal>
+							<goal>jar-no-fork</goal>
 						</goals>
+						<configuration>
+						    <include>**/pom.xml</include>
+						    <include>**/README.txt</include>
+						    <include>**/LICENCE.txt</include>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
