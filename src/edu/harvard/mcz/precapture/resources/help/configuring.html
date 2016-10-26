@@ -71,8 +71,14 @@ There are three options (1) allowquadrinomials=true, both subspecific epithet an
 <li>print.outputfile (=labels.pdf) The pdf file to which labels are written to before being sent to the printer.</li>
 <li>config.fieldmap The location of the XML configuration file for fields to print on container labels.  
 A relative path is inside the jar, an absolute path on the local filesystem.  
-Configurations included in the jar are: <strong>resources/MCZ_Lepidoptera_PrecaptureFields.xml</strong> 
-and <strong>resources/NEVP_TCN_PrecaptureFields.xml</strong></li>
+Configurations included in the jar are: </li>
+<li>
+<ul>
+<li>resources/MCZ_Lepidoptera_PrecaptureFields.xml (supported by DataShot)</li>
+<li>resources/ETHZ_PrecaptureFields.xml (Supported by DataShot > v1.1.0)</li>
+<li>resources/NEVP_TCN_PrecaptureFields.xml (Supported by the NEVP high throughput application)</li>
+</ul>
+</li>
 <li>config.displayauthorityfile true to display the authority file in a separate tab.</li>
 <li>config.editableauthorityfile true to display the authority file in editable form in a separate tab, also may allow copying of fields from the authority file to the print list.</li>
 <li>config.extrahumantext Additional human readable text that is added to the label (e.g. "Do not remove from folder")</li>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:FieldMapping xmlns:tns="http://mcz.harvard.edu/PreCaptureFieldSchema" 
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+     xsi:schemaLocation="http://mcz.harvard.edu/PreCaptureFieldSchema PreCaptureFieldSchema.xsd ">
+  <tns:SupportedProject>ETHZ Entomology</tns:SupportedProject>
+  <tns:Version>1.0</tns:Version>
+      <!--
+        specification from Althea Parker althea.parker @ id.ethz.ch
+        f Family
+        b Subfamily
+        t Tribe
+        g Genus
+        s Species (specific epithet)
+        u Subspecies (subspecific epithet)
+        r Infra Specific Rank (attention to order!)
+        i Infra Specific Epithet
+        a Authorship
+        c Collection
+        id identified by 
+       -->
+      <!-- 
+        edu.harvard.mcz.imagecapture.data.UnitTrayLabel.toJSONString() 
+		result.append("{");
+		result.append( " \"f\":\"").append(family).append("\"");
+		result.append(", \"b\":\"").append(subfamily).append("\"");
+		result.append(", \"t\":\"").append(tribe).append("\"");
+		result.append(", \"g\":\"").append(genus).append("\"");		
+		result.append(", \"s\":\"").append(specificEpithet).append("\"");
+		result.append(", \"u\":\"").append(subspecificEpithet).append("\"");
+		result.append(", \"i\":\"").append(infraspecificEpithet).append("\"");
+		result.append(", \"r\":\"").append(infraspecificRank).append("\"");
+		result.append(", \"a\":\"").append(authorship).append("\"");
+		result.append(", \"d\":\"").append(drawerNumber).append("\"");
+		if (collection != null) { 
+		if (!collection.isEmpty()) { 
+		    result.append(", \"c\":\"").append(collection).append("\"");
+		}
+		}
+        if (identifiedBy!=null && identifiedBy.trim().length()>0) { 
+            result.append(", \"id\":\"").append(identifiedBy).append("\"");
+        }
+       -->
+  <tns:FieldInList>      
+    <tns:Label>Family</tns:Label>
+    <tns:Code>f</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>dwc:family</tns:VocabularyTerm>
+    <tns:Optional>false</tns:Optional>
+    <tns:UseItalic>false</tns:UseItalic>
+    <tns:NewLine>false</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+    <tns:Suffix>:</tns:Suffix>
+  </tns:FieldInList>
+  <tns:FieldInList>      
+    <tns:Label>Subfamily</tns:Label>
+    <tns:Code>b</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>hTaxon:subfamily</tns:VocabularyTerm>
+    <tns:Optional>false</tns:Optional>
+    <tns:UseItalic>false</tns:UseItalic>
+    <tns:NewLine>false</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+    <tns:Suffix>:</tns:Suffix>
+  </tns:FieldInList>
+  <tns:FieldInList>      
+    <tns:Label>Tribe</tns:Label>
+    <tns:Code>t</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>hTaxon:tribe</tns:VocabularyTerm>
+    <tns:Optional>false</tns:Optional>
+    <tns:UseItalic>false</tns:UseItalic>
+    <tns:NewLine>false</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+  </tns:FieldInList>  
+  <tns:FieldInList>      
+    <tns:Label>Genus</tns:Label>
+    <tns:Code>g</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>dwc:genus</tns:VocabularyTerm>
+    <tns:Optional>false</tns:Optional>
+    <tns:UseItalic>true</tns:UseItalic>
+    <tns:NewLine>true</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+  </tns:FieldInList>
+  <tns:FieldInList>
+    <tns:Label>Specific Epithet</tns:Label>
+    <tns:Code>s</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>dwc:specificEpithet</tns:VocabularyTerm>
+    <tns:Optional>false</tns:Optional>
+    <tns:UseItalic>true</tns:UseItalic>
+    <tns:NewLine>false</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+  </tns:FieldInList>
+  <tns:FieldInList>
+    <tns:Label>Subspecific Epithet</tns:Label>
+    <tns:Code>u</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>abcd:SubspeciesEpithet</tns:VocabularyTerm>
+    <tns:Optional>false</tns:Optional>
+    <tns:UseItalic>true</tns:UseItalic>
+    <tns:NewLine>false</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+  </tns:FieldInList>   
+  <tns:FieldInList>
+    <tns:Label>Infraspecific Rank</tns:Label>
+    <tns:Code>r</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>hispid:isprk</tns:VocabularyTerm>
+    <tns:Optional>false</tns:Optional>
+    <tns:UseItalic>false</tns:UseItalic>
+    <tns:NewLine>false</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+  </tns:FieldInList>    
+  <tns:FieldInList>
+    <tns:Label>Infraspecific Epithet</tns:Label>
+    <tns:Code>i</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>dwc:infraspecificEpithet</tns:VocabularyTerm>
+    <tns:Optional>false</tns:Optional>
+    <tns:UseItalic>true</tns:UseItalic>
+    <tns:NewLine>false</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+  </tns:FieldInList>  
+  <tns:FieldInList>
+    <tns:Label>Authorship</tns:Label>
+    <tns:Code>a</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>dwc:scientificNameAuthorship</tns:VocabularyTerm>
+    <tns:Optional>false</tns:Optional>
+    <tns:UseItalic>false</tns:UseItalic>
+    <tns:NewLine>true</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+  </tns:FieldInList>  
+  <tns:FieldInList>
+    <tns:Label>Collection</tns:Label>
+    <tns:Code>c</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>abcd:PreviousUnit/Owner</tns:VocabularyTerm>
+    <tns:Optional>true</tns:Optional>
+    <tns:UseItalic>false</tns:UseItalic>
+    <tns:NewLine>true</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+  </tns:FieldInList>
+  <tns:FieldInList>
+    <tns:Label>Identified By</tns:Label>
+    <tns:Code>id</tns:Code>
+    <tns:Type>String</tns:Type>
+    <tns:VocabularyTerm>dwc:identifiedBy</tns:VocabularyTerm>
+    <tns:Optional>true</tns:Optional>
+    <tns:UseItalic>false</tns:UseItalic>
+    <tns:NewLine>true</tns:NewLine>
+    <tns:FontSize>12</tns:FontSize>
+    <tns:DefaultValue></tns:DefaultValue>
+  </tns:FieldInList>
+</tns:FieldMapping>

@@ -24,6 +24,8 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Date;
@@ -69,7 +71,7 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "1.1.1";
+	public static final String VERSION = "1.1.2";
 	public static final String SVN_ID = "$Id$";
 	public static final String AUTHORS = "Paul J. Morris";
 	public static final String COPYRIGHT = "Copyright © 2012 President and Fellows of Harvard College";
@@ -101,6 +103,14 @@ public class PreCaptureApp {
 			// Load field mappings from XML 
 			String resource = PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_FIELDMAPPING);
 			InputStream stream = PreCaptureApp.class.getResourceAsStream(resource);
+			if (stream==null) { 
+				// try to see if an absolute path to a file was provided
+				try {
+					stream = new FileInputStream(resource);
+				} catch (FileNotFoundException e) {
+					log.error(e.getMessage());
+				}
+			}
 			if (stream!=null) {
 				JAXBContext jc;
 				try {
@@ -133,12 +143,23 @@ public class PreCaptureApp {
 			} else { 
 				// getResourceAsStream returns null if loader has an IO exception.
 				log.error("Couldn't find resource file: " + resource);
+				String message = "Couldn't find resource file: " + resource;
+				log.error(message);
+				throw new StartupFailedException(message + "  \nEdit the value of config.fieldmap in the PreCapture.properties file to point to the correct resource.  \nconfig.fieldmap=resources/NEVP_TCN_PrecaptureFields.xml is the default.");
 			}	
 			PreCaptureSingleton.getInstance().getSplashScreen().setProgress(20);
 
 			// Load printing definitions from XML
 			String printresource = PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_PRINTDEFINITIONS);
 			InputStream printstream = PreCaptureApp.class.getResourceAsStream(printresource);
+			if (printstream==null) { 
+				// try to see if an absolute path to a file was provided
+				try {
+					printstream = new FileInputStream(printresource);
+				} catch (FileNotFoundException e) {
+					log.error(e.getMessage());
+				}
+			}
 			if (printstream!=null) {
 				JAXBContext jc;
 				try {
@@ -177,10 +198,13 @@ public class PreCaptureApp {
 				}
 			} else { 
 				// getResourceAsStream returns null if loader has an IO exception.
-				log.error("Couldn't find resource file: " + resource);
+				
+				String message = "Couldn't find resource file: " + resource;
+				log.error(message);
+				throw new StartupFailedException(message + "\nEdit the value of config.printdefinitions in the PreCapture.properties file to point to the correct resource.  \nconfig.printdefinitions=resources/LabelDefinitions.xml is the default.");
 			}		
 			PreCaptureSingleton.getInstance().getSplashScreen().setProgress(30);
-
+			
 			ContainerListTableModel labelList = new ContainerListTableModel();
 			PreCaptureSingleton.getInstance().setCurrentLabelList(labelList);
 
