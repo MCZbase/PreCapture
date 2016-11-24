@@ -1,0 +1,38 @@
+Libraries:
+
+Apache commons-collections
+Apache Software License, Version 2.0
+https://www.apache.org/licenses/LICENSE-2.0
+https://projects.apache.org/projects/commons_collections.html
+
+Hibernate
+LGPL v2.1
+https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+http://www.hibernate.org/license
+
+javassist
+MPL, the LGPL, and the Apache License
+
+zxing
+Apache License v2.0
+https://www.apache.org/licenses/LICENSE-2.0
+
+jgoodies
+BSD
+
+Apache derby
+Apache License v2.0
+https://www.apache.org/licenses/LICENSE-2.0
+
+itext
+GNU Affero General Public License
+
+javacsv
+LGPL
+
+json-lib
+Apache License v2.0
+https://www.apache.org/licenses/LICENSE-2.0
+
+pdf-renderer
+GPL v3, MIT

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://mcz.harvard.edu/PreCaptureFieldSchema" xmlns:tns="http://mcz.harvard.edu/PreCaptureFieldSchema" elementFormDefault="qualified">
+
+    <annotation>
+    	<documentation>Schema to support encoding of a list of fields in JSON (in a barcode) for the precapture of a digitization project.</documentation></annotation>
+    <complexType name="Field">
+    	<sequence>
+    		<element name="Label" type="string" maxOccurs="1"
+    			minOccurs="1">
+                <annotation>
+                	<documentation>The label to display to human users for this field.  Purpose: UI</documentation>
+                </annotation>
+    		</element>
+    		<element name="Code" type="string" maxOccurs="1"
+    			minOccurs="1">
+                <annotation>
+                	<documentation>The short (one or two letter) code to use for this field when encoding as JSON.  The code must not begin with the letter m followed by a number, as such codes are reserved for metadata derived from the instance document  Purpose: Semantic</documentation>
+                </annotation>
+    		</element>
+    		<element name="Type" type="string" maxOccurs="1"
+    			minOccurs="1">
+                <annotation>
+                	<documentation>Data type expected in this field.  Purpose: Semantic.</documentation>
+                </annotation>
+    		</element>
+    		<element name="VocabularyTerm" type="string" maxOccurs="1" minOccurs="1">
+    			<annotation>
+    				<documentation>Term in a vocabulary that this field maps onto.  Purpose: Semantic.</documentation>
+    			</annotation></element>
+    		<element name="Optional" type="boolean" maxOccurs="1"
+    			minOccurs="1">
+    			<annotation>
+    				<documentation>
+    					True if display of the field to users is optional.  Purpose: UI.  Not currently used.  
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="UseItalic" type="boolean" maxOccurs="1"
+    			minOccurs="1">
+    			<annotation>
+    				<documentation>
+    					True if the field should be italicized when printing.  Purpose: Print Format.
+    				</documentation>
+    			</annotation>
+    		</element>    		
+    		<element name="NewLine" type="boolean" maxOccurs="1"
+    			minOccurs="1">
+    			<annotation>
+    				<documentation>
+    					True if the field should begin a new line in printing.  Purpose: Print Format.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="FontSize" type="int" maxOccurs="1"
+    			minOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Print size of the text in this field in points.  Purpose: Print Format.
+    				</documentation>
+    			</annotation>
+    		</element>    		
+    		<element name="DefaultValue" type="string" maxOccurs="unbounded"
+    			minOccurs="1">
+                <annotation>
+                	<documentation>Default value to populate this field.  Empty for no default value.  Expectation is that a single default value will populate this field in the UI.  Expectation is that a list of default value elements (one default value in each element) will populate a pick list in the UI.  Purpose: UI.</documentation>
+                </annotation>
+    		</element>
+            <element name="Suffix" type="string" maxOccurs="1" 
+                minOccurs="0">
+                <annotation>
+                    <documentation>String to place after the field when printing (e.g. a separator).  Empty for no prefix.  This value is not included in the semantic encoding. Purpose: Print Format.</documentation>
+                </annotation>
+            </element>    		
+    	</sequence>
+    </complexType>
+
+    <element name="FieldMapping" type="tns:MappingList">
+    	<annotation>
+    		<documentation>List of Fields to include in precapture encoding for this project.</documentation>
+    	</annotation></element>
+    
+
+
+
+    <complexType name="MappingList">
+    	<sequence>
+    		<element name="FieldInList" type="tns:Field"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</element>
+    		<element name="SupportedProject" type="string" maxOccurs="unbounded" minOccurs="1">
+    			<annotation>
+    				<documentation>Project Supported by this list of mappings.  This corresponds to the code m1p in a JSON encoding.</documentation>
+    			</annotation></element>
+    		<element name="Version" type="string" maxOccurs="1" minOccurs="1">
+    			<annotation>
+    				<documentation>Version of this MappingList.  This corresponds to the code m2v in a JSON encoding.</documentation>
+    			</annotation></element>
+    	</sequence>
+    </complexType>
+</schema>
