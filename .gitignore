@@ -2,3 +2,7 @@ target/
 .classpath
 .project
 .settings/
+PRECAPTURE2.mv.db
+PRECAPTURE2.trace.db
+PreCapture.properties
+precapturedebug.log

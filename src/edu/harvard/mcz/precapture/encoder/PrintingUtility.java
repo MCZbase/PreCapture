@@ -126,19 +126,14 @@ public class PrintingUtility {
 				log.debug("No PDF printing services found.");
 				log.error("Failing over to print using awt PrintJob");
 
-				try { 
-					pdfInputStream.close();
-					
-					pdfInputStream = new FileInputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE));
-					
-					// trying pdfbox instead of pdf-renderer
-					PDDocument pdfDocument = PDDocument.load(pdfInputStream);
-					PrintingUtility.print(pdfDocument);
-					pdfDocument.close();
-					printed = true;
-				} catch (Exception e) { 
-			        log.error(e.getMessage(), e);
-				}
+				pdfInputStream.close();
+				pdfInputStream = new FileInputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE));
+
+				// trying pdfbox instead of pdf-renderer
+				PDDocument pdfDocument = PDDocument.load(pdfInputStream);
+				PrintingUtility.print(pdfDocument);
+				pdfDocument.close();
+				printed = true;
 			} else { 
 				log.debug("Available printing services " + services.length);
 				for (int i =0; i< services.length; i++) { 
@@ -160,21 +155,17 @@ public class PrintingUtility {
 
 							log.error("Failing over to print using awt PrintJob");
 
-							try { 
-								pdfInputStream.close();
-								
-								pdfInputStream = new FileInputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE));
-								
-								// Send PDF to printer using PDFBox PDF printing support.
-								PDDocument pdfDocument = PDDocument.load(pdfInputStream);
-								PrintingUtility.print(pdfDocument);
-								pdfDocument.close();
-								printed = true;
-								// Note, can't get pdf-renderer to print without re-scaling and shrinking the document.
-								
-							} catch (Exception e) { 
-			                    log.error(e.getMessage(), e);
-							}
+							pdfInputStream.close();
+
+							pdfInputStream = new FileInputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE));
+
+							// Send PDF to printer.
+							PDDocument pdfDocument = PDDocument.load(pdfInputStream);
+							PrintingUtility.print(pdfDocument);
+							pdfDocument.close();
+							printed = true;
+							// Note, can't get pdf-renderer to print without re-scaling and shrinking the document.
+							// may or may not still hold true with PDDocument.
 						} 
 					}
 				}
@@ -187,7 +178,10 @@ public class PrintingUtility {
 		} catch (FileNotFoundException e) {
 			log.error(e.getMessage());
 			throw new PrintFailedException("Unable to find PDF file to print " + e.getMessage());
-		} catch (Exception e) { 
+		} catch (PrinterException e) {
+			log.error(e.getMessage());
+			throw new PrintFailedException("Error printing PDF " + e.getMessage());			
+		} catch (Exception e) {
 			log.error(e.getMessage());
 			if (e!=null && e.getCause()!=null) { 
 			    log.error(e.getCause().getMessage());
