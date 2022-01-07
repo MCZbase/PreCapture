@@ -37,11 +37,14 @@ import javax.print.attribute.standard.MediaPrintableArea;
 import javax.print.attribute.standard.MediaSize;
 import javax.print.attribute.standard.MediaSizeName;
 import javax.print.attribute.standard.Sides;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import javax.swing.JOptionPane;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.printing.PDFPageable;
 
 import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
@@ -121,7 +124,7 @@ public class PrintingUtility {
 			boolean printed = false;
 			if (services.length ==0 ) {
 				log.debug("No PDF printing services found.");
-				log.error("Failing over to print using a pdf printing library");
+				log.error("Failing over to print using awt PrintJob");
 
 				try { 
 					pdfInputStream.close();
@@ -130,7 +133,7 @@ public class PrintingUtility {
 					
 					// trying pdfbox instead of pdf-renderer
 					PDDocument pdfDocument = PDDocument.load(pdfInputStream);
-					pdfDocument.print();
+					PrintingUtility.print(pdfDocument);
 					pdfDocument.close();
 					printed = true;
 				} catch (Exception e) { 
@@ -155,7 +158,7 @@ public class PrintingUtility {
 						log.error("Printing Error: " + pe.getMessage());
 						if (pe.getClass().getName().equals("sun.print.PrintJobFlavorException")) { 
 
-							log.error("Failing over to print using a pdf printing library");
+							log.error("Failing over to print using awt PrintJob");
 
 							try { 
 								pdfInputStream.close();
@@ -164,7 +167,7 @@ public class PrintingUtility {
 								
 								// Send PDF to printer using PDFBox PDF printing support.
 								PDDocument pdfDocument = PDDocument.load(pdfInputStream);
-								pdfDocument.print();
+								PrintingUtility.print(pdfDocument);
 								pdfDocument.close();
 								printed = true;
 								// Note, can't get pdf-renderer to print without re-scaling and shrinking the document.
@@ -193,7 +196,10 @@ public class PrintingUtility {
 		}
 	}
 	
-
-	
-	
+	private static void print(PDDocument document) throws PrinterException  {
+		PrinterJob job = PrinterJob.getPrinterJob();
+		job.setPageable(new PDFPageable(document));
+		job.print();
+	}
+		
 }
