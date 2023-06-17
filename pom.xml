@@ -106,7 +106,7 @@
             <artifactId>jarinjarloader</artifactId>
             <version>1</version>
             <scope>system</scope>
-            <systemPath>${basedir}/jar-in-jar-loader.zip</systemPath>
+            <systemPath>${project.basedir}/jar-in-jar-loader.zip</systemPath>
         </dependency>		
         <!-- allow build with java 10+ where java.xml.bind is not available in java-se -->
         <!-- Java 7 = JAXB version 2.2.3 -->
@@ -115,17 +115,17 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>2.2.8</version>
+            <version>2.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-core</artifactId>
-            <version>2.2.10</version>
+            <version>2.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>2.2.10</version>
+            <version>2.3.0</version>
         </dependency>
 		<dependency>
 			<groupId>javax.activation</groupId>
