@@ -1,7 +1,7 @@
 /**
  * PreCaptureApp.java
  * edu.harvard.mcz.precapture
- * Copyright © 2012 President and Fellows of Harvard College
+ * Copyright © 2012-2026 President and Fellows of Harvard College
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of Version 2 of the GNU General Public License
@@ -74,7 +74,7 @@ public class PreCaptureApp {
 	public static final String VERSION = loadVersion();
 	public static final String SVN_ID = "$Id$";
 	public static final String AUTHORS = "Paul J. Morris";
-	public static final String COPYRIGHT = "Copyright © 2012-2022 President and Fellows of Harvard College";
+	public static final String COPYRIGHT = "Copyright © 2012-2026 President and Fellows of Harvard College";
 	public static final String NARATIVE = "This code originates with the Museum of Compative Zoology's internally funded Lepidoptera project workflow and data capture application, DataShot.  It has been extended to this PreCapture application with support from the US National Science Foundation funded NE Vascular Plant TCN, NSF:DBI 1209149.";
 	public static final String LICENSE = "Version 2 of the GNU General Public License";
 	public static final String LIBRARIES = "Apache Commons CSV, Apache commons-logging, Apache log4j, Apache PDFBox, H2, Hibernate, iText, Jakarta XML Binding, javahelp, jgoodies, org.json, zxing";

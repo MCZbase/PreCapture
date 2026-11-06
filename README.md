@@ -7,7 +7,7 @@ This PreCapture barcode application refactored from the DataShot application cod
 
 Licensed under Version 2 of the GNU General Public License
 
-Copyright © 2012-2016 President and Fellows of Harvard College
+Copyright © 2012-2026 President and Fellows of Harvard College
 
 ## Sources
 
@@ -157,3 +157,19 @@ SupportedProject and Version unchanged, so that labels printed with either
 mapping can be read with the other.  Note that File, Make Annotation Labels, which 
 reads a label's barcode, displays the Scientific Name from the barcode, and 
 shows it blank for labels without one.
+
+## Use of generative AI
+
+On 2026-11-06 a generative AI coding assistant (Claude Opus 5.5, Anthropic, 
+used through Claude Code) contributed code, tests and documentation to this 
+project, working at the direction of the maintainer, who reviewed the changes.  
+Its contributions were: updating the libraries in pom.xml to current versions 
+(including iText, Hibernate 7, H2, PDFBox, zxing, Jakarta XML Binding and 
+log4j2) and adapting the code to their API changes; replacing unmaintained 
+libraries (Derby, javacsv, json-lib, pdf-renderer); moving to the standard 
+Maven directory layout; detecting and converting databases from older H2 
+versions at startup; a configurable database location; preventing data loss at 
+startup; csv import and export fixes; the barcode reading tests at multiple 
+resolutions and the barcode capacity section of this README; tests of the 
+persistence layer; and the GitHub Actions workflows for testing and releases.  
+Commits it contributed to are marked Co-Authored-By: Claude.
