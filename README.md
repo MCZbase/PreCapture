@@ -92,3 +92,46 @@ much as printing resolution.  Treat the table as indicative, with the 300 dpi
 column closest to a typical laser printer, and test real labels with the 
 scanner and software that will read them, particularly for payloads above about 
 300 bytes or for other print formats.
+
+### Example: a payload of about 300 bytes
+
+The payload is the label's fields as JSON, with short keys defined by the field 
+mapping (config.fieldmap).  This folder label for a variety, using the default 
+NEVP TCN mapping, is 304 bytes; in the table above it can be read at 150 and 300 
+dpi, but not at 72 dpi:
+
+```json
+{"m1p":"[NEVP TCN]","m2v":"1.1","g":"Symphyotrichum","s":"novi-belgii","ir":"var.","i":"villicaule","sn":"Symphyotrichum novi-belgii var. villicaule (A.G. Jones) Labrecque & Brouillet","a":"(A.G. Jones) Labrecque & Brouillet","st":"Massachusetts","ct":"Barnstable","sr":"GH Case 2041, Shelf 3","cc":"GH"}
+```
+
+| Key | Field | Value |
+|---|---|---|
+| m1p, m2v | Field mapping project and version | [NEVP TCN], 1.1 (fixed, 32 bytes with the braces) |
+| g, s | Genus, Specific Epithet | Symphyotrichum novi-belgii |
+| ir, i | Infraspecific Rank, Infraspecific Epithet | var. villicaule |
+| sn | Scientific Name | Symphyotrichum novi-belgii var. villicaule (A.G. Jones) Labrecque & Brouillet |
+| a | Authorship | (A.G. Jones) Labrecque & Brouillet |
+| st, ct | State, County | Massachusetts, Barnstable |
+| sr | Storage Location | GH Case 2041, Shelf 3 |
+| cc | Herbarium Acronym | GH |
+
+Fields that are left empty (here Identification Qualifier and Collector) are not 
+included.  Each field adds about 8 bytes for its key and quotation marks, and 
+characters outside ASCII take 2 or more bytes.  The Scientific Name repeats the 
+genus, epithets and authorship, about 80 bytes here.  For comparison, the same 
+label for a species with a short authorship, Acer rubrum L., is 165 bytes, well 
+within what can be read at 150 dpi.
+
+Scientific Name is not filled in when a taxon is picked from the taxon authority 
+file, it is only included if it is typed in, so leaving it blank keeps the 
+payload smaller; without it this label is 219 bytes.  To remove the field 
+altogether, copy NEVP_TCN_PrecaptureFields.xml (in 
+src/main/resources/edu/harvard/mcz/precapture/resources/), delete the 
+FieldInList element for Scientific Name (code sn), and set config.fieldmap in 
+PreCapture.properties to the path of the copy.  The field is then neither 
+entered, printed in the label text, nor encoded in the barcode; the genus, 
+epithets and authorship are still printed from their own fields.  Keep the 
+SupportedProject and Version unchanged, so that labels printed with either 
+mapping can be read with the other.  Note that File, Make Annotation Labels, which 
+reads a label's barcode, displays the Scientific Name from the barcode, and 
+shows it blank for labels without one.
