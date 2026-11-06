@@ -29,10 +29,7 @@ import java.util.Map;
 
 import javax.swing.JTextField;
 
-import net.sf.json.JSON;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
-import net.sf.json.util.JSONTokener;
+import org.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,11 +84,26 @@ public class LabelDecoder {
 		this.label = containerLabel;
 	}
 
+	/**
+	 * Obtain a value from a JSON object as a string.
+	 * 
+	 * @param json the JSON object
+	 * @param key the key for the value
+	 * @return the value as a string, or null if the key is absent or its value is JSON null.
+	 */
+	private static String getString(JSONObject json, String key) { 
+		Object value = json.opt(key);
+		if (value == null || JSONObject.NULL.equals(value)) { 
+			return null;
+		}
+		return value.toString();
+	}
+
 	public static Map<String,String> getVocabularyValueMap(String jsonString) {
 		HashMap<String,String> result = new HashMap<String,String>();
-	     JSONObject json = (JSONObject)JSONSerializer.toJSON(jsonString);
-	     String project = (String) json.get("m1p");
-	     String version = (String) json.get("m2v");
+	     JSONObject json = new JSONObject(jsonString);
+	     String project = getString(json, "m1p");
+	     String version = getString(json, "m2v");
 	     
 	     boolean foundMapping = false;
 	     // Check if current mapping list is the one used in this json
@@ -106,11 +118,11 @@ public class LabelDecoder {
 	     //TODO Find other mappings
 	     
 	     if (foundMapping) { 
-	    	 Iterator keys = json.keys();
+	    	 Iterator<String> keys = json.keys();
 	    	 while (keys.hasNext()) { 
-	    		 String key = (String)keys.next();
+	    		 String key = keys.next();
 	    		 String term = getTermForKey(mapping,key);
-	    		 String value = (String)json.get(key);
+	    		 String value = getString(json, key);
 	    		 log.debug(key + ":" + term + ":" + value );
 	    		 result.put(term, value);
 	    	 }
@@ -126,9 +138,9 @@ public class LabelDecoder {
 	 */
 	public static ContainerLabel createLabelFromJson(String jsonString) { 
 	     ContainerLabel result = null;
-	     JSONObject json = (JSONObject)JSONSerializer.toJSON(jsonString);
-	     String project = (String) json.get("m1p");
-	     String version = (String) json.get("m2v");
+	     JSONObject json = new JSONObject(jsonString);
+	     String project = getString(json, "m1p");
+	     String version = getString(json, "m2v");
 	     log.debug("Project: " + project);
 	     log.debug("Version: " + version);
 	     
@@ -155,11 +167,11 @@ public class LabelDecoder {
 		     	textFields.add(new FieldPlusText(PreCaptureSingleton.getInstance().getMappingList().getFieldInList().get(j), new JTextField()));
 		     } 	    	 
 	    	 result = new ContainerLabel(textFields);
-	    	 Iterator keys = json.keys();
+	    	 Iterator<String> keys = json.keys();
 	    	 while (keys.hasNext()) { 
-	    		 String key = (String)keys.next();
+	    		 String key = keys.next();
 	    		 String term = getTermForKey(mapping,key);
-	    		 String value = (String)json.get(key);
+	    		 String value = getString(json, key);
 
 	    		 ArrayList<FieldPlusText> fields = result.getFields();
 	    		 Iterator<FieldPlusText> f = fields.iterator();

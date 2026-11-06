@@ -38,7 +38,7 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
-import net.sf.json.JSONObject;
+import org.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -126,6 +126,37 @@ public class TestLabelEncoder {
 	}
 
 	/**
+	 * Test that a label survives a round trip through JSON, 
+	 * {@link edu.harvard.mcz.precapture.decoder.LabelDecoder#createLabelFromJson(String)}.
+	 */
+	@Test
+	public void testCreateLabelFromJson() {
+		ArrayList<FieldPlusText> textFields = new ArrayList<FieldPlusText>(); 
+		int fieldCount = PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size();
+		for (int i=0; i<fieldCount; i++) { 
+			textFields.add(new FieldPlusText(PreCaptureSingleton.getInstance().getMappingList().getFieldInList().get(i), new JTextField()));
+		} 
+		ContainerLabel containerLabel = new ContainerLabel(textFields);
+		String[] values = { "Üäè⾙", "with \"quotes\"", "[bracketed]", "{braced}", "123", "" };
+		for (int i=0; i<fieldCount; i++) { 
+			containerLabel.getFields().get(i).getTextField().setText(values[i % values.length]);
+		}
+		String json = containerLabel.toJSON();
+		ContainerLabel decoded = LabelDecoder.createLabelFromJson(json);
+		assertNotNull("No mapping found for " + json, decoded);
+		for (int i=0; i<fieldCount; i++) { 
+			assertEquals(values[i % values.length], decoded.getFields().get(i).getTextField().getText());
+		}
+		assertEquals(json, decoded.toJSON());
+
+		// toJSON() writes the text null as an unquoted JSON null, which decodes as an empty field.
+		containerLabel.getFields().get(0).getTextField().setText("null");
+		decoded = LabelDecoder.createLabelFromJson(containerLabel.toJSON());
+		assertNotNull(decoded);
+		assertEquals("", decoded.getFields().get(0).getTextField().getText());
+	}
+
+	/**
 	 * Test method for {@link edu.harvard.mcz.precapture.encoder.LabelEncoder#getBufferedImage()}.
 	 */
 	@Test
@@ -200,7 +231,7 @@ public class TestLabelEncoder {
 		try {
 			decodedJson = LabelDecoder.decodeImage(encoder.getBufferedImage());
 			log.debug(decodedJson);
-			JSONObject jsonObject = JSONObject.fromObject(decodedJson);
+			JSONObject jsonObject = new JSONObject(decodedJson);
 			String oneDataElement = jsonObject.get(firstKey).toString();
 			assertTrue(data.equals(oneDataElement));
 			log.debug(data + " = " + oneDataElement);

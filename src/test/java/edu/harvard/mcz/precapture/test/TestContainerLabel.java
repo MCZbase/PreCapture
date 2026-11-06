@@ -23,8 +23,8 @@ import static org.junit.Assert.*;
 
 import javax.swing.JTextField;
 
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,7 +73,7 @@ public class TestContainerLabel {
 		// the comma value separator, for space in QRcode probably better to leave them out.
 		assertTrue(testLabel.metadataToJSON().equals("\"m1p\":\"[]\",\"m2v\":null"));
 		try {
-		    JSONObject deserialized = JSONObject.fromObject(testLabel.metadataToJSON());
+		    JSONObject deserialized = new JSONObject(testLabel.metadataToJSON());
 			fail("Incorrectly parsed metadata testLabel.toJSON() as JSON");
 		} catch (JSONException e) {
 			// expected as this isn't valid JSON
@@ -90,7 +90,7 @@ public class TestContainerLabel {
 		log.debug(testLabel.toJSON());
 		assertTrue(testLabel.toJSON().equals("{\"m1p\":\"[]\",\"m2v\":null}"));
 		try {
-		    JSONObject deserialized = JSONObject.fromObject(testLabel.toJSON());
+		    JSONObject deserialized = new JSONObject(testLabel.toJSON());
 		} catch (JSONException e) {
 			fail("Unable to parse metadata testLabel.toJSON() as JSON");
 		}
@@ -112,10 +112,10 @@ public class TestContainerLabel {
 		assertTrue(testLabel.toJSON().equals("{\"m1p\":\"[]\",\"m2v\":null,\"a\":\"Test\\\"Quoted\\\"Bit\"}"));
 		
 		try { 
-		    JSONObject deserialized = JSONObject.fromObject(testLabel.toJSON());
+		    JSONObject deserialized = new JSONObject(testLabel.toJSON());
 		    log.debug(deserialized.toString());
-		    log.debug(deserialized.getString("m2v"));
-		    assertTrue(deserialized.getString("m2v").equals("null"));
+		    // m2v is written as an unquoted JSON null
+		    assertTrue(deserialized.isNull("m2v"));
 		    log.debug(deserialized.getString("a"));
 		    assertTrue(deserialized.getString("a").equals("Test\"Quoted\"Bit")); 
 		} catch (JSONException e) {
