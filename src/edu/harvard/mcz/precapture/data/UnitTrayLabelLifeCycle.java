@@ -32,14 +32,15 @@ import javax.swing.SwingUtilities;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
+
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.LockMode;
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.SessionException;
-import org.hibernate.classic.Session;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.Session;
 
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
@@ -204,7 +205,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 				session.persist(transientInstance);
 				session.getTransaction().commit();
 				log.debug("persist successful");
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 				throw new SaveFailedException("Save to UnitTrayLabel table failed. " + e.getMessage());
@@ -222,10 +223,15 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try  {
-				session.saveOrUpdate(instance);
+				if (instance.getId()==null) {
+					// new record, assigns an id to instance
+					session.persist(instance);
+				} else {
+					session.merge(instance);
+				}
 				session.getTransaction().commit();
 				log.debug("attach successful");
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 				throw new SaveFailedException("Save to UnitTrayLabel table failed. " + e.getMessage());
@@ -246,7 +252,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 				session.lock(instance, LockMode.NONE);
 				session.getTransaction().commit();
 				log.debug("attach successful");
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			}
@@ -263,10 +269,13 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				session.delete(persistentInstance);
+				UnitTrayLabel managed = session.find(UnitTrayLabel.class, persistentInstance.getId());
+				if (managed!=null) {
+					session.remove(managed);
+				}
 				session.getTransaction().commit();
 				log.debug("delete successful");
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 				throw new SaveFailedException("Delete from UnitTrayLabel table failed. " + e.getMessage());
@@ -285,10 +294,10 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				result = (UnitTrayLabel) session.merge(detachedInstance);
+				result = session.merge(detachedInstance);
 				session.getTransaction().commit();
 				log.debug("merge successful");
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 				throw new SaveFailedException("Save to UnitTrayLabel table failed. " + e.getMessage());
@@ -308,14 +317,14 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				instance = (UnitTrayLabel) session.get("edu.harvard.mcz.precapture.data.UnitTrayLabel", id);
+				instance = session.find(UnitTrayLabel.class, Long.valueOf(id));
 				session.getTransaction().commit();
 				if (instance == null) {
 					log.debug("get successful, no instance found");
 				} else {
 					log.debug("get successful, instance found");
 				}
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			}
@@ -335,18 +344,22 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				Criteria criteria = session.createCriteria("edu.harvard.mcz.precapture.data.UnitTrayLabel");
+				CriteriaBuilder builder = session.getCriteriaBuilder();
+				CriteriaQuery<UnitTrayLabel> query = builder.createQuery(UnitTrayLabel.class);
+				Root<UnitTrayLabel> root = query.from(UnitTrayLabel.class);
+				List<Predicate> predicates = new ArrayList<Predicate>();
 				if (instance.getFamily()!=null && instance.getFamily().length()>0) { 
-					criteria.add(Restrictions.eq("family", instance.getFamily()));
+					predicates.add(builder.equal(root.get("family"), instance.getFamily()));
 				}
 				if (instance.getGenus()!=null && instance.getGenus().length()>0) { 
-					criteria.add(Restrictions.eq("genus", instance.getGenus()));
+					predicates.add(builder.equal(root.get("genus"), instance.getGenus()));
 				}
-				results = (List<UnitTrayLabel>) criteria.list();
+				query.select(root).where(predicates.toArray(new Predicate[predicates.size()]));
+				results = session.createSelectionQuery(query).getResultList();
 				session.getTransaction().commit();
 				log.debug("find by example successful, result size: "
 						+ results.size());
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 
@@ -370,10 +383,10 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				results = (List<UnitTrayLabel>) session.createQuery("from UnitTrayLabel u order by u.genus, u.specificEpithet ").list();
+				results = session.createSelectionQuery("from UnitTrayLabel u order by u.genus, u.specificEpithet ", UnitTrayLabel.class).getResultList();
 				session.getTransaction().commit();
 				log.debug("find all successful, result size: " + results.size());
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			} finally { 
@@ -394,12 +407,11 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				Query delete = session.createQuery("delete from UnitTrayLabel u ");
-				int rowsAffected = delete.executeUpdate();
+				int rows = session.createMutationQuery("delete from UnitTrayLabel u ").executeUpdate();
 				session.getTransaction().commit();
-				log.debug("delete all successful.  Rows=" + rowsAffected);
+				log.debug("delete all successful.  Rows=" + rows);
 				result = true;
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			} finally { 
@@ -421,17 +433,14 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try {
-				SQLQuery query = session.createSQLQuery("select max(Ordinal) from UNIT_TRAY_LABEL");
-				List queryresult = query.list();
-				if (!queryresult.isEmpty()) { 
-					// MySQL returns an integer, Oracle returns a BigDecimal
-					// Need to cast from either in a system independent way.
-					// NOTE: This will fail if maximum value of ordinal exceeds the size of Integer.
-					String temp  = queryresult.get(0).toString();
-					result = Integer.valueOf(temp);
-					log.debug(result);
+				Integer max = session.createSelectionQuery("select max(u.ordinal) from UnitTrayLabel u", Integer.class).getSingleResult();
+				session.getTransaction().commit();
+				// max() is null when the table is empty, in which case return 0.
+				if (max!=null) { 
+					result = max;
 				}
-			} catch (HibernateException e) { 
+				log.debug(result);
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			} finally { 
@@ -459,10 +468,10 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				result = ((Long)session.createQuery("select count(*) from UnitTrayLabel ").iterate().next()).intValue();
+				result = session.createSelectionQuery("select count(*) from UnitTrayLabel ", Long.class).getSingleResult().intValue();
 				session.getTransaction().commit();
 				log.debug("find all successful, count= " + result);
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			} finally { 
@@ -488,10 +497,10 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				result = ((Long)session.createQuery("select count(*) from UnitTrayLabel ").iterate().next()).intValue();
+				result = session.createSelectionQuery("select count(*) from UnitTrayLabel ", Long.class).getSingleResult().intValue();
 				session.getTransaction().commit();
 				log.debug("find all successful, count= " + result);
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 				throw e;
@@ -520,10 +529,10 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				results.addAll((List<String>) session.createQuery("select distinct u.family from UnitTrayLabel u order by u.family ").list());
+				results.addAll(session.createSelectionQuery("select distinct u.family from UnitTrayLabel u order by u.family ", String.class).getResultList());
 				session.getTransaction().commit();
 				log.debug("find distinct families successful, result size: " + results.size());
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			} finally { 
@@ -550,10 +559,10 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				results.addAll((List<String>) session.createQuery("select distinct u.genus from UnitTrayLabel u order by u.genus ").list());
+				results.addAll(session.createSelectionQuery("select distinct u.genus from UnitTrayLabel u order by u.genus ", String.class).getResultList());
 				session.getTransaction().commit();
 				log.debug("find distinct families successful, result size: " + results.size());
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			} finally { 

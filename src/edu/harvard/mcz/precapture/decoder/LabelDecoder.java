@@ -219,8 +219,7 @@ public class LabelDecoder {
 		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 		Map<DecodeHintType,Boolean> hints = new HashMap<DecodeHintType,Boolean>();
 		hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
-		QRCodeReader reader = new QRCodeReader();
-		Result readValue = reader.decode(bitmap, hints);
+		Result readValue = decodeWithFallback(bitmap, hints);
 		result = readValue.getText();
 		byte[] dataBytes = result.getBytes("UTF-8");
 		result = new String(dataBytes,"UTF-8");
@@ -249,9 +248,29 @@ public class LabelDecoder {
 		Result result = null;
 		LuminanceSource source = new BufferedImageLuminanceSource(image);
 		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-		QRCodeReader reader = new QRCodeReader();
-		result = reader.decode(bitmap);
+		result = decodeWithFallback(bitmap, new HashMap<DecodeHintType,Boolean>());
 		return result;		
+	}
+	
+	/**
+	 * Decode a QR code, if the finder patterns can't be located, retry treating 
+	 * the image as a pure barcode (just the code and its quiet zone, as produced by 
+	 * LabelEncoder.getBufferedImage()).  The zxing 3.x detector can't locate finder 
+	 * patterns in such images when they are at 1 pixel per module.
+	 * 
+	 * @param bitmap the image to decode
+	 * @param hints decoding hints, not modified.
+	 * @return the decoded result
+	 */
+	private static Result decodeWithFallback(BinaryBitmap bitmap, Map<DecodeHintType,Boolean> hints) throws NotFoundException, ChecksumException, FormatException { 
+		QRCodeReader reader = new QRCodeReader();
+		try { 
+			return reader.decode(bitmap, hints);
+		} catch (NotFoundException e) { 
+			Map<DecodeHintType,Boolean> pureHints = new HashMap<DecodeHintType,Boolean>(hints);
+			pureHints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
+			return reader.decode(bitmap, pureHints);
+		}
 	}
 	
 	

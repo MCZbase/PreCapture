@@ -122,7 +122,12 @@ public class LabelEncoder {
 		// which forces every character to be a multi byte character, dramatically
 		// limiting the amount of information that can be encoded.
 		// hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
-		hints.put(EncodeHintType.CHARACTER_SET, "ISO-8859-1");
+		// The data string holds the UTF-8 bytes of the JSON, one byte per ISO-8859-1 
+		// character, ISO-8859-1 is the default QR code byte mode encoding.  
+		// Do not set hints.put(EncodeHintType.CHARACTER_SET, "ISO-8859-1"), with zxing 3.x 
+		// that adds an ECI segment declaring ISO-8859-1, which causes readers to decode the 
+		// UTF-8 bytes as ISO-8859-1, garbling non-ASCII characters.  Without that hint, 
+		// zxing 3.x produces the same barcode as zxing 2.0 did with it.
 		// Providing a large preferred height and width results in some barcodes
 		// having a white margin larger than 4 units, thus specifying small numbers.
 		// This is documented in a comment within QRCodeWriter: "Padding includes 

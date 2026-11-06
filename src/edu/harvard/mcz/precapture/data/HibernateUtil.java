@@ -2,8 +2,9 @@ package edu.harvard.mcz.precapture.data;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.*;
-import org.hibernate.cfg.*;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 // import edu.harvard.mcz.precapture.LoginDialog;
 // import edu.harvard.mcz.precapture.MainFrame;
@@ -186,6 +187,18 @@ public class HibernateUtil {
 			createSessionFactory();
 		}
 		return sessionFactory;
+	}
+
+	/**
+	 * Drop and recreate the database tables for the mapped entities, 
+	 * equivalent to the Hibernate 3 SchemaExport.create(true, true), logging 
+	 * the DDL statements when show_sql is enabled.  Destroys any existing data 
+	 * in those tables.
+	 */
+	public static void recreateSchema() { 
+		SessionFactory factory = getSessionFactory();
+		factory.getSchemaManager().drop(false);
+		factory.getSchemaManager().create(false);
 	}
 
 	/**

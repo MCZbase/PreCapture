@@ -19,19 +19,21 @@
  */
 package edu.harvard.mcz.precapture.data;
 
-import static org.hibernate.criterion.Example.create;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
+
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.LockMode;
-import org.hibernate.Query;
 import org.hibernate.SessionException;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
@@ -57,7 +59,7 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 				session.persist(transientInstance);
 				session.getTransaction().commit();
 				log.debug("persist successful");
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 				throw new SaveFailedException("Save to Inventory table failed. " + e.getMessage());
@@ -75,10 +77,15 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try  {
-				session.saveOrUpdate(instance);
+				if (instance.getId()==null) {
+					// new record, assigns an id to instance
+					session.persist(instance);
+				} else {
+					session.merge(instance);
+				}
 				session.getTransaction().commit();
 				log.debug("attach successful");
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 				throw new SaveFailedException("Save to UnitTrayLabel table failed. " + e.getMessage());
@@ -99,7 +106,7 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 				session.lock(instance, LockMode.NONE);
 				session.getTransaction().commit();
 				log.debug("attach successful");
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			}
@@ -116,10 +123,13 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				session.delete(persistentInstance);
+				Inventory managed = session.find(Inventory.class, persistentInstance.getId());
+				if (managed!=null) {
+					session.remove(managed);
+				}
 				session.getTransaction().commit();
 				log.debug("delete successful");
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 				throw new SaveFailedException("Delete from Inventory table failed. " + e.getMessage());
@@ -138,10 +148,10 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				result = (Inventory) session.merge(detachedInstance);
+				result = session.merge(detachedInstance);
 				session.getTransaction().commit();
 				log.debug("merge successful");
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 				throw new SaveFailedException("Save to Inventory table failed. " + e.getMessage());
@@ -161,14 +171,14 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				instance = (Inventory) session.get("edu.harvard.mcz.precapture.data.Inventory", id);
+				instance = session.find(Inventory.class, Long.valueOf(id));
 				session.getTransaction().commit();
 				if (instance == null) {
 					log.debug("get successful, no instance found");
 				} else {
 					log.debug("get successful, instance found");
 				}
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			}
@@ -188,12 +198,26 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				results = (List<Inventory>) session.createCriteria("edu.harvard.mcz.precapture.data.Inventory").add(
-						create(instance)).list();
+				// Query by example: match on each non-null property except the identifier
+				// (equivalent of the legacy org.hibernate.criterion.Example.create(instance)).
+				CriteriaBuilder builder = session.getCriteriaBuilder();
+				CriteriaQuery<Inventory> query = builder.createQuery(Inventory.class);
+				Root<Inventory> root = query.from(Inventory.class);
+				List<Predicate> predicates = new ArrayList<Predicate>();
+				if (instance.getCabinet()!=null) {
+					predicates.add(builder.equal(root.get("cabinet"), instance.getCabinet()));
+				}
+				if (instance.getTaxon()!=null) {
+					predicates.add(builder.equal(root.get("taxon"), instance.getTaxon()));
+				}
+				predicates.add(builder.equal(root.get("thickness"), instance.getThickness()));
+				predicates.add(builder.equal(root.get("sheetsPerUnitThickness"), instance.getSheetsPerUnitThickness()));
+				query.select(root).where(predicates.toArray(new Predicate[predicates.size()]));
+				results = session.createSelectionQuery(query).getResultList();
 				session.getTransaction().commit();
 				log.debug("find by example successful, result size: "
 						+ results.size());
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 
@@ -217,11 +241,11 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				results = (List<Inventory>) session.createQuery("from Inventory i order by i.cabinet, i.taxon ").list();
+				results = session.createSelectionQuery("from Inventory i order by i.cabinet, i.taxon ", Inventory.class).getResultList();
 				session.getTransaction().commit();
 				log.debug("find all successful, result size: "
 						+ results.size());
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			} finally { 
@@ -246,10 +270,10 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				result = ((Long)session.createQuery("select count(*) from Inventory i").iterate().next()).intValue();
+				result = session.createSelectionQuery("select count(*) from Inventory i", Long.class).getSingleResult().intValue();
 				session.getTransaction().commit();
 				log.debug("count successful, count= " + result);
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			} finally { 
@@ -276,10 +300,10 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				result = ((Long)session.createQuery("select count(*) from Inventory i").iterate().next()).intValue();
+				result = session.createSelectionQuery("select count(*) from Inventory i", Long.class).getSingleResult().intValue();
 				session.getTransaction().commit();
 				log.debug("count successful, count= " + result);
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 				throw e;
@@ -300,12 +324,11 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 			Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 			session.beginTransaction();
 			try { 
-				Query delete = session.createQuery("delete from Inventory ");
-				int rows = delete.executeUpdate();
+				int rows = session.createMutationQuery("delete from Inventory ").executeUpdate();
 				session.getTransaction().commit();
 				log.debug("delete all successful.  Rows=" + rows);
 				result = true;
-			} catch (HibernateException e) { 
+			} catch (PersistenceException e) { 
 				session.getTransaction().rollback();
 				log.error(e.getMessage());
 			} finally { 

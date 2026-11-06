@@ -5,5 +5,5 @@
 // Generated on: 2012.07.25 at 08:32:56 AM EDT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://mcz.harvard.edu/LabelDefinitionSchema", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://mcz.harvard.edu/LabelDefinitionSchema", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package edu.harvard.mcz.precapture.xml.labels;

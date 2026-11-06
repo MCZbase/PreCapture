@@ -19,6 +19,13 @@
  */
 package edu.harvard.mcz.precapture.data;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,6 +33,8 @@ import org.apache.commons.logging.LogFactory;
  * @author mole
  *
  */
+@Entity
+@Table(name = "INVENTORY")
 public class Inventory  {
 	private static final Log log = LogFactory.getLog(Inventory.class);
 
@@ -49,6 +58,7 @@ public class Inventory  {
 	/**
 	 * @return the cabinet
 	 */
+	@Column(name = "Cabinet", length = 40)
 	public String getCabinet() {
 		return cabinet;
 	}
@@ -63,6 +73,7 @@ public class Inventory  {
 	/**
 	 * @return the taxon
 	 */
+	@Column(name = "Taxon", length = 40)
 	public String getTaxon() {
 		return taxon;
 	}
@@ -77,6 +88,7 @@ public class Inventory  {
 	/**
 	 * @return the thickness
 	 */
+	@Column(name = "Thickness")
 	public float getThickness() {
 		return thickness;
 	}
@@ -91,6 +103,7 @@ public class Inventory  {
 	/**
 	 * @return the sheetsPerUnitThickness
 	 */
+	@Column(name = "SheetsPerThickness")
 	public float getSheetsPerUnitThickness() {
 		return sheetsPerUnitThickness;
 	}
@@ -105,6 +118,9 @@ public class Inventory  {
 	/**
 	 * @return the id
 	 */
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	public Long getId() {
 		return id;
 	}

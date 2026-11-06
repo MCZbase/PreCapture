@@ -68,7 +68,7 @@ public class MainMenu extends JMenuBar {
 		add(mnFile);
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
-		mntmExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
+		mntmExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
 		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				PreCaptureApp.exit(frame);
@@ -104,7 +104,7 @@ public class MainMenu extends JMenuBar {
 			}
 		});
 		mntmMakeAnnotationLabels.setMnemonic('A');
-		mntmMakeAnnotationLabels.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
+		mntmMakeAnnotationLabels.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
 		mnFile.add(mntmMakeAnnotationLabels);
 		
 		//mnFile.add(mntmLoadTaxa);

@@ -16,6 +16,8 @@ Former source code repository is at: https://sourceforge.net/p/datashot/code/HEA
 
 ## Building
 
+Building and running requires Java 17 or later.
+
 To build PreCaptureApp.jar run:
 
 mvn package

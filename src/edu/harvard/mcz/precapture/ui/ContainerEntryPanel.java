@@ -38,7 +38,7 @@ import javax.swing.border.BevelBorder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
@@ -86,15 +86,15 @@ public class ContainerEntryPanel extends JPanel {
 		panel_2.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		panel_2.setBackground(Color.WHITE);
 		panel_2.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
+				FormSpecs.RELATED_GAP_COLSPEC,
+				FormSpecs.DEFAULT_COLSPEC,
 				ColumnSpec.decode("186px"),
 				ColumnSpec.decode("61px:grow"),},
 			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
 				RowSpec.decode("15px"),}));
 		
 		JLabel lblFilterTaxaBy = new JLabel("Filter Taxa by:");
@@ -138,23 +138,23 @@ public class ContainerEntryPanel extends JPanel {
 		int fieldCount = PreCaptureSingleton.getInstance().getMappingList().getFieldInList().size();
 		
 		ArrayList<RowSpec> rowSpec = new ArrayList<RowSpec>();
-	    rowSpec.add(FormFactory.RELATED_GAP_ROWSPEC);
-	    rowSpec.add(FormFactory.DEFAULT_ROWSPEC);
+	    rowSpec.add(FormSpecs.RELATED_GAP_ROWSPEC);
+	    rowSpec.add(FormSpecs.DEFAULT_ROWSPEC);
 	    for (int i=0; i<=fieldCount; i++) { 
-	        rowSpec.add(FormFactory.RELATED_GAP_ROWSPEC);
-	        rowSpec.add(FormFactory.DEFAULT_ROWSPEC);
+	        rowSpec.add(FormSpecs.RELATED_GAP_ROWSPEC);
+	        rowSpec.add(FormSpecs.DEFAULT_ROWSPEC);
 	    }
-	    rowSpec.add(FormFactory.RELATED_GAP_ROWSPEC);
-	    rowSpec.add(FormFactory.DEFAULT_ROWSPEC);
+	    rowSpec.add(FormSpecs.RELATED_GAP_ROWSPEC);
+	    rowSpec.add(FormSpecs.DEFAULT_ROWSPEC);
 		
 		JPanel panel_3 = new JPanel();
 		this.add(panel_3, BorderLayout.CENTER);
 		panel_3.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
+				FormSpecs.RELATED_GAP_COLSPEC,
+				FormSpecs.DEFAULT_COLSPEC,
+				FormSpecs.RELATED_GAP_COLSPEC,
+				FormSpecs.DEFAULT_COLSPEC,
+				FormSpecs.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),},
 			    (RowSpec[]) rowSpec.toArray((RowSpec[])Array.newInstance(RowSpec.class, rowSpec.size()))
 			));

@@ -21,6 +21,16 @@ package edu.harvard.mcz.precapture.data;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,6 +45,8 @@ import edu.harvard.mcz.precapture.interfaces.TaxonNameReturner;
  * @author Paul J. Morris
  *
  */
+@Entity
+@Table(name = "UNIT_TRAY_LABEL")
 public class UnitTrayLabel implements TaxonNameReturner {
 	
 	private static final Log log = LogFactory.getLog(UnitTrayLabel.class);
@@ -309,6 +321,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the drawerNumber
 	 */
+	@Column(name = "DrawerNumber", length = 10)
 	public String getDrawerNumber() {
 		return drawerNumber;
 	}
@@ -326,6 +339,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the family
 	 */
+	@Column(name = "Family", length = 40)
 	public String getFamily() {
 		return family;
 	}
@@ -343,6 +357,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the subfamily
 	 */
+	@Column(name = "Subfamily", length = 40)
 	public String getSubfamily() {
 		return subfamily;
 	}
@@ -360,6 +375,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the tribe
 	 */
+	@Column(name = "Tribe", length = 40)
 	public String getTribe() {
 		if (tribe==null) { tribe=""; }
 		return tribe;
@@ -392,6 +408,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the genus
 	 */
+	@Column(name = "Genus", length = 40)
 	public String getGenus() {
 		if (genus==null) { genus=""; } 
 		return genus;
@@ -410,6 +427,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the specificEpithet
 	 */
+	@Column(name = "SpecificEpithet", length = 40)
 	public String getSpecificEpithet() {
 		if (specificEpithet==null) { specificEpithet=""; } 
 		return specificEpithet;
@@ -428,6 +446,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the subspecificEpithet
 	 */
+	@Column(name = "SubspecificEpithet")
 	public String getSubspecificEpithet() {
 		if (subspecificEpithet==null) { subspecificEpithet=""; }  
 		return subspecificEpithet;
@@ -446,6 +465,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the infraspecificEpithet
 	 */
+	@Column(name = "InfraspecificEpithet", length = 40)
 	public String getInfraspecificEpithet() {
 		if (infraspecificEpithet==null) { infraspecificEpithet=""; }  
 		return infraspecificEpithet;
@@ -464,6 +484,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the infraspecifcRank
 	 */
+	@Column(name = "InfraspecificRank", length = 40)
 	public String getInfraspecificRank() {
 		if (infraspecificRank==null) { infraspecificRank=""; }  
 		return infraspecificRank;
@@ -482,6 +503,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the authorship
 	 */
+	@Column(name = "Authorship")
 	public String getAuthorship() {
 		if (authorship==null) { authorship=""; }  
 		return authorship;
@@ -501,6 +523,9 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the id
 	 */
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	public Long getId() {
 		return id;
 	}
@@ -515,6 +540,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the unnamedForm
 	 */
+	@Column(name = "UnNamedForm", length = 50)
 	public String getUnNamedForm() {
 		if (unNamedForm==null) { unNamedForm=""; }  
 		return unNamedForm;
@@ -531,6 +557,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 		this.printed = printed;
 	}
 
+	@Column(name = "Printed")
 	public int getPrinted() {
 		return printed;
 	}
@@ -539,6 +566,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 		this.numberToPrint = numberToPrint;
 	}
 
+	@Column(name = "NumberToPrint")
 	public int getNumberToPrint() {
 		return this.numberToPrint;
 	}
@@ -547,6 +575,8 @@ public class UnitTrayLabel implements TaxonNameReturner {
 		this.dateCreated = dateCreated;
 	}
 
+	@JdbcTypeCode(SqlTypes.TIMESTAMP)
+	@Column(name = "DateCreated")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -555,6 +585,8 @@ public class UnitTrayLabel implements TaxonNameReturner {
 		this.dateLastUpdated = dateLastUpdated;
 	}
 
+	@JdbcTypeCode(SqlTypes.DATE)
+	@Column(name = "DateLastUpdated")
 	public Date getDateLastUpdated() {
 		return dateLastUpdated;
 	}
@@ -567,6 +599,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	}
 
 	
+	@Column(name = "Collection", length = 255)
 	public String getCollection() {
 		return collection;
 	}
@@ -574,9 +607,10 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	/**
 	 * @return the ordinal
 	 */
+	@Column(name = "Ordinal")
 	public Integer getOrdinal() {
 		if(ordinal == null) { 
-		    ordinal = new Integer(0);
+		    ordinal = Integer.valueOf(0);
 		}  
 		return ordinal;
 	}
@@ -586,7 +620,7 @@ public class UnitTrayLabel implements TaxonNameReturner {
 	 */
 	public void setOrdinal(Integer ordinal) {
 		if(ordinal == null) { 
-		    this.ordinal = new Integer(0);
+		    this.ordinal = Integer.valueOf(0);
 		} else { 
 		    this.ordinal = ordinal;
 		}

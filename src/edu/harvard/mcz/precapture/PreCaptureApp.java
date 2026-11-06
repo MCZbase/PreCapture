@@ -38,17 +38,16 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.text.DefaultEditorKit;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.tool.hbm2ddl.SchemaExport;
+
+import jakarta.persistence.PersistenceException;
 
 import edu.harvard.mcz.precapture.data.HibernateUtil;
 import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
@@ -224,16 +223,11 @@ public class PreCaptureApp {
 					// Test to see if unit tray label table exists
 					UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
 					log.debug("Unit Tray Label Records: " + uls.countAtStartup());
-				} catch (HibernateException ex) { 
+				} catch (PersistenceException | NullPointerException ex) { 
+					// HibernateException is a subclass of PersistenceException
 					log.debug("Recreating schema.");
-					// if not, create schema specified in hibernate.cfg.xml
-					Configuration conf = new Configuration().configure();
-					new SchemaExport(conf).create(true, true);
-				} catch (NullPointerException ex) { 
-					log.debug("Recreating schema.");
-					// if not, create schema specified in hibernate.cfg.xml
-					Configuration conf = new Configuration().configure();
-					new SchemaExport(conf).create(true, true);
+					// if not, create schema from the entities mapped in hibernate.cfg.xml
+					HibernateUtil.recreateSchema();
 				}
 
 
@@ -260,19 +254,19 @@ public class PreCaptureApp {
 							inputMap.put(
 									KeyStroke.getKeyStroke(
 									    KeyEvent.VK_C, 
-									    PreCaptureSingleton.getInstance().getSplashScreen().getToolkit().getMenuShortcutKeyMask()
+									    PreCaptureSingleton.getInstance().getSplashScreen().getToolkit().getMenuShortcutKeyMaskEx()
 									    ),
 									DefaultEditorKit.copyAction);
 							inputMap.put(
 									KeyStroke.getKeyStroke(
 									    KeyEvent.VK_V, 
-									    PreCaptureSingleton.getInstance().getSplashScreen().getToolkit().getMenuShortcutKeyMask()
+									    PreCaptureSingleton.getInstance().getSplashScreen().getToolkit().getMenuShortcutKeyMaskEx()
 									    ),
 									DefaultEditorKit.pasteAction);
 							inputMap.put(
 									KeyStroke.getKeyStroke(
 									    KeyEvent.VK_X, 
-									    PreCaptureSingleton.getInstance().getSplashScreen().getToolkit().getMenuShortcutKeyMask()
+									    PreCaptureSingleton.getInstance().getSplashScreen().getToolkit().getMenuShortcutKeyMaskEx()
 									    ),
 									DefaultEditorKit.cutAction);
 							

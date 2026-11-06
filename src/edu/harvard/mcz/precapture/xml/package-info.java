@@ -5,5 +5,5 @@
 // Generated on: 2012.08.01 at 06:10:51 PM EDT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://mcz.harvard.edu/PreCaptureFieldSchema", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://mcz.harvard.edu/PreCaptureFieldSchema", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package edu.harvard.mcz.precapture.xml;

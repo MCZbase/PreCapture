@@ -43,6 +43,8 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
 
@@ -130,7 +132,7 @@ public class PrintingUtility {
 				pdfInputStream = new FileInputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE));
 
 				// trying pdfbox instead of pdf-renderer
-				PDDocument pdfDocument = PDDocument.load(pdfInputStream);
+				PDDocument pdfDocument = Loader.loadPDF(new RandomAccessReadBuffer(pdfInputStream));
 				PrintingUtility.print(pdfDocument);
 				pdfDocument.close();
 				printed = true;
@@ -160,7 +162,7 @@ public class PrintingUtility {
 							pdfInputStream = new FileInputStream(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_LABELPRINTFILE));
 
 							// Send PDF to printer.
-							PDDocument pdfDocument = PDDocument.load(pdfInputStream);
+							PDDocument pdfDocument = Loader.loadPDF(new RandomAccessReadBuffer(pdfInputStream));
 							PrintingUtility.print(pdfDocument);
 							pdfDocument.close();
 							printed = true;
