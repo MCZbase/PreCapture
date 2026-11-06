@@ -87,6 +87,11 @@ public class BarcodeTestingFrame extends JFrame {
 	
 	private JProgressBar progressBar;
 	private JLabel labelFirstError;
+	/** Resolutions, in dots per inch, at which the test PDF page is rendered to an 
+	 * image to test reading the barcode: screen resolution (72) and typical printer 
+	 * resolutions. */
+	public static final int[] RENDER_RESOLUTIONS = { 72, 150, 300 };
+
 	private JLabel labelResult;
 	private JTable table;
 	private JLabel labelImage;
@@ -249,8 +254,6 @@ public class BarcodeTestingFrame extends JFrame {
 		Iterator<FieldPlusText> i = containerLabel.getFields().iterator();
 		int counter = 0;
 		
-		int successes = 0;
-		int failures = 0;
 		
 		// estimate how many characters per field should be the upper limit for test.
 		int stop = 1000/containerLabel.getFields().size();
@@ -265,9 +268,11 @@ public class BarcodeTestingFrame extends JFrame {
 			}
 		});
 		String lastSuccess = "";
+		String firstError = null;
+		int[] successes = new int[RENDER_RESOLUTIONS.length];
+		int[] failures = new int[RENDER_RESOLUTIONS.length];
 		BarcodeTestResultsTableModel testResults = new BarcodeTestResultsTableModel();
 		for (int x=0; x<stop; x++) { 
-			BarcodeTestResult testResult = new BarcodeTestResult();
 			final int xF = x;
 			SwingUtilities.invokeLater(new Runnable() { 
 				public void run() { 
@@ -278,7 +283,6 @@ public class BarcodeTestingFrame extends JFrame {
 			});
 			i = containerLabel.getFields().iterator();
 			counter = 0;
-			int byteSize = 0;
 			while (i.hasNext()) {
 			    StringBuffer text = new StringBuffer(); 
 			    text.append("è");  // a unicode character
@@ -290,150 +294,128 @@ public class BarcodeTestingFrame extends JFrame {
 				i.next().getTextField().setText(text.toString());
 			}
 			json = containerLabel.toJSON();
-			byteSize = json.getBytes().length;
-			testResult.setBytes(byteSize);
+			int byteSize = json.getBytes().length;
 			log.debug("JSON Length:" + json.length());
 			encoder = new LabelEncoder(containerLabel);
 			int scaleWidth = 0;
+			int scaleHeight = 0;
 			int imageNeedsWidth = 0;
-			String errorMessage = null;
+			ImageIcon originalIcon = null;
+			ImageIcon scaledIcon = null;
+			byte[] pdf = null;
+			String generationFailure = null;
+			String generationFirstError = null;
 			try {
 				// Create a barcode image
 				BufferedImage image = encoder.getBufferedImage();
-				testResult.setOriginalImage(new ImageIcon(image));
+				originalIcon = new ImageIcon(image);
 				// Figure out the scaling of the image into the space available on the PDF.
 				imageNeedsWidth = image.getWidth();
 				log.debug("Image Needs " + imageNeedsWidth + " pixel width (at 72dpi).");
 				log.debug("Available space is " + barcodeCellWidthPoints);
-				testResult.setOriginalWidth(imageNeedsWidth);
-				
 				scaleWidth = (int) (image.getWidth()*(barcodeCellWidthPoints/image.getWidth()));  
 				log.debug("Scaled to " + scaleWidth);
-				testResult.setScaledToWidth(scaleWidth);
-				int scaleHeight = (int) (image.getHeight()*(barcodeCellWidthPoints/image.getHeight()));
+				scaleHeight = (int) (image.getHeight()*(barcodeCellWidthPoints/image.getHeight()));
 				log.debug("Trying " + scaleWidth + "x" + scaleHeight + " Bytes=" + byteSize);
 				BufferedImage rescaledImage = LabelEncoder.resizeImage(image, scaleWidth * 2, scaleHeight *2 ,4);
+				scaledIcon = new ImageIcon(new BufferedImage(rescaledImage.getColorModel(), rescaledImage.getRaster(), true, null));
+				if (x==0) { 
+					final ImageIcon scaledIconF = scaledIcon;
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() { 
+					        labelImage.setIcon(scaledIconF);
+						}
+					});
+				}
 				
 				// Rescale the barcode image and write it into a PDF.
 				Document document = new Document();
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 				PdfWriter.getInstance(document, outputStream);
-				
 				Image iTextImage = encoder.getImage();
 				iTextImage.scaleToFit(scaleWidth, scaleHeight);
 				document.open();
 				document.add(iTextImage);
 				document.close();
-				
-				// Convert the PDF page containing the barcode to an image, at 72 dpi (one pixel per point)
-				BufferedImage pageImage;
-				try (PDDocument pdfDocument = Loader.loadPDF(outputStream.toByteArray())) { 
-					pageImage = new PDFRenderer(pdfDocument).renderImage(0, 1.0f);
-				}
-				ImageIcon rescaledIcon = new ImageIcon(pageImage);
-				
-				// Test to see if the result of the round trip to PDF is readable.
-				ImageIcon rescaledIconLocal = new ImageIcon(new BufferedImage(rescaledImage.getColorModel(), rescaledImage.getRaster(), true, null));
-				testResult.setScaledImage(rescaledIconLocal);
-				if (x==0) { 
-				   //labelImage.setIcon(new ImageIcon(rescaledImage));
-					final ImageIcon rescaledIconLocalF = rescaledIconLocal;
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() { 
-					        labelImage.setIcon(rescaledIconLocalF);
-						}
-					});
-				}
-				BufferedImage toDecode = (BufferedImage) rescaledIcon.getImage();
-				decodedJson = LabelDecoder.decodeImage(toDecode);
-				if (decodedJson.equals(json)) { 
-				   successes ++;
-				   lastSuccess = "Success at scale " + scaleWidth + "x" + scaleHeight + " Scaling=" + barcodeCellWidthPoints/image.getWidth();
-				   report.append("Success.  Bytes=" + byteSize +  " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth ).append("\n");
-				   log.debug(lastSuccess);
-				   testResult.setMessage("Success");
-				} else { 
-					throw new BarcodeReadException("JSON encoded and decoded strings didn't match.");
-				}
+				pdf = outputStream.toByteArray();
 			} catch (WriterException wex) { 
 				log.debug(wex.getMessage());
-				report.append("Generation Failure.  Bytes=" + byteSize +  " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth).append(wex.getMessage()).append("\n");
-				testResult.setMessage("Generation Failed " + wex.getMessage());
-				failures++;
-				if (failures==1) { 
-					errorMessage="Failed to generate QRCode, too many characters: " + json.length();
-				}
-			} catch (BarcodeReadException e) {
-				report.append("Failure.  Bytes=" + byteSize +  " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth).append(e.getMessage()).append("\n");
-				log.debug("Failure. Bytes=" + byteSize +" Last " + lastSuccess);
-				StringBuffer message = new StringBuffer();
-				message.append(e.getMessage());
-				if (e.getCause()!=null) { 
-					message.append(e.getCause().getMessage());
-				}
-				testResult.setMessage("Failed " + message);
-				failures++;
-				if (failures==1) { 
-					errorMessage = "Bytes = " + byteSize + ", Last " + lastSuccess;
-				}
-			} catch (BarcodeCreationException e) {
-				report.append("Failure.  Bytes=" + byteSize +  " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth).append(e.getMessage()).append("\n");
+				generationFailure = "Generation Failed " + wex.getMessage();
+				generationFirstError = "Failed to generate QRCode, too many characters: " + json.length();
+			} catch (BarcodeCreationException | DocumentException e) {
 				log.debug("Failure to create barcode. Bytes=" + byteSize +" Last " + lastSuccess);
-				StringBuffer message = new StringBuffer();
-				message.append(e.getMessage());
-				if (e.getCause()!=null) { 
-					message.append(e.getCause().getMessage());
-				}
-				testResult.setMessage("Failed " + message);
-				failures++;
-				if (failures==1) { 
-					errorMessage = "Bytes = " + byteSize + ", Last " + lastSuccess;
-				}
-			} catch (IOException e) {
-				report.append("Failure [IO Exception].  Bytes=" + byteSize +  " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth).append(e.getMessage()).append("\n");
-				log.debug("Failure to create barcode. Bytes=" + byteSize +" Last " + lastSuccess);
-				StringBuffer message = new StringBuffer();
-				message.append(e.getMessage());
-				if (e.getCause()!=null) { 
-					message.append(e.getCause().getMessage());
-				}
-				testResult.setMessage("Failed " + message);
-				failures++;
-				if (failures==1) { 
-					errorMessage = "Bytes = " + byteSize + ", Last " + lastSuccess;
-				}
-			} catch (DocumentException e) {
-				report.append("Failure [document exception].  Bytes=" + byteSize +  " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth).append(e.getMessage()).append("\n");
-				log.debug("Failure to create barcode. Bytes=" + byteSize +" Last " + lastSuccess);
-				StringBuffer message = new StringBuffer();
-				message.append(e.getMessage());
-				if (e.getCause()!=null) { 
-					message.append(e.getCause().getMessage());
-				}
-				testResult.setMessage("Failed " + message);
-				failures++;
-				if (failures==1) { 
-				     errorMessage = "Bytes = " + byteSize + ", Last " + lastSuccess;
-				}
-			} finally {
-				if (errorMessage!=null) {
-					final String errorMessageF = errorMessage;
-				SwingUtilities.invokeLater(new Runnable() { 
-					public void run() { 
-					      labelFirstError.setText(errorMessageF);
-					}
-				});
-				}
+				generationFailure = "Failed " + messageOf(e);
 			}
-		    testResults.addResult(testResult);
+			
+			// Convert the PDF page containing the barcode to an image at each resolution, 
+			// and test whether the barcode can be read from it.
+			for (int r=0; r<RENDER_RESOLUTIONS.length; r++) { 
+				int dpi = RENDER_RESOLUTIONS[r];
+				BarcodeTestResult testResult = new BarcodeTestResult();
+				testResult.setBytes(byteSize);
+				testResult.setResolution(dpi);
+				testResult.setOriginalWidth(imageNeedsWidth);
+				testResult.setScaledToWidth(scaleWidth);
+				testResult.setOriginalImage(originalIcon);
+				testResult.setScaledImage(scaledIcon);
+				String failure = generationFailure;
+				if (failure == null) { 
+					try { 
+						BufferedImage pageImage;
+						try (PDDocument pdfDocument = Loader.loadPDF(pdf)) { 
+							pageImage = new PDFRenderer(pdfDocument).renderImageWithDPI(0, dpi);
+						}
+						decodedJson = LabelDecoder.decodeImage(pageImage);
+						if (!decodedJson.equals(json)) { 
+							failure = "Failed JSON encoded and decoded strings didn't match.";
+						}
+					} catch (BarcodeReadException | IOException e) { 
+						failure = "Failed " + messageOf(e);
+					}
+				}
+				if (failure == null) { 
+					successes[r]++;
+					lastSuccess = "Success at scale " + scaleWidth + "x" + scaleHeight + " Scaling=" + barcodeCellWidthPoints/imageNeedsWidth + " at " + dpi + " dpi";
+					report.append("Success.  Bytes=" + byteSize + " Resolution=" + dpi + " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth ).append("\n");
+					log.debug(lastSuccess);
+					testResult.setMessage("Success");
+				} else { 
+					failures[r]++;
+					report.append("Failure.  Bytes=" + byteSize + " Resolution=" + dpi + " Scaled to Fit=" + scaleWidth + " Original Size= " + imageNeedsWidth).append(failure).append("\n");
+					log.debug("Failure. Bytes=" + byteSize + " Resolution=" + dpi + " Last " + lastSuccess);
+					testResult.setMessage(failure);
+					if (firstError == null) { 
+						firstError = generationFirstError != null ? generationFirstError : "Bytes = " + byteSize + ", " + dpi + " dpi, Last " + lastSuccess;
+						final String firstErrorF = firstError;
+						SwingUtilities.invokeLater(new Runnable() { 
+							public void run() { 
+							      labelFirstError.setText(firstErrorF);
+							}
+						});
+					}
+				}
+			    testResults.addResult(testResult);
+			}
+			if (generationFirstError != null) { 
+				// The payload exceeds the capacity of a QR code, larger payloads will fail 
+				// the same way, so stop here.
+				log.debug("Stopping at " + byteSize + " bytes, too much data for a QR code.");
+				break;
+			}
 		}
-		final int successesF = successes;
-		final int failuresF = failures;
+		StringBuilder summary = new StringBuilder();
+		for (int r=0; r<RENDER_RESOLUTIONS.length; r++) { 
+			if (r > 0) { 
+				summary.append("; ");
+			}
+			summary.append(RENDER_RESOLUTIONS[r]).append(" dpi: successes=").append(successes[r]).append(", failures=").append(failures[r]);
+		}
+		final String summaryF = summary.toString();
 		final BarcodeTestResultsTableModel testResultsF = testResults;
 		SwingUtilities.invokeLater(new Runnable() { 
 			public void run() { 
 		        progressBarF.setValue(stopF);
-		        labelResult.setText("Successes=" + successesF + ", failures=" + failuresF);
+		        labelResult.setText(summaryF);
 		        table.setModel(testResultsF);
 		        table.setRowHeight(300);
 		        table.doLayout();
@@ -442,6 +424,19 @@ public class BarcodeTestingFrame extends JFrame {
 		} // end label definition is not null
 	}
 	
+	/**
+	 * @param e an exception
+	 * @return the message of the exception followed by that of its cause, if any.
+	 */
+	private static String messageOf(Exception e) { 
+		StringBuffer message = new StringBuffer();
+		message.append(e.getMessage());
+		if (e.getCause()!=null) { 
+			message.append(e.getCause().getMessage());
+		}
+		return message.toString();
+	}
+
 	/**
 	 * Launch the application.
 	 */

@@ -32,6 +32,7 @@ public class BarcodeTestResult {
 	private static final Log log = LogFactory.getLog(BarcodeTestResult.class);
 
 	private int bytes;
+	private int resolution;
 	private int originalWidth;
 	private int scaledToWidth;
 	private String message;
@@ -86,6 +87,19 @@ public class BarcodeTestResult {
 	/**
 	 * @return the originalWidth
 	 */
+	/**
+	 * @return the resolution, in dots per inch, at which the barcode was rendered for reading.
+	 */
+	public int getResolution() {
+		return resolution;
+	}
+
+
+	public void setResolution(int resolution) {
+		this.resolution = resolution;
+	}
+
+
 	public int getOriginalWidth() {
 		return originalWidth;
 	}

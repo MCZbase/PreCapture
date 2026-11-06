@@ -18,15 +18,77 @@ Former source code repository is at: https://sourceforge.net/p/datashot/code/HEA
 
 Building and running requires Java 17 or later.
 
-## Upgrading
-
-PreCapture keeps its data (taxon authority file and inventory) in an H2 database 
-in the directory it is run from.  Databases created by earlier versions of 
-PreCapture (PRECAPTURE2.h2.db from releases up to 1.1.2, or PRECAPTURE2.mv.db 
-from 2022-2023 development builds) use older H2 file formats.  On startup 
-PreCapture detects these and offers to convert them, which downloads the 
-earlier H2 version from Maven Central; the original file is kept with a .bak suffix.
-
 To build PreCaptureApp.jar run:
 
 mvn package
+
+## Upgrading
+
+PreCapture keeps its data (taxon authority file and inventory) in an H2 database, 
+by default PRECAPTURE2.mv.db in the directory it is run from (set config.database 
+in PreCapture.properties to use another location).  Databases created by earlier 
+versions of PreCapture (PRECAPTURE2.h2.db from releases up to 1.1.2, or 
+PRECAPTURE2.mv.db from 2022-2023 development builds) use older H2 file formats.  
+On startup PreCapture detects these and offers to convert them, which downloads 
+the earlier H2 version from Maven Central; the original file is kept with a .bak 
+suffix.  If Maven Central can't be reached, PreCapture can instead start with a 
+new, empty, database, keeping the old one, after which the taxon authority file 
+can be reloaded (Configuration, Data Sources).
+
+## Barcode capacity and print resolution
+
+The amount of text a label's QR code can hold, and still be read, depends on the 
+size the code is printed at and the resolution it is printed (or scanned) at.  
+File, Run Tests opens a stress test for the selected print format: it fills every 
+field of a label with progressively longer text, encodes the label as a QR code 
+(error correction level H), places the code in a PDF scaled to the format's 
+barcode cell, renders the PDF page to an image at 72, 150 and 300 dpi, and 
+checks whether the code can be read back from each image.
+
+Results for the default format, Two Half Sheets on 8.5x11, where the barcode 
+cell is 93 points (about 1.3 inches) wide.  Payload is the size of the encoded 
+label text; QR width is the size of the code in modules (the black and white 
+squares), including the 4 module quiet zone on each side.  Consecutive payload 
+sizes with the same results are combined.
+
+| Payload (bytes) | QR width (modules incl. quiet zone) | 72 dpi | 150 dpi | 300 dpi |
+|---:|---:|---|---|---|
+| 160–244 | 77–89 | ❌ fail | ✅ read | ✅ read |
+| 256–280 | 93 | ✅ read | ✅ read | ✅ read |
+| 304 | 97 | ❌ fail | ✅ read | ✅ read |
+| 328 | 101 | ❌ fail | ❌ fail | ✅ read |
+| 352–376 | 105 | ❌ fail | ✅ read | ✅ read |
+| 400 | 109 | ❌ fail | ❌ fail | ✅ read |
+| 424 | 113 | ❌ fail | ✅ read | ✅ read |
+| 448–496 | 117–121 | ❌ fail | ❌ fail | ✅ read |
+| 520 | 125 | ❌ fail | ✅ read | ✅ read |
+| 544–616 | 129–133 | ❌ fail | ❌ fail | ✅ read |
+| 640 | 137 | ❌ fail | ✅ read | ✅ read |
+| 664–688 | 141 | ❌ fail | ✅ read | ❌ fail |
+| 712–736 | 145 | ❌ fail | ❌ fail | ✅ read |
+| 760–784 | 149 | ❌ fail | ❌ fail | ❌ fail |
+| 808–832 | 153 | ❌ fail | ❌ fail | ✅ read |
+| 856–952 | 157–161 | ❌ fail | ❌ fail | ❌ fail |
+| 976–1048 | 165–169 | ❌ fail | ❌ fail | ✅ read |
+| 1072 | 173 | ❌ fail | ❌ fail | ❌ fail |
+| 1096–1216 | 177–181 | ❌ fail | ❌ fail | ✅ read |
+| 1240–1264 | 185 | ❌ fail | ❌ fail | ❌ fail |
+| 1288 | – | too much data | too much data | too much data |
+
+In this test, codes are read reliably up to 304 bytes at 150 dpi and up to 640 
+bytes at 300 dpi.  At 72 dpi (screen resolution) only codes that are exactly 93 
+modules wide, one pixel per module, are read.  Beyond those sizes the results are 
+not monotonic: whether a code can be read depends on how its modules fall on the 
+pixel grid, as a module that is not a whole number of pixels wide is blurred 
+unevenly (e.g. 141 modules in 93 points at 300 dpi is 2.75 pixels per module).  
+1288 bytes exceeds the capacity of a QR code at error correction level H, at any 
+resolution.
+
+Caveats: this simulates printing, it is not a test of printed labels.  The QR 
+code is embedded in the PDF as an image with one pixel per module, which PDFBox 
+resamples when rendering the page; a printer driver resamples differently, 
+printers and scanners add their own blur, and scanning resolution matters as 
+much as printing resolution.  Treat the table as indicative, with the 300 dpi 
+column closest to a typical laser printer, and test real labels with the 
+scanner and software that will read them, particularly for payloads above about 
+300 bytes or for other print formats.

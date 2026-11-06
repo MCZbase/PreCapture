@@ -32,6 +32,9 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class BarcodeTestResultsTableModel extends AbstractTableModel {
+
+	/** Index of the column showing the resolution the barcode was read at. */
+	private static final int RESOLUTION_COLUMN = 1;
 	private static final Log log = LogFactory
 			.getLog(BarcodeTestResultsTableModel.class);
 
@@ -53,10 +56,17 @@ public class BarcodeTestResultsTableModel extends AbstractTableModel {
 	}
 
 	public int getColumnCount() {
-		return 6;
+		return 7;
 	}
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
+		// column 1 is the resolution, the remaining columns follow it
+		if (columnIndex == RESOLUTION_COLUMN) { 
+			return results.get(rowIndex).getResolution();
+		}
+		if (columnIndex > RESOLUTION_COLUMN) { 
+			columnIndex--;
+		}
 		Object result = null;
 		switch (columnIndex) { 
 		case 0:
@@ -86,6 +96,12 @@ public class BarcodeTestResultsTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public String getColumnName(int columnIndex) {
+		if (columnIndex == RESOLUTION_COLUMN) { 
+			return "Resolution (dpi)";
+		}
+		if (columnIndex > RESOLUTION_COLUMN) { 
+			columnIndex--;
+		}
 		String result = null;
 		switch (columnIndex) { 
 		case 0:
@@ -115,6 +131,12 @@ public class BarcodeTestResultsTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
+		if (columnIndex == RESOLUTION_COLUMN) { 
+			return Integer.class;
+		}
+		if (columnIndex > RESOLUTION_COLUMN) { 
+			columnIndex--;
+		}
 		Class<?> result = null;
 		switch (columnIndex) { 
 		case 0:
