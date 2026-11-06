@@ -1,4 +1,5 @@
 /**
+ * SPDX-License-Identifier: GPL-2.0-only
  * UnitTrayLabel.java
  * edu.harvard.mcz.precapture.encoder
  * Copyright © 2009-2026 President and Fellows of Harvard College
@@ -16,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * Author: Paul J. Morris
+ * Author: Claude Opus 5.5 (Anthropic)
  */
 package edu.harvard.mcz.precapture.data;
 

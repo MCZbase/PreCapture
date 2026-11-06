@@ -2,6 +2,7 @@
 # This file is part of PreCapture, licensed under Version 2 of the GNU General
 # Public License, see LICENSE.txt.
 # SPDX-License-Identifier: GPL-2.0-only
+# Author: Claude Opus 5.5 (Anthropic)
 #
 # Build and run the tests on every push (of one or more commits, to any
 # branch).  A push of several commits is tested once, at its latest commit.
