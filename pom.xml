@@ -100,13 +100,6 @@
 			<artifactId>pdfbox</artifactId>
 			<version>3.0.8</version>
 		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jdt.internal</groupId>
-			<artifactId>jarinjarloader</artifactId>
-			<version>1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/jar-in-jar-loader.zip</systemPath>
-		</dependency>
 	</dependencies>
 	<build>
 		<resources>
@@ -176,11 +169,6 @@
 						<goals>
 							<goal>jar-no-fork</goal>
 						</goals>
-						<configuration>
-						    <include>**/pom.xml</include>
-						    <include>**/README.txt</include>
-						    <include>**/LICENCE.txt</include>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

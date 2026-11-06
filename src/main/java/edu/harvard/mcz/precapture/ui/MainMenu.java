@@ -37,7 +37,6 @@ import javax.swing.JMenuItem;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader;
 
 import edu.harvard.mcz.precapture.PreCaptureApp;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
@@ -146,15 +145,6 @@ public class MainMenu extends JMenuBar {
 			if (hsURL==null) { 
 				hsURL =  HelpLoaderClass.class.getClassLoader().getResource("edu/harvard/mcz/precapture/resources/help/helpset.hs");
 			}
-			if (hsURL==null) { 
-				hsURL =  JarRsrcLoader.class.getClassLoader().getResource("helpset.hs");
-			}
-			if (hsURL==null) { 
-				hsURL =  JarRsrcLoader.class.getClassLoader().getSystemResource("helpset.hs");
-			}			
-			if (hsURL==null) { 
-				//hsURL =  JarRsrcLoader.class.getClassLoader().getResourceAsStream("helpset.hs");
-			}			
 			log.debug(hsURL);
 			
 			//HelpSet hs = new HelpSet(HelpLoaderClass.class.getClassLoader(),hsURL);
