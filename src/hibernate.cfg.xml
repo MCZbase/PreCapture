@@ -15,7 +15,6 @@
 <!--       <property name="hibernate.connection.url"> jdbc:derby:PRECAPTURE;create=true</property>-->
 <!--       <property name="hibernate.connection.username"></property>-->
 <!--	<property name="hibernate.connection.password"></property>-->
-		<property name="hibernate.hbm2dll.auto">create</property> 
 		<property name="hibernate.generateDdl">true</property>
 <!--    	<property name="hibernate.connection.username">LEPIDOPTERA</property>-->
 <!--        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>-->
