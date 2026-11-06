@@ -3,6 +3,7 @@ target/
 .project
 .settings/
 PRECAPTURE2.mv.db
+PRECAPTURE2.mv.db.bak
 PRECAPTURE2.trace.db
 PreCapture.properties
 precapturedebug.log
