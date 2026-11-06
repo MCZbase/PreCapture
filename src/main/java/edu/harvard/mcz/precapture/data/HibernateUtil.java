@@ -276,18 +276,6 @@ public class HibernateUtil {
 	}
 
 	/**
-	 * Drop and recreate the database tables for the mapped entities, 
-	 * equivalent to the Hibernate 3 SchemaExport.create(true, true), logging 
-	 * the DDL statements when show_sql is enabled.  Destroys any existing data 
-	 * in those tables.
-	 */
-	public static void recreateSchema() { 
-		SessionFactory factory = getSessionFactory();
-		factory.getSchemaManager().drop(false);
-		factory.getSchemaManager().create(false);
-	}
-
-	/**
 	 * Provide a display of the configured driver_class.  Intended to show, in 
 	 * the UI, the user the value of driver_class.
 	 * 

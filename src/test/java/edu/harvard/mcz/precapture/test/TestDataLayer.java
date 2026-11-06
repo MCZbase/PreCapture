@@ -25,6 +25,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.Date;
 import java.util.List;
 
@@ -54,7 +56,6 @@ public class TestDataLayer {
 	public void setUp() throws Exception {
 		databaseBase = new File(folder.getRoot(), "PRECAPTURE2");
 		HibernateUtil.setDatabasePath(databaseBase.getPath());
-		HibernateUtil.recreateSchema();
 	}
 
 	@After
@@ -66,6 +67,7 @@ public class TestDataLayer {
 	@Test
 	public void testDatabaseLocation() {
 		assertTrue(HibernateUtil.getConnectionURL().startsWith("jdbc:h2:file:" + databaseBase.getPath() + ";"));
+		HibernateUtil.getSessionFactory();
 		assertTrue(new File(databaseBase.getPath() + ".mv.db").exists());
 		assertEquals("jdbc:h2:file:/data/db;INIT=create schema IF NOT EXISTS precapture",
 				HibernateUtil.replaceDatabasePath(" jdbc:h2:file:./PRECAPTURE2;INIT=create schema IF NOT EXISTS precapture", "/data/db"));
@@ -77,6 +79,51 @@ public class TestDataLayer {
 		assertEquals("~/PRECAPTURE2", HibernateUtil.normalizeDatabasePath("~/PRECAPTURE2"));
 		assertEquals("/data/PRECAPTURE2", HibernateUtil.normalizeDatabasePath("/data/PRECAPTURE2"));
 		assertNull(HibernateUtil.normalizeDatabasePath(" "));
+	}
+
+	/** Run sql directly against the test database, with the session factory closed. */
+	private void executeSql(String sql) throws Exception {
+		HibernateUtil.terminateSessionFactory();
+		try (Connection connection = DriverManager.getConnection("jdbc:h2:file:" + databaseBase.getPath(), "sa", "")) {
+			connection.createStatement().execute(sql);
+		}
+	}
+
+	private void persistOneOfEach() throws Exception {
+		UnitTrayLabel label = new UnitTrayLabel();
+		label.setGenus("Malaxis");
+		label.setOrdinal(4);
+		new UnitTrayLabelLifeCycle().persist(label);
+		Inventory inventory = new Inventory();
+		inventory.setCabinet("C1");
+		new InventoryLifeCycle().persist(inventory);
+	}
+
+	@Test
+	public void testExistingDataKeptAtStartup() throws Exception {
+		persistOneOfEach();
+		HibernateUtil.terminateSessionFactory();
+		// a new session factory, as at application startup
+		assertEquals(1, new UnitTrayLabelLifeCycle().countAtStartup());
+		assertEquals(1, new InventoryLifeCycle().countAtStartup());
+	}
+
+	@Test
+	public void testMissingTableCreatedAtStartup() throws Exception {
+		persistOneOfEach();
+		executeSql("drop table PUBLIC.INVENTORY");
+		assertEquals(0, new InventoryLifeCycle().countAtStartup());
+		assertEquals(1, new UnitTrayLabelLifeCycle().countAtStartup());
+	}
+
+	@Test
+	public void testMissingColumnAddedAtStartup() throws Exception {
+		persistOneOfEach();
+		executeSql("alter table PUBLIC.UNIT_TRAY_LABEL drop column Ordinal");
+		UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
+		assertEquals(1, uls.countAtStartup());
+		assertEquals("Malaxis", uls.findAll().get(0).getGenus());
+		assertEquals(Integer.valueOf(0), uls.findMaxOrdinal());
 	}
 
 	@Test

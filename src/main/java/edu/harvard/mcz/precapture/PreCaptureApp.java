@@ -45,10 +45,7 @@ import jakarta.xml.bind.Unmarshaller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
-import jakarta.persistence.PersistenceException;
 
 import edu.harvard.mcz.precapture.data.DatabaseUpgrade;
 import edu.harvard.mcz.precapture.data.HibernateUtil;
@@ -218,22 +215,14 @@ public class PreCaptureApp {
 				// Convert a database written by an older, incompatible, version of H2.
 				upgradeDatabaseIfNeeded();
 
-				// test database connectivity
-				SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-				Session session = sessionFactory.openSession();
-				try {
-					// Test to see if inventory table exists
-					InventoryLifeCycle ils = new InventoryLifeCycle();
-					log.debug("Inventory Records: " + ils.countAtStartup());
-					// Test to see if unit tray label table exists
-					UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
-					log.debug("Unit Tray Label Records: " + uls.countAtStartup());
-				} catch (PersistenceException | NullPointerException ex) { 
-					// HibernateException is a subclass of PersistenceException
-					log.debug("Recreating schema.");
-					// if not, create schema from the entities mapped in hibernate.cfg.xml
-					HibernateUtil.recreateSchema();
-				}
+				// Test database connectivity.  Creating the session factory creates any 
+				// missing tables (hibernate.hbm2ddl.auto=update), it never drops tables or data.
+				// Any error here is reported as a startup failure, leaving the database unchanged.
+				HibernateUtil.getSessionFactory();
+				InventoryLifeCycle ils = new InventoryLifeCycle();
+				log.debug("Inventory Records: " + ils.countAtStartup());
+				UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
+				log.debug("Unit Tray Label Records: " + uls.countAtStartup());
 
 
 				EventQueue.invokeLater(new Runnable() {

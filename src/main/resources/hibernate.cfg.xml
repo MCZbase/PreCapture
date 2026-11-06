@@ -15,7 +15,8 @@
 <!--       <property name="hibernate.connection.url"> jdbc:derby:PRECAPTURE;create=true</property>-->
 <!--       <property name="hibernate.connection.username"></property>-->
 <!--	<property name="hibernate.connection.password"></property>-->
-		<property name="hibernate.generateDdl">true</property>
+		<!-- Create missing tables (and add missing columns) at startup, never drops tables or data. -->
+		<property name="hibernate.hbm2ddl.auto">update</property>
 <!--    	<property name="hibernate.connection.username">LEPIDOPTERA</property>-->
 <!--        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>-->
 <!--    	<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/precapture</property>-->
