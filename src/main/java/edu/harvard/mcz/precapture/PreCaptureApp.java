@@ -49,6 +49,7 @@ import org.hibernate.SessionFactory;
 
 import jakarta.persistence.PersistenceException;
 
+import edu.harvard.mcz.precapture.data.DatabaseUpgrade;
 import edu.harvard.mcz.precapture.data.HibernateUtil;
 import edu.harvard.mcz.precapture.data.InventoryLifeCycle;
 import edu.harvard.mcz.precapture.data.UnitTrayLabelLifeCycle;
@@ -211,6 +212,9 @@ public class PreCaptureApp {
 			try {
 				log.debug("H2 Database " + org.h2.engine.Constants.FULL_VERSION);
 
+				// Convert a database written by an older, incompatible, version of H2.
+				upgradeDatabaseIfNeeded();
+
 				// test database connectivity
 				SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 				Session session = sessionFactory.openSession();
@@ -308,6 +312,47 @@ public class PreCaptureApp {
 			System.exit(1);
 		}
 
+	}
+
+	/**
+	 * If the database was written by an older version of H2 that the current
+	 * version can't read, ask the user, and if they agree convert it to the
+	 * current format.
+	 *
+	 * @throws StartupFailedException if the database needs converting and the
+	 * user declines or the conversion fails, the existing database is left unchanged.
+	 */
+	private static void upgradeDatabaseIfNeeded() throws StartupFailedException {
+		DatabaseUpgrade upgrade = DatabaseUpgrade.checkForUpgrade();
+		if (upgrade == null) {
+			return;
+		}
+		String alternative = "Alternatively, move " + upgrade.getDatabaseFile() + " out of the way, start " + NAME
+				+ " with a new, empty, database, and reload your taxon authority file (Configuration, Data Sources).";
+		String message = "The database " + upgrade.getDatabaseFile() + "\n"
+				+ "was created by an earlier version of " + NAME + " and must be converted\n"
+				+ "to a new format before it can be used.\n\n"
+				+ "Converting requires an internet connection, to download the earlier version\n"
+				+ "(" + upgrade.getFromVersion() + ") of the H2 database library from Maven Central.\n"
+				+ "The original database will be kept as " + upgrade.getBackupFile() + "\n\n"
+				+ "Convert the database now?";
+		int choice = JOptionPane.showConfirmDialog(PreCaptureSingleton.getInstance().getSplashScreen(), message,
+				NAME + ": Convert Database", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if (choice != JOptionPane.YES_OPTION) {
+			log.info("User declined database upgrade.");
+			throw new StartupFailedException("The database " + upgrade.getDatabaseFile() + " must be converted before "
+					+ NAME + " can use it.\n" + alternative);
+		}
+		try {
+			upgrade.upgrade();
+		} catch (Exception e) {
+			log.error("Database upgrade failed: " + e.getMessage(), e);
+			throw new StartupFailedException("Unable to convert the database " + upgrade.getDatabaseFile() + ": " + e.getMessage()
+					+ "\nThe database has not been changed, check the internet connection and try again.\n" + alternative);
+		}
+		JOptionPane.showMessageDialog(PreCaptureSingleton.getInstance().getSplashScreen(),
+				"The database was converted.  The original is kept as\n" + upgrade.getBackupFile(),
+				NAME + ": Convert Database", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	/**

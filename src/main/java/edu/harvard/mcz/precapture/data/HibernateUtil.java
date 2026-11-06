@@ -224,6 +224,17 @@ public class HibernateUtil {
 		Configuration config = new Configuration().configure();
 		return config.getProperties().getProperty("hibernate.connection.url");
 	}
+
+	/**
+	 * Obtain the value of a property from the hibernate configuration file.
+	 * 
+	 * @param name the name of the property, e.g. hibernate.connection.username
+	 * @return the value of the property, or null if it is not set.
+	 */
+	public static String getConfigurationProperty(String name) { 
+		Configuration config = new Configuration().configure();
+		return config.getProperties().getProperty(name);
+	}
 	
 }
 	

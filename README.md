@@ -18,6 +18,15 @@ Former source code repository is at: https://sourceforge.net/p/datashot/code/HEA
 
 Building and running requires Java 17 or later.
 
+## Upgrading
+
+PreCapture keeps its data (taxon authority file and inventory) in an H2 database 
+in the directory it is run from.  Databases created by earlier versions of 
+PreCapture (PRECAPTURE2.h2.db from releases up to 1.1.2, or PRECAPTURE2.mv.db 
+from 2022-2023 development builds) use older H2 file formats.  On startup 
+PreCapture detects these and offers to convert them, which downloads the 
+earlier H2 version from Maven Central; the original file is kept with a .bak suffix.
+
 To build PreCaptureApp.jar run:
 
 mvn package
