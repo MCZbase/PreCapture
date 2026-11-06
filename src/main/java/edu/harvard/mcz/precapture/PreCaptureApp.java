@@ -26,6 +26,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Date;
@@ -322,12 +323,16 @@ public class PreCaptureApp {
 	 * @throws StartupFailedException if the database needs converting and the
 	 * user declines or the conversion fails, the existing database is left unchanged.
 	 */
-	private static void upgradeDatabaseIfNeeded() throws StartupFailedException {
+	private static void upgradeDatabaseIfNeeded() throws StartupFailedException { 
 		DatabaseUpgrade upgrade = DatabaseUpgrade.checkForUpgrade();
-		if (upgrade == null) {
+		if (upgrade == null) { 
 			return;
 		}
-		String alternative = "Alternatively, move " + upgrade.getDatabaseFile() + " out of the way, start " + NAME
+		if (!upgrade.isOldH2Available()) { 
+			offerNewDatabase(upgrade, "it requires an internet connection, and Maven Central\n(where the earlier H2 database library is downloaded from) can't be reached.");
+			return;
+		}
+		String alternative = "Alternatively, move " + upgrade.getDatabaseFile() + " out of the way, start " + NAME 
 				+ " with a new, empty, database, and reload your taxon authority file (Configuration, Data Sources).";
 		String message = "The database " + upgrade.getDatabaseFile() + "\n"
 				+ "was created by an earlier version of " + NAME + " and must be converted\n"
@@ -336,23 +341,67 @@ public class PreCaptureApp {
 				+ "(" + upgrade.getFromVersion() + ") of the H2 database library from Maven Central.\n"
 				+ "The original database will be kept as " + upgrade.getBackupFile() + "\n\n"
 				+ "Convert the database now?";
-		int choice = JOptionPane.showConfirmDialog(PreCaptureSingleton.getInstance().getSplashScreen(), message,
+		int choice = JOptionPane.showConfirmDialog(PreCaptureSingleton.getInstance().getSplashScreen(), message, 
 				NAME + ": Convert Database", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if (choice != JOptionPane.YES_OPTION) {
+		if (choice != JOptionPane.YES_OPTION) { 
 			log.info("User declined database upgrade.");
-			throw new StartupFailedException("The database " + upgrade.getDatabaseFile() + " must be converted before "
+			throw new StartupFailedException("The database " + upgrade.getDatabaseFile() + " must be converted before " 
 					+ NAME + " can use it.\n" + alternative);
 		}
-		try {
+		try { 
 			upgrade.upgrade();
-		} catch (Exception e) {
+		} catch (Exception e) { 
 			log.error("Database upgrade failed: " + e.getMessage(), e);
-			throw new StartupFailedException("Unable to convert the database " + upgrade.getDatabaseFile() + ": " + e.getMessage()
-					+ "\nThe database has not been changed, check the internet connection and try again.\n" + alternative);
+			if (DatabaseUpgrade.isDownloadFailure(e)) { 
+				offerNewDatabase(upgrade, "the earlier H2 database library could not be downloaded\n(" + e.getMessage() + ").");
+				return;
+			}
+			throw new StartupFailedException("Unable to convert the database " + upgrade.getDatabaseFile() + ": " + e.getMessage() 
+					+ "\nThe database has not been changed.\n" + alternative);
 		}
-		JOptionPane.showMessageDialog(PreCaptureSingleton.getInstance().getSplashScreen(),
-				"The database was converted.  The original is kept as\n" + upgrade.getBackupFile(),
+		JOptionPane.showMessageDialog(PreCaptureSingleton.getInstance().getSplashScreen(), 
+				"The database was converted.  The original is kept as\n" + upgrade.getBackupFile(), 
 				NAME + ": Convert Database", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	/**
+	 * When an old database can't be converted because the earlier version of H2 
+	 * can't be downloaded, explain how to continue by reloading the taxon authority 
+	 * file, and offer to set the old database aside and start with a new, empty, one.
+	 * 
+	 * @param upgrade the conversion that could not be performed.
+	 * @param reason why it could not be performed, completing the sentence 
+	 *   "The database can't be converted now because ..."
+	 * @throws StartupFailedException if the user chooses to exit or the old database 
+	 *   can't be moved aside.
+	 */
+	private static void offerNewDatabase(DatabaseUpgrade upgrade, String reason) throws StartupFailedException { 
+		String message = "The database " + upgrade.getDatabaseFile() + "\n"
+				+ "was created by an earlier version of " + NAME + " and must be converted to a new\n"
+				+ "format before it can be used.  It can't be converted now because " + reason + "\n\n"
+				+ "You can start " + NAME + " with a new, empty, database instead.  The old database will\n"
+				+ "be kept, unchanged, in a .bak file.  Then reload your taxon authority file:\n"
+				+ "Configuration, Data Sources, Load Taxon Authority File.  Inventory records are not\n"
+				+ "carried over to the new database.\n\n"
+				+ "Or exit, and start " + NAME + " again when an internet connection is available\n"
+				+ "to convert the database.";
+		String startNew = "Start with a new database";
+		String exit = "Exit";
+		int choice = JOptionPane.showOptionDialog(PreCaptureSingleton.getInstance().getSplashScreen(), message, 
+				NAME + ": Convert Database", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, 
+				new Object[] { startNew, exit }, startNew);
+		if (choice != 0) { 
+			log.info("User chose to exit rather than start with a new database.");
+			throw new StartupFailedException("The database " + upgrade.getDatabaseFile() + " was not converted.\n" 
+					+ "Start " + NAME + " again with an internet connection available to convert it.");
+		}
+		try { 
+			String backup = upgrade.setAside();
+			log.info("Starting with a new database, the old database is kept as " + backup);
+		} catch (IOException e) { 
+			log.error(e.getMessage(), e);
+			throw new StartupFailedException("Unable to move the database " + upgrade.getDatabaseFile() + " aside: " + e.getMessage());
+		}
 	}
 
 	/**
