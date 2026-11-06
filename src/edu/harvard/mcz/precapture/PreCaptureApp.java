@@ -76,7 +76,7 @@ public class PreCaptureApp {
 	public static final String COPYRIGHT = "Copyright © 2012-2022 President and Fellows of Harvard College";
 	public static final String NARATIVE = "This code originates with the Museum of Compative Zoology's internally funded Lepidoptera project workflow and data capture application, DataShot.  It has been extended to this PreCapture application with support from the US National Science Foundation funded NE Vascular Plant TCN, NSF:DBI 1209149.";
 	public static final String LICENSE = "Version 2 of the GNU General Public License";
-	public static final String LIBRARIES = "Apache commons-collections, Apache derby, Hibernate, iText, javassist, javacsv, jgoodies, json-lib, pdf-renderer, pdfbox, zxing";
+	public static final String LIBRARIES = "Apache commons-logging, Apache log4j, H2, Hibernate, iText, Jakarta XML Binding, javacsv, javahelp, jgoodies, json-lib, pdf-renderer, pdfbox, zxing";
 
 	private static final Log log = LogFactory.getLog(PreCaptureApp.class);
 
@@ -209,9 +209,7 @@ public class PreCaptureApp {
 
 			// Test database 
 			try {
-				log.debug(org.apache.derby.tools.sysinfo.getProductName() + " " + org.apache.derby.tools.sysinfo.getVersionString());
-				// Database lives in current directory.
-				System.setProperty("derby.system.home", System.getProperty("user.dir"));
+				log.debug("H2 Database " + org.h2.engine.Constants.FULL_VERSION);
 
 				// test database connectivity
 				SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
