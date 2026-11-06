@@ -24,14 +24,22 @@ mvn package
 
 ## Releasing
 
-Release versions are numbered e.g. 1.1.3 and tagged v1.1.3.  Publishing a GitHub 
-release with such a tag runs the Release executable jar workflow 
-(.github/workflows/release.yml), which builds that version (setting it in 
-pom.xml for the build, so the application reports it), runs the tests, and 
-attaches PreCaptureApp-1.1.3.jar, an executable jar including all dependencies 
-(run with java -jar PreCaptureApp-1.1.3.jar), and its SHA-256 checksum to the 
-release.  The workflow can also be run from the Actions tab for an existing 
-release tag, to rebuild and replace the jar.
+Release versions are numbered e.g. 1.1.3 and tagged v1.1.3.  To make a release:
+
+1. In pom.xml, set the version to the release version, removing -SNAPSHOT 
+   (1.1.3-SNAPSHOT becomes 1.1.3), and change the tag in the scm section from 
+   HEAD to the release tag (v1.1.3).  Commit and push.
+2. Publish a GitHub release with the tag v1.1.3 on that commit.  This runs the 
+   Release executable jar workflow (.github/workflows/release.yml), which checks 
+   that the version and scm tag in pom.xml match the release tag, builds and 
+   tests that version, and attaches PreCaptureApp-1.1.3.jar, an executable jar 
+   including all dependencies (run with java -jar PreCaptureApp-1.1.3.jar), and 
+   its SHA-256 checksum to the release.
+3. In pom.xml, set the version to the next -SNAPSHOT version (1.1.4-SNAPSHOT) 
+   and the scm tag back to HEAD.  Commit and push.
+
+The workflow can also be run from the Actions tab for an existing release tag, 
+to rebuild and replace the jar.
 
 ## Upgrading
 

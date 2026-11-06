@@ -1,8 +1,10 @@
 # Build the executable jar (PreCaptureApp-<version>.jar, with all dependencies)
 # and attach it to a GitHub release when the release is published.
 #
-# The version is taken from the release tag, with a leading v removed (tag
-# v1.1.3 builds version 1.1.3), and set in pom.xml for the build only.
+# Release versions are numbered e.g. 1.1.3 and tagged v1.1.3.  Before tagging
+# a release, set the <version> in pom.xml to the release version (removing
+# -SNAPSHOT) and the <tag> in its <scm> section to the release tag; this
+# workflow checks both match the release tag and fails if they don't.
 #
 # To rebuild and replace the jar on an existing release, run this workflow from
 # the Actions tab (Run workflow) with the release's tag.
@@ -40,16 +42,25 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - name: Set the version from the tag
+      - name: Check pom.xml has the release version and tag
         run: |
           VERSION="${TAG#v}"
           if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
-            echo "::error::Tag '$TAG' is not a version such as v1.1.3"
+            echo "::error::Tag '$TAG' is not a version tag such as v1.1.3"
+            exit 1
+          fi
+          HELP=org.apache.maven.plugins:maven-help-plugin:3.5.2:evaluate
+          POM_VERSION=$(mvn -B -q $HELP -Dexpression=project.version -DforceStdout)
+          POM_SCM_TAG=$(mvn -B -q $HELP -Dexpression=project.scm.tag -DforceStdout)
+          if [ "$POM_VERSION" != "$VERSION" ]; then
+            echo "::error::pom.xml <version> is '$POM_VERSION', expected '$VERSION' for release tag '$TAG'"
+            exit 1
+          fi
+          if [ "$POM_SCM_TAG" != "$TAG" ]; then
+            echo "::error::pom.xml <scm><tag> is '$POM_SCM_TAG', expected '$TAG'"
             exit 1
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          mvn -B -q org.codehaus.mojo:versions-maven-plugin:2.24.0:set \
-            -DnewVersion="$VERSION" -DgenerateBackupPoms=false
 
       - name: Build and test
         run: mvn -B package -Djava.awt.headless=true
