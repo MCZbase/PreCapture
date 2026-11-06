@@ -55,8 +55,8 @@ import edu.harvard.mcz.precapture.decoder.LabelDecoder;
 import edu.harvard.mcz.precapture.encoder.LabelEncoder;
 import edu.harvard.mcz.precapture.exceptions.BarcodeCreationException;
 import edu.harvard.mcz.precapture.exceptions.BarcodeReadException;
-import edu.harvard.mcz.precapture.test.BarcodeTestResult;
-import edu.harvard.mcz.precapture.test.BarcodeTestResultsTableModel;
+import edu.harvard.mcz.precapture.ui.BarcodeTestResult;
+import edu.harvard.mcz.precapture.ui.BarcodeTestResultsTableModel;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionListType;
 import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 

@@ -58,6 +58,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.13.2</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.zxing</groupId>
@@ -125,52 +126,19 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<sourceDirectory>${project.basedir}/src</sourceDirectory>
-		<testSourceDirectory>${project.basedir}/src</testSourceDirectory>
-<testResources>
-   <testResource>
-     <directory>${project.basedir}/src</directory>
-     <includes>
-       <include>**/*.xml</include>
-     </includes>
-   </testResource>
-</testResources> 		
-<resources>
-   <resource>
-     <directory>${project.basedir}/src/edu/harvard/mcz/precapture/resources</directory>
-     <targetPath>edu/harvard/mcz/precapture/resources</targetPath>
-     <includes>
-       <include>**/**</include>
-     </includes>
-   </resource>
-   <resource>
-     <directory>${project.basedir}/src/</directory>
-     <includes>
-       <include>**/*.xml</include>
-       <include>**/*.properties</include>
-     </includes>
-     <excludes>
-         <exclude>log4j2.properties</exclude>
-     </excludes>
-   </resource>
-   <resource>
-     <directory>${project.basedir}</directory>
-     <includes>
-       <include>pom.xml</include>
-       <include>README.txt</include>
-       <include>LICENCE.txt</include>
-     </includes>
-   </resource>   
-   <resource>
-     <directory>${project.basedir}/supporting/</directory>
-     <targetPath>./</targetPath>
-     <includes>
-         <include>log4j2.properties</include>
-     </includes>
-     <excludes>
-     </excludes>
-   </resource>   
-</resources> 
+		<resources>
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>${project.basedir}</directory>
+				<includes>
+					<include>pom.xml</include>
+					<include>README.md</include>
+					<include>LICENSE.txt</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 		<plugin>
 			<artifactId>maven-compiler-plugin</artifactId>
@@ -179,6 +147,17 @@
 				<release>${maven.compiler.release}</release>
 			</configuration>
 		</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.5.6</version>
+				<configuration>
+					<excludes>
+						<!-- suite of the other tests, avoid running them twice -->
+						<exclude>**/AllTests.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>

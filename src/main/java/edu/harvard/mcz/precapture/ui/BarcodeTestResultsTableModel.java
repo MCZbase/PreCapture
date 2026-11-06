@@ -1,6 +1,6 @@
 /**
  * BarcodeTestResultsTableModel.java
- * edu.harvard.mcz.precapture.test
+ * edu.harvard.mcz.precapture.ui
  * Copyright © 2012 President and Fellows of Harvard College
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  * 
  * Author: mole
  */
-package edu.harvard.mcz.precapture.test;
+package edu.harvard.mcz.precapture.ui;
 
 import java.util.ArrayList;
 
