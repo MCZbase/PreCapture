@@ -17,10 +17,16 @@
  */
 package edu.harvard.mcz.precapture.data;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -33,7 +39,8 @@ import org.apache.commons.csv.DuplicateHeaderMode;
  * authority file and inventory, configured to read and write csv the same
  * way as the javacsv library previously used: comma delimited, double quote
  * text qualifier, values quoted only when needed, \n line endings, blank lines
- * skipped, and surrounding white space trimmed from unquoted values.
+ * skipped, and surrounding white space trimmed from unquoted values.  Unlike
+ * javacsv, a UTF-8 byte order mark at the start of a file is recognized.
  */
 public final class CsvUtility {
 
@@ -52,6 +59,9 @@ public final class CsvUtility {
 			.setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL)
 			.get();
 
+	/** The UTF-8 encoding of the byte order mark U+FEFF. */
+	private static final byte[] UTF8_BOM = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
+
 	private CsvUtility() { }
 
 	/**
@@ -63,7 +73,35 @@ public final class CsvUtility {
 	 * @throws IOException on an error opening the file.
 	 */
 	public static CSVParser openForReading(String filename, Charset charset) throws IOException {
-		return CSVParser.parse(Paths.get(filename), charset, READ_WITH_HEADER_FORMAT);
+		return CSVParser.parse(openReader(filename, charset), READ_WITH_HEADER_FORMAT);
+	}
+
+	/**
+	 * Open a text file for reading.  If the file starts with a UTF-8 byte order
+	 * mark (as written by Excel's "CSV UTF-8" format) the mark is skipped and the
+	 * file is read as UTF-8, otherwise it is read with the given character encoding.
+	 *
+	 * @param filename the file to read.
+	 * @param charset the character encoding of the file if it has no byte order mark.
+	 * @return a reader, the caller is responsible for closing it.
+	 * @throws IOException on an error opening the file.
+	 */
+	public static Reader openReader(String filename, Charset charset) throws IOException {
+		InputStream in = new BufferedInputStream(Files.newInputStream(Paths.get(filename)));
+		try {
+			in.mark(UTF8_BOM.length);
+			byte[] start = new byte[UTF8_BOM.length];
+			int read = in.readNBytes(start, 0, start.length);
+			if (read == UTF8_BOM.length && Arrays.equals(start, UTF8_BOM)) {
+				charset = StandardCharsets.UTF_8;
+			} else {
+				in.reset();
+			}
+			return new InputStreamReader(in, charset);
+		} catch (IOException | RuntimeException e) {
+			in.close();
+			throw e;
+		}
 	}
 
 	/**
@@ -88,7 +126,7 @@ public final class CsvUtility {
 	 */
 	public static int countRecords(String filename, Charset charset) throws IOException {
 		int count = 0;
-		try (CSVParser parser = CSVParser.parse(Paths.get(filename), charset, CSVFormat.DEFAULT)) {
+		try (CSVParser parser = CSVParser.parse(openReader(filename, charset), CSVFormat.DEFAULT)) {
 			for (@SuppressWarnings("unused") CSVRecord record : parser) {
 				count++;
 			}

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -79,6 +80,32 @@ public class TestCsvUtility {
 			}
 		}
 		assertEquals("[[Orchidaceae][Malaxis][  q  ][], [Rosaceae][Rosa][][], [a,b][c][Ü][]]", values.toString());
+	}
+
+	@Test
+	public void testReadWithByteOrderMark() throws IOException {
+		// Excel's "CSV UTF-8" format starts the file with a UTF-8 byte order mark
+		byte[] bom = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
+		byte[] content = "Family,Genus\nOrchidaceae,Malaxis Ü\n".getBytes(StandardCharsets.UTF_8);
+		byte[] withBom = new byte[bom.length + content.length];
+		System.arraycopy(bom, 0, withBom, 0, bom.length);
+		System.arraycopy(content, 0, withBom, bom.length, content.length);
+		File file = folder.newFile("bom.csv");
+		Files.write(file.toPath(), withBom);
+		// read as UTF-8 even when ISO-8859-1 is expected
+		for (Charset charset : new Charset[] { StandardCharsets.UTF_8, StandardCharsets.ISO_8859_1 }) {
+			assertEquals(2, CsvUtility.countRecords(file.getPath(), charset));
+			try (CSVParser parser = CsvUtility.openForReading(file.getPath(), charset)) {
+				assertEquals("[Family, Genus]", parser.getHeaderNames().toString());
+				CSVRecord record = parser.iterator().next();
+				assertEquals("Orchidaceae", CsvUtility.get(record, "Family"));
+				assertEquals("Malaxis Ü", CsvUtility.get(record, "Genus"));
+			}
+		}
+		// a file shorter than a byte order mark
+		File shortFile = folder.newFile("short.csv");
+		Files.write(shortFile.toPath(), "a\n".getBytes(StandardCharsets.UTF_8));
+		assertEquals(1, CsvUtility.countRecords(shortFile.getPath(), StandardCharsets.UTF_8));
 	}
 
 }
