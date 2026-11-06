@@ -1,4 +1,5 @@
 /**
+ * SPDX-License-Identifier: GPL-2.0-only
  * TestCsvUtility.java
  * edu.harvard.mcz.precapture.test
  * Copyright © 2026 President and Fellows of Harvard College

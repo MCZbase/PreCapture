@@ -1,3 +1,8 @@
+# Copyright © 2026 President and Fellows of Harvard College
+# This file is part of PreCapture, licensed under Version 2 of the GNU General
+# Public License, see LICENSE.txt.
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # Build the executable jar (PreCaptureApp-<version>.jar, with all dependencies)
 # and attach it to a GitHub release when the release is published.
 #
