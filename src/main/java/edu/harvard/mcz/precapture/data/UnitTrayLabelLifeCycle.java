@@ -20,7 +20,7 @@
 package edu.harvard.mcz.precapture.data;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,8 +42,9 @@ import org.hibernate.LockMode;
 import org.hibernate.SessionException;
 import org.hibernate.Session;
 
-import com.csvreader.CsvReader;
-import com.csvreader.CsvWriter;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 
 import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
@@ -102,11 +103,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     	int totalLines = 0;
     	final JProgressBar jpb = taxonProgressBar;
     	if (taxonProgressBar!=null) { 
-    		CsvReader readerTest = new CsvReader(filename,',',Charset.forName("utf-8"));
-    		while (readerTest.readRecord()) { 
-    			totalLines++;
-    		}
-    		readerTest.close();
+    		totalLines = CsvUtility.countRecords(filename, StandardCharsets.UTF_8);
     		final int totalLinesF = totalLines;
     		SwingUtilities.invokeLater(new Runnable() {
     			public void run() { 
@@ -114,38 +111,37 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     			}
     		});
     	}
-    	CsvReader reader = new CsvReader(filename,',',Charset.forName("utf-8"));
+    	CSVParser reader = CsvUtility.openForReading(filename, StandardCharsets.UTF_8);
     	log.debug("Reading: " + filename);
-    	reader.readHeaders();
     	boolean hasTribe = false;
     	boolean hasSubfamily = false;
-    	String[] headers = reader.getHeaders();
+    	List<String> headers = reader.getHeaderNames();
     	log.debug("ExpectedHeaders: Family, Genus, SpecificEpithet, SubspecificEpithet, InfraspecificEpithet, InfraspecificRank, Authorship");
     	log.debug("OptionalHeaders: Subfamily, Tribe");
-    	for (int i=0; i<headers.length; i++) { 
-    		log.debug("Contains Header: "+ headers[i]);
-    		if (headers[i].equals("Tribe")) { hasTribe = true; } 
-    		if (headers[i].equals("Subfamily")) { hasSubfamily = true; } 
+    	for (String header : headers) { 
+    		log.debug("Contains Header: "+ header);
+    		if (header.equals("Tribe")) { hasTribe = true; } 
+    		if (header.equals("Subfamily")) { hasSubfamily = true; } 
     	}
     	UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
     	uls.deleteAll();
-    	while (reader.readRecord()) { 
+    	for (CSVRecord record : reader) { 
     		UnitTrayLabel unitTrayLabel = new UnitTrayLabel();
     		// TODO: If scientific name is added to data structure 
     		// it will need to be added here as well.
-    		unitTrayLabel.setFamily(reader.get("Family"));
+    		unitTrayLabel.setFamily(CsvUtility.get(record, "Family"));
     	    if (hasSubfamily) {
-    		    unitTrayLabel.setSubfamily(reader.get("Subfamily"));
+    		    unitTrayLabel.setSubfamily(CsvUtility.get(record, "Subfamily"));
     		}
     	    if (hasTribe) {
-    		    unitTrayLabel.setTribe(reader.get("Tribe"));
+    		    unitTrayLabel.setTribe(CsvUtility.get(record, "Tribe"));
     		}
-    		unitTrayLabel.setGenus(reader.get("Genus"));
-    		unitTrayLabel.setSpecificEpithet(reader.get("SpecificEpithet"));
-    		unitTrayLabel.setSubspecificEpithet(reader.get("SubspecificEpithet"));
-    		unitTrayLabel.setInfraspecificEpithet(reader.get("InfraspecificEpithet"));
-    		unitTrayLabel.setInfraspecificRank(reader.get("InfraspecificRank"));
-    		unitTrayLabel.setAuthorship(reader.get("Authorship"));
+    		unitTrayLabel.setGenus(CsvUtility.get(record, "Genus"));
+    		unitTrayLabel.setSpecificEpithet(CsvUtility.get(record, "SpecificEpithet"));
+    		unitTrayLabel.setSubspecificEpithet(CsvUtility.get(record, "SubspecificEpithet"));
+    		unitTrayLabel.setInfraspecificEpithet(CsvUtility.get(record, "InfraspecificEpithet"));
+    		unitTrayLabel.setInfraspecificRank(CsvUtility.get(record, "InfraspecificRank"));
+    		unitTrayLabel.setAuthorship(CsvUtility.get(record, "Authorship"));
     		try {
 				uls.persist(unitTrayLabel);
 				if (unitTrayLabel.getSpecificEpithet()!=null) { 
@@ -172,9 +168,12 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
 
     public static int exportToCSV(String filename) throws IOException {
     	int numberWritten = 0;
-    	CsvWriter writer = new CsvWriter(filename);
+    	// Write UTF-8, the encoding loadFromCSV() reads (previously written as ISO-8859-1, 
+    	// so characters outside ISO-8859-1 were lost and non-ASCII characters were 
+    	// garbled when an export was reloaded).
+    	CSVPrinter writer = CsvUtility.openForWriting(filename, StandardCharsets.UTF_8);
     	String[] header = {"Family","Genus","SpecificEpithet","SubspecificEpithet","InfraspecificEpithet","InfraspecificRank","Authorship"};
-    	writer.writeRecord(header,false);
+    	writer.printRecord((Object[])header);
     	UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
     	List<UnitTrayLabel> list = uls.findAll();
     	Iterator<UnitTrayLabel> i = list.iterator();
@@ -189,7 +188,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     		row.add(unitTrayLabel.getInfraspecificEpithet());
     		row.add(unitTrayLabel.getInfraspecificRank());
     		row.add(unitTrayLabel.getAuthorship());
-    		writer.writeRecord(row.toArray(new String[row.size()]), true);
+    		writer.printRecord(row);
     		numberWritten++;
     	}
     	writer.close();

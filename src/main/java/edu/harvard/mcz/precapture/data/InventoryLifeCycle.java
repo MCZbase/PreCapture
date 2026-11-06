@@ -20,6 +20,7 @@
 package edu.harvard.mcz.precapture.data;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,8 +36,9 @@ import org.hibernate.LockMode;
 import org.hibernate.SessionException;
 import org.hibernate.Session;
 
-import com.csvreader.CsvReader;
-import com.csvreader.CsvWriter;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 
 import edu.harvard.mcz.precapture.exceptions.SaveFailedException;
 
@@ -343,9 +345,9 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
 	
     public static int exportToCSV(String filename) throws IOException {
     	int numberWritten = 0;
-    	CsvWriter writer = new CsvWriter(filename);
+    	CSVPrinter writer = CsvUtility.openForWriting(filename, StandardCharsets.ISO_8859_1);
     	String[] header = {"Cabinet","Taxon","Thickness","SheetsPerUnitThickness"};
-    	writer.writeRecord(header,false);
+    	writer.printRecord((Object[])header);
     	InventoryLifeCycle ils = new InventoryLifeCycle();
     	List<Inventory> list = ils.findAll();
     	Iterator<Inventory> i = list.iterator();
@@ -356,7 +358,7 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
     		row.add(inventory.getTaxon());
     		row.add(((Float)inventory.getThickness()).toString());
     		row.add(((Float)inventory.getSheetsPerUnitThickness()).toString());
-    		writer.writeRecord(row.toArray(new String[row.size()]), true);
+    		writer.printRecord(row);
     		numberWritten++;
     	}
     	writer.close();
@@ -365,18 +367,17 @@ private static final Log log = LogFactory.getLog(InventoryLifeCycle.class);
     
     public static int loadFromCSV(String filename, boolean deleteAllFirst) throws IOException {
     	int numberLoaded = 0;
-    	CsvReader reader = new CsvReader(filename);
-    	reader.readHeaders();
+    	CSVParser reader = CsvUtility.openForReading(filename, StandardCharsets.ISO_8859_1);
     	InventoryLifeCycle ils = new InventoryLifeCycle();
     	if (deleteAllFirst) { 
     	    ils.deleteAll();
     	}
-    	while (reader.readRecord()) { 
+    	for (CSVRecord record : reader) { 
     		Inventory inventory = new Inventory();
-    		inventory.setCabinet(reader.get("Cabinet"));
-    		inventory.setTaxon(reader.get("Taxon"));
-    		inventory.setThickness(Float.parseFloat(reader.get("Thickness")));
-    		inventory.setSheetsPerUnitThickness(Float.parseFloat(reader.get("SheetsPerUnitThickness")));
+    		inventory.setCabinet(CsvUtility.get(record, "Cabinet"));
+    		inventory.setTaxon(CsvUtility.get(record, "Taxon"));
+    		inventory.setThickness(Float.parseFloat(CsvUtility.get(record, "Thickness")));
+    		inventory.setSheetsPerUnitThickness(Float.parseFloat(CsvUtility.get(record, "SheetsPerUnitThickness")));
     		try {
 				ils.persist(inventory);
 				numberLoaded++;
