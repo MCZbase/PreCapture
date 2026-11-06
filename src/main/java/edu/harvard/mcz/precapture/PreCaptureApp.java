@@ -32,6 +32,7 @@ import java.io.PrintStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.InputMap;
 import javax.swing.JFrame;
@@ -69,7 +70,8 @@ import edu.harvard.mcz.precapture.xml.labels.LabelDefinitionType;
 public class PreCaptureApp {
 
 	public static final String NAME = "PreCaptureApp";
-	public static final String VERSION = "1.1.3-SNAPSHOT";
+	/** The version of the application, from the version in pom.xml at build time. */
+	public static final String VERSION = loadVersion();
 	public static final String SVN_ID = "$Id$";
 	public static final String AUTHORS = "Paul J. Morris";
 	public static final String COPYRIGHT = "Copyright © 2012-2022 President and Fellows of Harvard College";
@@ -78,6 +80,29 @@ public class PreCaptureApp {
 	public static final String LIBRARIES = "Apache Commons CSV, Apache commons-logging, Apache log4j, Apache PDFBox, H2, Hibernate, iText, Jakarta XML Binding, javahelp, jgoodies, org.json, zxing";
 
 	private static final Log log = LogFactory.getLog(PreCaptureApp.class);
+
+	/**
+	 * Read the application version from version.properties, which the build 
+	 * fills in with the version from pom.xml.
+	 * 
+	 * @return the version, or "unknown" if it can't be read.
+	 */
+	private static String loadVersion() { 
+		Properties versionProperties = new Properties();
+		try (InputStream stream = PreCaptureApp.class.getResourceAsStream("version.properties")) { 
+			if (stream != null) { 
+				versionProperties.load(stream);
+			}
+		} catch (IOException e) { 
+			// fall through to unknown
+		}
+		String version = versionProperties.getProperty("version", "unknown");
+		if (version.startsWith("${")) { 
+			// not filtered, e.g. running from an IDE without Maven resource processing
+			version = "unknown";
+		}
+		return version;
+	}
 
 	/**
 	 * Entry point for the PreCapture application.  

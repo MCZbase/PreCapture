@@ -22,6 +22,17 @@ To build PreCaptureApp.jar run:
 
 mvn package
 
+## Releasing
+
+Release versions are numbered e.g. 1.1.3 and tagged v1.1.3.  Publishing a GitHub 
+release with such a tag runs the Release executable jar workflow 
+(.github/workflows/release.yml), which builds that version (setting it in 
+pom.xml for the build, so the application reports it), runs the tests, and 
+attaches PreCaptureApp-1.1.3.jar, an executable jar including all dependencies 
+(run with java -jar PreCaptureApp-1.1.3.jar), and its SHA-256 checksum to the 
+release.  The workflow can also be run from the Actions tab for an existing 
+release tag, to rebuild and replace the jar.
+
 ## Upgrading
 
 PreCapture keeps its data (taxon authority file and inventory) in an H2 database, 

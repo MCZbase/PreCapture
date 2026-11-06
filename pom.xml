@@ -105,6 +105,17 @@
 		<resources>
 			<resource>
 				<directory>${project.basedir}/src/main/resources</directory>
+				<excludes>
+					<exclude>edu/harvard/mcz/precapture/version.properties</exclude>
+				</excludes>
+			</resource>
+			<!-- only version.properties is filtered, to insert the project version -->
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>edu/harvard/mcz/precapture/version.properties</include>
+				</includes>
 			</resource>
 			<resource>
 				<directory>${project.basedir}</directory>
