@@ -172,7 +172,7 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     	// so characters outside ISO-8859-1 were lost and non-ASCII characters were 
     	// garbled when an export was reloaded).
     	CSVPrinter writer = CsvUtility.openForWriting(filename, StandardCharsets.UTF_8);
-    	String[] header = {"Family","Genus","SpecificEpithet","SubspecificEpithet","InfraspecificEpithet","InfraspecificRank","Authorship"};
+    	String[] header = {"Family","Subfamily","Tribe","Genus","SpecificEpithet","SubspecificEpithet","InfraspecificEpithet","InfraspecificRank","Authorship"};
     	writer.printRecord((Object[])header);
     	UnitTrayLabelLifeCycle uls = new UnitTrayLabelLifeCycle();
     	List<UnitTrayLabel> list = uls.findAll();
@@ -182,6 +182,8 @@ private static final Log log = LogFactory.getLog(UnitTrayLabelLifeCycle.class);
     		UnitTrayLabel unitTrayLabel = i.next();
     		ArrayList<String> row = new ArrayList<String>();
     		row.add(unitTrayLabel.getFamily());
+    		row.add(unitTrayLabel.getSubfamily());
+    		row.add(unitTrayLabel.getTribe());
     		row.add(unitTrayLabel.getGenus());
     		row.add(unitTrayLabel.getSpecificEpithet());
     		row.add(unitTrayLabel.getSubspecificEpithet());

@@ -220,9 +220,9 @@ public class TestDataLayer {
 	@Test
 	public void testTaxonCsvRoundTrip() throws Exception {
 		File in = folder.newFile("taxa.csv");
-		Files.write(in.toPath(), ("Family,Genus,SpecificEpithet,SubspecificEpithet,InfraspecificEpithet,InfraspecificRank,Authorship\n"
-				+ "Orchidaceae,Malaxis,monophyllos,,,,(L.) Sw.\n"
-				+ "Rosaceae,Rosa,carolina,,,,\"Łuczaj, Müll.\"\n").getBytes(StandardCharsets.UTF_8));
+		Files.write(in.toPath(), ("Family,Subfamily,Tribe,Genus,SpecificEpithet,SubspecificEpithet,InfraspecificEpithet,InfraspecificRank,Authorship\n"
+				+ "Orchidaceae,Epidendroideae,Malaxideae,Malaxis,monophyllos,,,,(L.) Sw.\n"
+				+ "Rosaceae,Rosoideae,Roseae,Rosa,carolina,,,,\"Łuczaj, Müll.\"\n").getBytes(StandardCharsets.UTF_8));
 		assertEquals(2, UnitTrayLabelLifeCycle.loadFromCSV(in.getPath()));
 		File out = new File(folder.getRoot(), "taxa_out.csv");
 		assertEquals(2, UnitTrayLabelLifeCycle.exportToCSV(out.getPath()));
@@ -230,7 +230,19 @@ public class TestDataLayer {
 				new String(Files.readAllBytes(out.toPath()), StandardCharsets.UTF_8));
 		// loading replaces the existing records
 		assertEquals(2, UnitTrayLabelLifeCycle.loadFromCSV(out.getPath()));
-		assertEquals("[Malaxis monophyllos (L.) Sw., Rosa carolina Łuczaj, Müll.]", new UnitTrayLabelLifeCycle().findAll().toString());
+		List<UnitTrayLabel> loaded = new UnitTrayLabelLifeCycle().findAll();
+		assertEquals("[Malaxis monophyllos (L.) Sw., Rosa carolina Łuczaj, Müll.]", loaded.toString());
+		assertEquals("Epidendroideae", loaded.get(0).getSubfamily());
+		assertEquals("Malaxideae", loaded.get(0).getTribe());
+
+		// files without the optional Subfamily and Tribe columns still load
+		File noHigherTaxa = folder.newFile("taxa_without_subfamily.csv");
+		Files.write(noHigherTaxa.toPath(), ("Family,Genus,SpecificEpithet,Authorship\n"
+				+ "Orchidaceae,Malaxis,monophyllos,(L.) Sw.\n").getBytes(StandardCharsets.UTF_8));
+		assertEquals(1, UnitTrayLabelLifeCycle.loadFromCSV(noHigherTaxa.getPath()));
+		loaded = new UnitTrayLabelLifeCycle().findAll();
+		assertEquals("Malaxis monophyllos (L.) Sw.", loaded.get(0).toString());
+		assertEquals("", loaded.get(0).getTribe());
 	}
 
 	@Test
