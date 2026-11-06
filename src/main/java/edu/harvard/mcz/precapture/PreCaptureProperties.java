@@ -82,6 +82,11 @@ public class PreCaptureProperties extends AbstractTableModel {
 	public static final String KEY_TRINOMIAL_SUBSP_RANK = "config.trinomialsubsprank";
 	/** When not using quadranomials, put subspecies and subspecies rank in infraspecific name and rank. */
 	public static final String KEY_PUT_SUBSPECIES_IN_INFRA = "config.putsubspeciesininfra";	
+	/** Key for the path of the H2 database file, without the .mv.db suffix, relative to the 
+	 * working directory unless absolute, takes effect when the application is next started. */
+	public static final String KEY_DATABASE = "config.database";
+	/** Default location of the database, PRECAPTURE2.mv.db in the working directory. */
+	public static final String DEFAULT_DATABASE = "./PRECAPTURE2";
 	
 
 	private Properties properties = null;
@@ -255,6 +260,10 @@ public class PreCaptureProperties extends AbstractTableModel {
 		if (!properties.containsKey(KEY_PUT_SUBSPECIES_IN_INFRA)) {
 			// by default print to labels.pdf in the current directory.
 			properties.setProperty(KEY_PUT_SUBSPECIES_IN_INFRA, "true");
+		}
+		if (!properties.containsKey(KEY_DATABASE)) {
+			// by default the database is PRECAPTURE2.mv.db in the current directory.
+			properties.setProperty(KEY_DATABASE, DEFAULT_DATABASE);
 		}			
 	}
 

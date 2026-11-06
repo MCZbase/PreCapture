@@ -2,6 +2,8 @@ package edu.harvard.mcz.precapture.data;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import java.nio.file.Paths;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -20,6 +22,9 @@ import org.hibernate.cfg.Configuration;
 public class HibernateUtil {
 
 	private static SessionFactory sessionFactory = null;
+	
+	/** Location of the H2 database file, overriding the one in hibernate.cfg.xml, if not null. */
+	private static String databasePath = null;
 	
 	private static final Log log = LogFactory.getLog(HibernateUtil.class);
 	
@@ -41,6 +46,87 @@ public class HibernateUtil {
 	
 
 	/**
+	 * Set the location of the H2 database file, replacing the file path in the 
+	 * hibernate.connection.url in hibernate.cfg.xml (other settings in that url 
+	 * are retained).  Closes the current session factory, if any, so that the 
+	 * next call to getSessionFactory() uses the new location.
+	 * 
+	 * @param path the path of the database file, without the .mv.db suffix, 
+	 * relative to the working directory unless absolute, e.g. ./PRECAPTURE2 
+	 * or /data/precapture/PRECAPTURE2.  Null or blank to use hibernate.cfg.xml.
+	 */
+	public static void setDatabasePath(String path) { 
+		if (sessionFactory != null) { 
+			terminateSessionFactory();
+		}
+		databasePath = normalizeDatabasePath(path);
+		log.debug("Database path set to " + databasePath);
+	}
+
+	/**
+	 * Put a database path in the form H2 requires: without a .mv.db suffix, and with 
+	 * a path relative to the working directory starting with ./ (H2 does not accept 
+	 * implicitly relative paths such as data/PRECAPTURE2).
+	 * 
+	 * @param path a database path, e.g. data/PRECAPTURE2.mv.db
+	 * @return the normalized path, e.g. ./data/PRECAPTURE2, or null if path is null or blank.
+	 */
+	public static String normalizeDatabasePath(String path) { 
+		if (path == null) { 
+			return null;
+		}
+		path = path.trim();
+		if (path.endsWith(".mv.db")) { 
+			path = path.substring(0, path.length() - ".mv.db".length());
+		}
+		if (path.isEmpty()) { 
+			return null;
+		}
+		if (!Paths.get(path).isAbsolute() && !path.startsWith(".") && !path.startsWith("~")) { 
+			path = "./" + path;
+		}
+		return path;
+	}
+
+	/**
+	 * The hibernate configuration from hibernate.cfg.xml, with the database 
+	 * path set by setDatabasePath() applied.
+	 * 
+	 * @return the configuration.
+	 */
+	private static Configuration configuration() { 
+		Configuration config = new Configuration().configure();
+		if (databasePath != null) { 
+			String configuredUrl = config.getProperties().getProperty("hibernate.connection.url");
+			String url = replaceDatabasePath(configuredUrl, databasePath);
+			if (url == null) { 
+				log.error("Not an H2 file database, unable to set its path: " + configuredUrl);
+			} else { 
+				config.setProperty("hibernate.connection.url", url);
+			}
+		}
+		return config;
+	}
+
+	/**
+	 * Replace the database file path in an H2 jdbc url.
+	 * 
+	 * @param url an H2 jdbc url for a file database, e.g. jdbc:h2:file:./PRECAPTURE2;INIT=...
+	 * @param path the new database path, e.g. /data/PRECAPTURE2
+	 * @return the url with the path replaced, e.g. jdbc:h2:file:/data/PRECAPTURE2;INIT=..., 
+	 * or null if url is not for an H2 file database.
+	 */
+	public static String replaceDatabasePath(String url, String path) { 
+		if (DatabaseUpgrade.getDatabasePath(url) == null) { 
+			return null;
+		}
+		String trimmed = url.trim();
+		int semicolon = trimmed.indexOf(';');
+		String settings = semicolon >= 0 ? trimmed.substring(semicolon) : "";
+		return "jdbc:h2:file:" + path + settings;
+	}
+
+	/**
 	 *  Using the Hibernate configuration in Configuration from hibernate.cfg.xml
 	 *  create a Hibernate sessionFactory.  Method is private as the the session factory 
 	 *  should be a singleton, invoke getSessionFactory() to create or access a session.
@@ -48,7 +134,7 @@ public class HibernateUtil {
 	 *  @see edu.harvard.mcz.precapture.data.HibernateUtil#getSessionFactory
 	 */
 	private static void createSessionFactory() {
-			Configuration config = new Configuration().configure();
+			Configuration config = configuration();
 			sessionFactory = config.buildSessionFactory();
 			Session session = sessionFactory.getCurrentSession();
 			session.beginTransaction();
@@ -209,7 +295,7 @@ public class HibernateUtil {
 	 * hibernate configuration file.
 	 */
 	public static String getDriverClassString() { 
-		Configuration config = new Configuration().configure();
+		Configuration config = configuration();
 		return config.getProperties().getProperty("hibernate.connection.driver_class");
 	}
 	
@@ -221,7 +307,7 @@ public class HibernateUtil {
 	 * configuration file.
 	 */
     public static String getConnectionURL() { 
-		Configuration config = new Configuration().configure();
+		Configuration config = configuration();
 		return config.getProperties().getProperty("hibernate.connection.url");
 	}
 
@@ -232,7 +318,7 @@ public class HibernateUtil {
 	 * @return the value of the property, or null if it is not set.
 	 */
 	public static String getConfigurationProperty(String name) { 
-		Configuration config = new Configuration().configure();
+		Configuration config = configuration();
 		return config.getProperties().getProperty(name);
 	}
 	

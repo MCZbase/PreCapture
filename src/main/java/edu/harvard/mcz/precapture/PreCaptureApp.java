@@ -98,6 +98,8 @@ public class PreCaptureApp {
 
 			// Load configuration properties
 			PreCaptureSingleton.getInstance().setProperties(new PreCaptureProperties());
+			// Location of the database
+			HibernateUtil.setDatabasePath(PreCaptureSingleton.getInstance().getProperties().getProperties().getProperty(PreCaptureProperties.KEY_DATABASE));
 
 			PreCaptureSingleton.getInstance().getSplashScreen().setProgress(10);
 			

@@ -30,7 +30,7 @@ import org.junit.runners.Suite.SuiteClasses;
  *
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TestContainerLabel.class, TestUnitTrayLifeCycle.class, TestLabelEncoder.class, TestCsvUtility.class, TestDatabaseUpgrade.class })
+@SuiteClasses({ TestContainerLabel.class, TestUnitTrayLifeCycle.class, TestLabelEncoder.class, TestCsvUtility.class, TestDatabaseUpgrade.class, TestDataLayer.class })
 public class AllTests {
 	private static final Log log = LogFactory.getLog(AllTests.class);
 
