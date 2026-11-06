@@ -30,7 +30,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.awt.Cursor;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
@@ -46,8 +45,9 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.layout.FormSpecs;
-import com.sun.pdfview.PDFFile;
-import com.sun.pdfview.PDFPage;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 
 import edu.harvard.mcz.precapture.PreCaptureProperties;
 import edu.harvard.mcz.precapture.PreCaptureSingleton;
@@ -66,7 +66,6 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -326,12 +325,11 @@ public class BarcodeTestingFrame extends JFrame {
 				document.add(iTextImage);
 				document.close();
 				
-				// Convert the PDF page containing the barcode to an image
-		        ByteBuffer byteBuffer = ByteBuffer.wrap(outputStream.toByteArray());
-				PDFFile pdfFile = new PDFFile(byteBuffer);
-		        PDFPage page = pdfFile.getPage(1);
-		        Rectangle rect = new Rectangle(0, 0, (int)page.getBBox().getWidth(), (int)page.getBBox().getHeight());
-		        java.awt.Image pageImage = page.getImage(rect.width, rect.height, rect, null, true, true);	
+				// Convert the PDF page containing the barcode to an image, at 72 dpi (one pixel per point)
+				BufferedImage pageImage;
+				try (PDDocument pdfDocument = Loader.loadPDF(outputStream.toByteArray())) { 
+					pageImage = new PDFRenderer(pdfDocument).renderImage(0, 1.0f);
+				}
 				ImageIcon rescaledIcon = new ImageIcon(pageImage);
 				
 				// Test to see if the result of the round trip to PDF is readable.

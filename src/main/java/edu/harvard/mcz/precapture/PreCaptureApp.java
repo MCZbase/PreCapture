@@ -77,7 +77,7 @@ public class PreCaptureApp {
 	public static final String COPYRIGHT = "Copyright © 2012-2022 President and Fellows of Harvard College";
 	public static final String NARATIVE = "This code originates with the Museum of Compative Zoology's internally funded Lepidoptera project workflow and data capture application, DataShot.  It has been extended to this PreCapture application with support from the US National Science Foundation funded NE Vascular Plant TCN, NSF:DBI 1209149.";
 	public static final String LICENSE = "Version 2 of the GNU General Public License";
-	public static final String LIBRARIES = "Apache commons-logging, Apache log4j, H2, Hibernate, iText, Jakarta XML Binding, javacsv, javahelp, jgoodies, json-lib, pdf-renderer, pdfbox, zxing";
+	public static final String LIBRARIES = "Apache Commons CSV, Apache commons-logging, Apache log4j, Apache PDFBox, H2, Hibernate, iText, Jakarta XML Binding, javahelp, jgoodies, org.json, zxing";
 
 	private static final Log log = LogFactory.getLog(PreCaptureApp.class);
 
