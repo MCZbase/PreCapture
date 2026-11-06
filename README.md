@@ -22,6 +22,9 @@ To build PreCaptureApp.jar run:
 
 mvn package
 
+The tests are run by mvn package, and on GitHub for every push by the Test 
+workflow (.github/workflows/test.yml).
+
 ## Releasing
 
 Release versions are numbered e.g. 1.1.3 and tagged v1.1.3.  To make a release:
